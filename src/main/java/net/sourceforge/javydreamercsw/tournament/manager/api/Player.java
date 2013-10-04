@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.javydreamercsw.tournament.manager;
+package net.sourceforge.javydreamercsw.tournament.manager.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,5 +67,9 @@ public class Player {
 
     public int getLosses() {
         return ((Integer) get(Variables.LOSSES.getDisplayName()));
+    }
+
+    public String getName() {
+        return ((String) get(Variables.PLAYER_NAME.getDisplayName()));
     }
 }

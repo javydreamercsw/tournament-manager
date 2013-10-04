@@ -1,4 +1,4 @@
-package net.sourceforge.javydreamercsw.tournament.manager;
+package net.sourceforge.javydreamercsw.tournament.manager.api;
 
 /**
  *
@@ -6,5 +6,5 @@ package net.sourceforge.javydreamercsw.tournament.manager;
  */
 public enum EncounterResult {
 
-    WIN, LOSS, DRAW, NO_SHOW;
+    WIN, LOSS, DRAW, NO_SHOW, UNDECIDED;
 }

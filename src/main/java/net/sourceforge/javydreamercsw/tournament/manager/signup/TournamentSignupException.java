@@ -1,6 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager.signup;
 
-import net.sourceforge.javydreamercsw.tournament.manager.TournamentException;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 
 /**
  * Exceptions specific for the tournament sign ups.

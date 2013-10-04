@@ -1,4 +1,4 @@
-package net.sourceforge.javydreamercsw.tournament.manager;
+package net.sourceforge.javydreamercsw.tournament.manager.api;
 
 import java.util.Map;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
@@ -63,7 +63,24 @@ public interface TournamentInterface {
     public int getAmountOfPlayers();
 
     /**
-     *
+     * Display pairings in text.
      */
     public void showPairings();
+
+    /**
+     * Status of current round.
+     *
+     * @return true if complete (All encounters have a result)
+     */
+    public boolean roundComplete();
+
+    /**
+     * Update results.
+     *
+     * @param encounterID encounter id to update results for
+     * @param player Player
+     * @param result Encounter
+     * @throws TournamentException
+     */
+    public void updateResults(int encounterID, Player player, EncounterResult result) throws TournamentException;
 }

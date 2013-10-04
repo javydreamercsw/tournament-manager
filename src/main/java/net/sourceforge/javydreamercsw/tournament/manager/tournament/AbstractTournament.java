@@ -1,24 +1,30 @@
 /*
  * Abstract tournament implementation.
  */
-package net.sourceforge.javydreamercsw.tournament.manager;
+package net.sourceforge.javydreamercsw.tournament.manager.tournament;
 
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
+import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
+import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
+import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sourceforge.javydreamercsw.tournament.manager.Team;
+import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 public abstract class AbstractTournament implements TournamentInterface {
 
     protected int encounterCount = 0;
     protected int round = 0;
-    protected List<Player> players = new ArrayList<Player>();
+    protected final List<Player> players = new ArrayList<Player>();
     protected final Player bye = new Player("BYE");
     protected final Map<Integer, Map<Integer, Encounter>> pairingHistory
             = new LinkedHashMap<Integer, Map<Integer, Encounter>>();
@@ -108,12 +114,17 @@ public abstract class AbstractTournament implements TournamentInterface {
         return players.size();
     }
 
-    public void updateEncounterResult(int i, int team, EncounterResult encounterResult) {
-        for (Entry<Integer, Map<Integer, Encounter>> entry : pairingHistory.entrySet()) {
-            if (entry.getValue().containsKey(i)) {
-                //Found the round
-                entry.getValue().get(i).updateResult(team, encounterResult);
+    public boolean roundComplete() {
+        boolean result = true;
+        //Check that all encounters have a set value.
+        for (Encounter e : getPairings().values()) {
+            for (Map.Entry<Team, EncounterResult> entry : e.getEncounterSummary().entrySet()) {
+                if (entry.getValue().equals(EncounterResult.UNDECIDED)) {
+                    result = false;
+                    break;
+                }
             }
         }
+        return result;
     }
 }

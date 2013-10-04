@@ -1,5 +1,11 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
+import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
+import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -37,19 +43,28 @@ public class EncounterTest {
      */
     @Test
     public void testUpdateResult() {
-        System.out.println("updateResult");
-        int team = 0;
-        Encounter instance = new Encounter(
-                new Team(new Player("Player 1")),
-                new Team(new Player("Player 2")));
-        instance.updateResult(team, EncounterResult.WIN);
-        assertEquals(1, instance.getTeams().get(team).getTeamMembers().get(0).getWins());
-        assertEquals(1, instance.getTeams().get(team + 1).getTeamMembers().get(0).getLosses());
-        instance.updateResult(team, EncounterResult.LOSS);
-        assertEquals(1, instance.getTeams().get(team + 1).getTeamMembers().get(0).getWins());
-        assertEquals(1, instance.getTeams().get(team).getTeamMembers().get(0).getLosses());
-        instance.updateResult(team, EncounterResult.DRAW);
-        assertEquals(1, instance.getTeams().get(team + 1).getTeamMembers().get(0).getDraws());
-        assertEquals(1, instance.getTeams().get(team).getTeamMembers().get(0).getDraws());
+        try {
+            System.out.println("updateResult");
+            Player player1 = new Player("Player 1");
+            Player player2 = new Player("Player 2");
+            Encounter instance = new Encounter(1,
+                    new Team(player1),
+                    new Team(player2));
+            instance.updateResult(player1, EncounterResult.WIN);
+            instance.updateResult(player2, EncounterResult.LOSS);
+            assertEquals(1, player1.getWins());
+            assertEquals(1, player2.getLosses());
+            instance.updateResult(player1, EncounterResult.LOSS);
+            instance.updateResult(player2, EncounterResult.WIN);
+            assertEquals(1, player2.getWins());
+            assertEquals(1, player1.getLosses());
+            instance.updateResult(player1, EncounterResult.DRAW);
+            instance.updateResult(player2, EncounterResult.DRAW);
+            assertEquals(1, player1.getDraws());
+            assertEquals(1, player2.getDraws());
+        } catch (TournamentException ex) {
+            Logger.getLogger(EncounterTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
     }
 }
