@@ -1,5 +1,7 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
+import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
+import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

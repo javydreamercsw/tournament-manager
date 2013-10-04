@@ -1,4 +1,4 @@
-package net.sourceforge.javydreamercsw.tournament.manager;
+package net.sourceforge.javydreamercsw.tournament.manager.api;
 
 /**
  *

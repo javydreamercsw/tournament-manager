@@ -1,5 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
+import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
