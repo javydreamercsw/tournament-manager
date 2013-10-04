@@ -1,8 +1,8 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
-import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
 import java.util.ArrayList;
 import java.util.List;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -42,7 +42,7 @@ public class TeamTest {
     public void testGetTeamMembers() {
         System.out.println("getTeamMembers");
         Team instance = new Team(new Player("Test"));
-        List<Player> result = instance.getTeamMembers();
+        List<TournamentPlayerInterface> result = instance.getTeamMembers();
         assertEquals(1, result.size());
         instance.getTeamMembers().add(new Player("Player 2"));
         result = instance.getTeamMembers();
@@ -55,7 +55,7 @@ public class TeamTest {
     @Test
     public void testToString() {
         System.out.println("toString");
-        List<Player> players = new ArrayList<Player>();
+        List<TournamentPlayerInterface> players = new ArrayList<TournamentPlayerInterface>();
         players.add(new Player("Test 1"));
         players.add(new Player("Test 2"));
         Team instance = new Team(players.get(0));

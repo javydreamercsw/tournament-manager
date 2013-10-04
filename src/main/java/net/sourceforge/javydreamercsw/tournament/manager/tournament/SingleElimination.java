@@ -11,9 +11,9 @@ import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
-import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -26,6 +26,9 @@ import org.openide.util.lookup.ServiceProvider;
 public class SingleElimination extends AbstractTournament
         implements TournamentInterface {
 
+    private static final Logger LOG
+            = Logger.getLogger(SingleElimination.class.getName());
+
     public String getName() {
         return "Single Elimination";
     }
@@ -34,31 +37,48 @@ public class SingleElimination extends AbstractTournament
         synchronized (players) {
             if (pairingHistory.get(getRound()) == null) {
                 //Remove teams with loses from tournament
-                List<Player> toRemove = new ArrayList<Player>();
-                for (Player p : players) {
+                List<TournamentPlayerInterface> toRemove
+                        = new ArrayList<TournamentPlayerInterface>();
+                for (TournamentPlayerInterface p : players) {
                     if (p.getLosses() > 0) {
                         toRemove.add(p);
                     }
                 }
-                for (Player p : toRemove) {
+                for (TournamentPlayerInterface p : toRemove) {
                     try {
+                        LOG.log(Level.INFO, "Removing player: {0}", p.toString());
                         removePlayer(p);
                     } catch (TournamentSignupException ex) {
-                        Logger.getLogger(SingleElimination.class.getName()).log(Level.SEVERE, null, ex);
+                        LOG.log(Level.SEVERE, null, ex);
                     }
                 }
-                Map<Integer, Encounter> pairings = new HashMap<Integer, Encounter>();
+                Map<Integer, Encounter> pairings
+                        = new HashMap<Integer, Encounter>();
                 int[] exclude = new int[]{};
                 Random rnd = new Random();
                 while (exclude.length < players.size()) {
-                    int player1 = getRandomWithExclusion(rnd, 0, players.size() - 1, exclude);
+                    int player1
+                            = getRandomWithExclusion(rnd, 0,
+                                    players.size() - 1, exclude);
                     exclude = ArrayUtils.add(exclude, player1);
                     if (exclude.length == players.size()) {
                         //Only one player left, pair with Bye
+                        LOG.log(Level.INFO, "Pairing {0} vs. BYE",
+                                players.get(player1).getName());
                         pairings.put(encounterCount,
-                                new Encounter(encounterCount, players.get(player1), bye));
+                                new Encounter(encounterCount,
+                                        players.get(player1), bye));
+                        try {
+                            //Assign the win already, BYE always losses
+                            pairings.get(encounterCount)
+                                    .updateResult(players.get(player1),
+                                            EncounterResult.WIN);
+                        } catch (TournamentException ex) {
+                            LOG.log(Level.SEVERE, null, ex);
+                        }
                     } else {
-                        int player2 = getRandomWithExclusion(rnd, 0, players.size() - 1, exclude);
+                        int player2 = getRandomWithExclusion(rnd, 0,
+                                players.size() - 1, exclude);
                         pairings.put(encounterCount,
                                 new Encounter(encounterCount, players.get(player1),
                                         players.get(player2)));
@@ -81,7 +101,9 @@ public class SingleElimination extends AbstractTournament
         }
     }
 
-    public void updateResults(int encounterId, Player player, EncounterResult result) throws TournamentException {
+    public void updateResults(int encounterId,
+            TournamentPlayerInterface player, EncounterResult result)
+            throws TournamentException {
         //Normal processing of results
         for (Map.Entry<Integer, Map<Integer, Encounter>> entry : pairingHistory.entrySet()) {
             if (entry.getValue().containsKey(encounterId)) {
@@ -92,7 +114,7 @@ public class SingleElimination extends AbstractTournament
                 for (Map.Entry<Team, EncounterResult> entry2 : encounterSummary.entrySet()) {
                     if (entry2.getKey().getTeamMembers().contains(player)) {
                         //Apply result to this team
-                        for (Player target : entry2.getKey().getTeamMembers()) {
+                        for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
                             encounter.updateResult(target, result);
                         }
                     } else {
@@ -100,19 +122,19 @@ public class SingleElimination extends AbstractTournament
                         switch (result) {
                             case WIN:
                                 //All others are losers
-                                for (Player target : entry2.getKey().getTeamMembers()) {
+                                for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
                                     encounter.updateResult(target, EncounterResult.LOSS);
                                 }
                                 break;
                             case LOSS:
                                 //All others are winners
-                                for (Player target : entry2.getKey().getTeamMembers()) {
+                                for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
                                     encounter.updateResult(target, EncounterResult.WIN);
                                 }
                                 break;
                             case DRAW:
                                 //Everyone drew
-                                for (Player target : entry2.getKey().getTeamMembers()) {
+                                for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
                                     encounter.updateResult(target, EncounterResult.DRAW);
                                 }
                                 break;

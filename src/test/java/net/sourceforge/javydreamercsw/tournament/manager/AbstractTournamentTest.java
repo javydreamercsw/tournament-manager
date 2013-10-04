@@ -2,7 +2,6 @@ package net.sourceforge.javydreamercsw.tournament.manager;
 
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import net.sourceforge.javydreamercsw.tournament.manager.tournament.AbstractTournament;
-import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -155,7 +155,7 @@ public class AbstractTournamentTest extends TestCase {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
-        public void updateResults(int id, Player player, EncounterResult result) throws TournamentException {
+        public void updateResults(int encounterID, TournamentPlayerInterface player, EncounterResult result) throws TournamentException {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }

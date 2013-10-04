@@ -7,7 +7,6 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException
 import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
-import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -16,15 +15,17 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sourceforge.javydreamercsw.tournament.manager.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 public abstract class AbstractTournament implements TournamentInterface {
 
     protected int encounterCount = 0;
     protected int round = 0;
-    protected final List<Player> players = new ArrayList<Player>();
+    protected final List<TournamentPlayerInterface> players = new ArrayList<TournamentPlayerInterface>();
     protected final Player bye = new Player("BYE");
     protected final Map<Integer, Map<Integer, Encounter>> pairingHistory
             = new LinkedHashMap<Integer, Map<Integer, Encounter>>();
@@ -35,14 +36,14 @@ public abstract class AbstractTournament implements TournamentInterface {
         return round;
     }
 
-    public void addPlayer(Player player) throws TournamentSignupException {
+    public void addPlayer(TournamentPlayerInterface player) throws TournamentSignupException {
         if (players.contains(player)) {
-            throw new TournamentSignupException("Player already signed: "
+            throw new TournamentSignupException("TournamentPlayerInterface already signed: "
                     + player.get(Variables.PLAYER_NAME.getDisplayName()));
         } else {
             //Loop thru players to check for name
             boolean found = false;
-            for (Player p : players) {
+            for (TournamentPlayerInterface p : players) {
                 if (player.get(Variables.PLAYER_NAME.getDisplayName())
                         .equals(p.get(Variables.PLAYER_NAME.getDisplayName()))) {
                     found = true;
@@ -55,10 +56,10 @@ public abstract class AbstractTournament implements TournamentInterface {
         }
     }
 
-    public void removePlayer(Player player) throws TournamentSignupException {
+    public void removePlayer(TournamentPlayerInterface player) throws TournamentSignupException {
         //Loop thru players to check for name
         boolean found = false;
-        for (Player p : players) {
+        for (TournamentPlayerInterface p : players) {
             if (player.get(Variables.PLAYER_NAME.getDisplayName()).
                     equals(p.get(Variables.PLAYER_NAME.getDisplayName()))) {
                 players.remove(p);
@@ -68,7 +69,7 @@ public abstract class AbstractTournament implements TournamentInterface {
         }
         if (!found) {
             throw new TournamentSignupException(
-                    "Unable to remove player. Player not found: "
+                    "Unable to remove player. TournamentPlayerInterface not found: "
                     + player.get(Variables.PLAYER_NAME.getDisplayName()));
         }
     }

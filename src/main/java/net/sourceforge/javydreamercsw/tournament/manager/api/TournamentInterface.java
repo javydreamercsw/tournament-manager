@@ -36,17 +36,19 @@ public interface TournamentInterface {
      *
      * @throws TournamentSignupException
      *
-     * @param player Player to add
+     * @param player TournamentPlayerInterface to add
      */
-    public void addPlayer(Player player) throws TournamentSignupException;
+    public void addPlayer(TournamentPlayerInterface player)
+            throws TournamentSignupException;
 
     /**
      * Remove a player.
      *
-     * @param player Player to remove.
+     * @param player TournamentPlayerInterface to remove.
      * @throws TournamentSignupException
      */
-    public void removePlayer(Player player) throws TournamentSignupException;
+    public void removePlayer(TournamentPlayerInterface player)
+            throws TournamentSignupException;
 
     /**
      * Advance the tournament to next round.
@@ -78,9 +80,11 @@ public interface TournamentInterface {
      * Update results.
      *
      * @param encounterID encounter id to update results for
-     * @param player Player
+     * @param player TournamentPlayerInterface
      * @param result Encounter
      * @throws TournamentException
      */
-    public void updateResults(int encounterID, Player player, EncounterResult result) throws TournamentException;
+    public void updateResults(int encounterID,
+            TournamentPlayerInterface player, EncounterResult result)
+            throws TournamentException;
 }
