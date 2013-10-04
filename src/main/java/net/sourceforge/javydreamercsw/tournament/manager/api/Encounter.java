@@ -3,6 +3,8 @@ package net.sourceforge.javydreamercsw.tournament.manager.api;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 
 /**
@@ -15,6 +17,8 @@ public class Encounter {
     private final Map<Team, EncounterResult> teams
             = new HashMap<Team, EncounterResult>();
     private final int id;
+    private static final Logger LOG
+            = Logger.getLogger(Encounter.class.getName());
 
     /**
      * Create an encounter between multiple teams.
@@ -40,13 +44,14 @@ public class Encounter {
      * @param p1 player 1
      * @param p2 player 2
      */
-    public Encounter(int id, Player p1, Player p2) {
+    public Encounter(int id, TournamentPlayerInterface p1, TournamentPlayerInterface p2) {
         teams.put(new Team(p1), EncounterResult.UNDECIDED);
         teams.put(new Team(p2), EncounterResult.UNDECIDED);
         this.id = id;
     }
 
-    public void updateResult(Player player, EncounterResult result) throws TournamentException {
+    public void updateResult(TournamentPlayerInterface player,
+            EncounterResult result) throws TournamentException {
         Team target = null;
         for (Entry<Team, EncounterResult> entry : getEncounterSummary().entrySet()) {
             if (entry.getKey().getTeamMembers().contains(player)) {
@@ -54,7 +59,9 @@ public class Encounter {
             }
         }
         if (target != null) {
-            for (Player p : target.getTeamMembers()) {
+            LOG.log(Level.INFO, "Updating result for player: {0} to: {1}",
+                    new Object[]{player.getName(), result});
+            for (TournamentPlayerInterface p : target.getTeamMembers()) {
                 switch (result) {
                     case WIN:
                         p.win();
@@ -72,7 +79,7 @@ public class Encounter {
                 }
             }
         } else {
-            throw new TournamentException("Player not part of this encounter: " + player.getName());
+            throw new TournamentException("TournamentPlayerInterface not part of this encounter: " + player.getName());
         }
     }
 

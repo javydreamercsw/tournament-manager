@@ -1,8 +1,8 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
-import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
 import java.util.ArrayList;
 import java.util.List;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 
 /**
  *
@@ -12,20 +12,20 @@ public class Team {
 
     private final String name;
 
-    private final List<Player> teamMembers;
+    private final List<TournamentPlayerInterface> teamMembers;
 
-    public Team(List<Player> teamMembers) {
+    public Team(List<TournamentPlayerInterface> teamMembers) {
         this.teamMembers = teamMembers;
         name = "";
     }
 
-    public Team(String name, List<Player> teamMembers) {
+    public Team(String name, List<TournamentPlayerInterface> teamMembers) {
         this.name = name;
         this.teamMembers = teamMembers;
     }
 
-    public Team(Player p1) {
-        teamMembers = new ArrayList<Player>();
+    public Team(TournamentPlayerInterface p1) {
+        teamMembers = new ArrayList<TournamentPlayerInterface>();
         teamMembers.add(p1);
         name = "";
     }
@@ -33,7 +33,7 @@ public class Team {
     /**
      * @return the teamMembers
      */
-    public List<Player> getTeamMembers() {
+    public List<TournamentPlayerInterface> getTeamMembers() {
         return teamMembers;
     }
 
@@ -47,7 +47,7 @@ public class Team {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder((name.trim().isEmpty() ? "" : "Team " + name + "("));
-        for (Player p : teamMembers) {
+        for (TournamentPlayerInterface p : teamMembers) {
             String val = sb.toString();
             if (!val.trim().isEmpty() && !val.endsWith("(")) {
                 sb.append(", ");

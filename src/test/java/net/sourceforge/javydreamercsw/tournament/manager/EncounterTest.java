@@ -3,7 +3,6 @@ package net.sourceforge.javydreamercsw.tournament.manager;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
-import net.sourceforge.javydreamercsw.tournament.manager.api.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import org.junit.After;
