@@ -21,33 +21,33 @@ import static org.junit.Assert.*;
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class SingleEliminationTest {
+public class EliminationTest {
 
     private static final Logger LOG
-            = Logger.getLogger(SingleEliminationTest.class.getName());
+            = Logger.getLogger(EliminationTest.class.getName());
 
-    public SingleEliminationTest() {
+    public EliminationTest() {
     }
 
     /**
-     * Test of getName method, of class SingleElimination.
+     * Test of getName method, of class Elimination.
      */
     @Test
     public void testGetName() {
         LOG.info("getName");
-        SingleElimination instance = new SingleElimination();
+        Elimination instance = new Elimination(1);
         assertFalse(instance.getName().trim().isEmpty());
     }
 
     /**
-     * Test of getPairings method, of class SingleElimination.
+     * Test of getPairings method, of class Elimination.
      */
     @Test
     public void testGetPairings() {
         LOG.info("getPairings");
         //Even entries
         LOG.info("Even amount of entries -----------------------");
-        SingleElimination instance = new SingleElimination();
+        Elimination instance = new Elimination(1);
         int limit = new Random().nextInt(1000) + 100;
         if (limit % 2 != 0) {
             //Not even, add one
@@ -95,7 +95,7 @@ public class SingleEliminationTest {
         assertEquals(players - 1, instance.getAmountOfPlayers());
         //Redo with odd entries
         LOG.info("Odd amount of entries -----------------------");
-        instance = new SingleElimination();
+        instance = new Elimination(1);
         limit = new Random().nextInt(1000) + 100;
         if (limit % 2 == 0) {
             //Not odd, add one
@@ -153,9 +153,12 @@ public class SingleEliminationTest {
     @Test
     public void testSimulateTournament() {
         LOG.info("Simulate tournament");
-        for (int i = 0; i < 1000; i++) {
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
             LOG.log(Level.INFO, "Simulation #{0}", (i + 1));
-            SingleElimination instance = new SingleElimination();
+            int eliminations = random.nextInt(2) + 1;
+            LOG.log(Level.INFO, "Eliminations: {0}", eliminations);
+            Elimination instance = new Elimination(eliminations);
             int limit = new Random().nextInt(1000) + 100;
             for (int y = 0; y < limit; y++) {
                 try {
@@ -169,7 +172,6 @@ public class SingleEliminationTest {
                     instance.getAmountOfPlayers());
             LOG.log(Level.INFO, "Amount of expected rounds: {0}",
                     instance.getMinimumAmountOfRounds());
-            Random random = new Random();
             boolean ignore = false;
             while (instance.getAmountOfPlayers() > 1) {
                 try {
@@ -223,7 +225,9 @@ public class SingleEliminationTest {
                 }
             }
             if (instance.playersCopy.size() > 0) {
-                LOG.log(Level.INFO, "Tournament winner: {0}", instance.playersCopy.get(0));
+                TournamentPlayerInterface winner = instance.playersCopy.get(0);
+                assertTrue(winner.getLosses() + winner.getDraws() < eliminations);
+                LOG.log(Level.INFO, "Tournament winner: {0}", winner);
             } else {
                 //They drew in the finals
                 LOG.log(Level.INFO, "Tournament winner: None (draw)");
