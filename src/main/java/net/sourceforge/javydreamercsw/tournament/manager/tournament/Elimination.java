@@ -1,11 +1,9 @@
 package net.sourceforge.javydreamercsw.tournament.manager.tournament;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
@@ -15,7 +13,6 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -23,11 +20,20 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
 @ServiceProvider(service = TournamentInterface.class)
-public class SingleElimination extends AbstractTournament
+public class Elimination extends AbstractTournament
         implements TournamentInterface {
 
     private static final Logger LOG
-            = Logger.getLogger(SingleElimination.class.getName());
+            = Logger.getLogger(Elimination.class.getName());
+    private final int eliminations;
+
+    public Elimination(int eliminations) {
+        this.eliminations = eliminations;
+    }
+
+    public Elimination() {
+        this.eliminations = 1;
+    }
 
     public String getName() {
         return "Single Elimination";
@@ -41,7 +47,7 @@ public class SingleElimination extends AbstractTournament
                         = new ArrayList<TournamentPlayerInterface>();
                 for (TournamentPlayerInterface p : playersCopy) {
                     //Loss or draw gets you eliminated
-                    if (p.getLosses() > 0 || p.getDraws() > 0) {
+                    if (p.getLosses() + p.getDraws() >= eliminations) {
                         toRemove.add(p);
                     }
                 }
