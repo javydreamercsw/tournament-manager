@@ -1,5 +1,7 @@
 package net.sourceforge.javydreamercsw.tournament.manager.tournament;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,7 +48,7 @@ public class SingleEliminationTest {
         //Even entries
         LOG.info("Even amount of entries -----------------------");
         SingleElimination instance = new SingleElimination();
-        int limit = 5;//new Random().nextInt(1000) + 100;
+        int limit = new Random().nextInt(1000) + 100;
         if (limit % 2 != 0) {
             //Not even, add one
             limit++;
@@ -142,6 +144,107 @@ public class SingleEliminationTest {
             Team[] teams = encounter.getEncounterSummary().keySet().toArray(new Team[]{});
             LOG.log(Level.INFO, "{0}: {1} vs. {2}", new Object[]{entry.getKey(),
                 teams[0].toString(), teams[1].toString()});
+        }
+    }
+
+    /**
+     * Test of tournament simulation.
+     */
+    @Test
+    public void testSimulateTournament() {
+        LOG.info("Simulate tournament");
+        for (int i = 0; i < 1000; i++) {
+            LOG.log(Level.INFO, "Simulation #{0}", (i + 1));
+            SingleElimination instance = new SingleElimination();
+            int limit = new Random().nextInt(1000) + 100;
+            for (int y = 0; y < limit; y++) {
+                try {
+                    instance.addPlayer(new Player("Player #" + y));
+                } catch (TournamentSignupException ex) {
+                    LOG.log(Level.SEVERE, null, ex);
+                    fail();
+                }
+            }
+            LOG.log(Level.INFO, "Amount of registered players: {0}",
+                    instance.getAmountOfPlayers());
+            LOG.log(Level.INFO, "Amount of expected rounds: {0}",
+                    instance.getMinimumAmountOfRounds());
+            Random random = new Random();
+            boolean ignore = false;
+            while (instance.getAmountOfPlayers() > 1) {
+                try {
+                    instance.nextRound();
+                    if (instance.playersCopy.size() > 1) {
+                        LOG.log(Level.INFO, "Round {0}", instance.getRound());
+                        LOG.info("Pairings...");
+                        assertFalse(instance.roundComplete());
+                        LOG.info("Simulating results...");
+                        for (Entry<Integer, Encounter> entry : instance.getPairings().entrySet()) {
+                            Encounter encounter = entry.getValue();
+                            TournamentPlayerInterface player1
+                                    = encounter.getEncounterSummary().keySet().toArray(
+                                            new Team[]{})[0].getTeamMembers().get(0);
+                            TournamentPlayerInterface player2
+                                    = encounter.getEncounterSummary().keySet().toArray(
+                                            new Team[]{})[1].getTeamMembers().get(0);
+                            //Make sure is not paired against BYE
+                            if (!player1.equals(instance.bye) && !player2.equals(instance.bye)) {
+                                //Random Result
+                                int range = EncounterResult.values().length - 1;
+                                int result = random.nextInt(range);
+                                instance.updateResults(encounter.getId(), player1,
+                                        EncounterResult.values()[result]);
+                            }
+                            if (player1.equals(instance.bye) || player2.equals(instance.bye) && instance.playersCopy.size() == 1) {
+                                //Only one player left, we got a winner!
+                                ignore = true;
+                                break;
+                            }
+                        }
+                    }
+                } catch (TournamentException ex) {
+                    LOG.log(Level.SEVERE, null, ex);
+                    fail();
+                }
+            }
+            if (!ignore) {
+                assertTrue(instance.roundComplete());
+            }
+            //Random player drop
+            if (instance.playersCopy.size() > 1 && random.nextBoolean()) {
+                TournamentPlayerInterface toDrop
+                        = instance.playersCopy.get(random.nextInt(instance.getAmountOfPlayers()));
+                LOG.log(Level.INFO, "Player: {0} dropped!", toDrop.getName());
+                try {
+                    instance.removePlayer(toDrop);
+                } catch (TournamentSignupException ex) {
+                    LOG.log(Level.SEVERE, null, ex);
+                    fail();
+                }
+            }
+            if (instance.playersCopy.size() > 0) {
+                LOG.log(Level.INFO, "Tournament winner: {0}", instance.playersCopy.get(0));
+            } else {
+                //They drew in the finals
+                LOG.log(Level.INFO, "Tournament winner: None (draw)");
+            }
+            instance.displayRankings();
+            //To store the amount of points on each ranking spot.
+            List<Integer> points = new ArrayList<Integer>();
+            for (Entry<Integer, List<TournamentPlayerInterface>> rankings : instance.getRankings().entrySet()) {
+                if (rankings.getValue().size() > 0) {
+                    int max = -1;
+                    for (TournamentPlayerInterface player : rankings.getValue()) {
+                        //Everyone tied has same amount of points
+                        assertTrue(max == -1 || instance.getPoints(player) == max);
+                        max = instance.getPoints(player);
+                    }
+                    points.add(max);
+                }
+            }
+            for (int x = points.size() - 1; x > 0; x--) {
+                assertTrue(points.get(x) < points.get(x - 1));
+            }
         }
     }
 }

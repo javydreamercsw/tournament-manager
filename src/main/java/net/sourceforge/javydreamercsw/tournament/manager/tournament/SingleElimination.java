@@ -34,12 +34,12 @@ public class SingleElimination extends AbstractTournament
     }
 
     public Map<Integer, Encounter> getPairings() {
-        synchronized (players) {
+        synchronized (playersCopy) {
             if (pairingHistory.get(getRound()) == null) {
                 //Remove teams with loses from tournament
                 List<TournamentPlayerInterface> toRemove
                         = new ArrayList<TournamentPlayerInterface>();
-                for (TournamentPlayerInterface p : players) {
+                for (TournamentPlayerInterface p : playersCopy) {
                     //Loss or draw gets you eliminated
                     if (p.getLosses() > 0 || p.getDraws() > 0) {
                         toRemove.add(p);
@@ -47,7 +47,7 @@ public class SingleElimination extends AbstractTournament
                 }
                 for (TournamentPlayerInterface p : toRemove) {
                     try {
-                        LOG.log(Level.INFO, "Removing player: {0}", p.toString());
+                        LOG.log(Level.FINE, "Removing player: {0}", p.toString());
                         removePlayer(p);
                     } catch (TournamentSignupException ex) {
                         LOG.log(Level.SEVERE, null, ex);
@@ -57,32 +57,32 @@ public class SingleElimination extends AbstractTournament
                         = new HashMap<Integer, Encounter>();
                 int[] exclude = new int[]{};
                 Random rnd = new Random();
-                while (exclude.length < players.size()) {
+                while (exclude.length < playersCopy.size() && playersCopy.size() > 1) {
                     int player1
                             = getRandomWithExclusion(rnd, 0,
-                                    players.size() - 1, exclude);
+                                    playersCopy.size() - 1, exclude);
                     exclude = ArrayUtils.add(exclude, player1);
-                    if (exclude.length == players.size()) {
+                    if (exclude.length == playersCopy.size()) {
                         //Only one player left, pair with Bye
-                        LOG.log(Level.INFO, "Pairing {0} vs. BYE",
-                                players.get(player1).getName());
+                        LOG.log(Level.FINE, "Pairing {0} vs. BYE",
+                                playersCopy.get(player1).getName());
                         pairings.put(encounterCount,
                                 new Encounter(encounterCount,
-                                        players.get(player1), bye));
+                                        playersCopy.get(player1), bye));
                         try {
                             //Assign the win already, BYE always losses
                             pairings.get(encounterCount)
-                                    .updateResult(players.get(player1),
+                                    .updateResult(playersCopy.get(player1),
                                             EncounterResult.WIN);
                         } catch (TournamentException ex) {
                             LOG.log(Level.SEVERE, null, ex);
                         }
                     } else {
                         int player2 = getRandomWithExclusion(rnd, 0,
-                                players.size() - 1, exclude);
+                                playersCopy.size() - 1, exclude);
                         pairings.put(encounterCount,
-                                new Encounter(encounterCount, players.get(player1),
-                                        players.get(player2)));
+                                new Encounter(encounterCount, playersCopy.get(player1),
+                                        playersCopy.get(player2)));
                         exclude = ArrayUtils.add(exclude, player2);
                     }
                     encounterCount++;
@@ -148,5 +148,23 @@ public class SingleElimination extends AbstractTournament
                 }
             }
         }
+    }
+
+    public int getMinimumAmountOfRounds() {
+        /**
+         * Assuming two competitors per match, if there are n competitors, there
+         * will be r = log {2} n rounds required, or if there are r rounds,
+         * there will be n= 2^r competitors. In the opening round, 2^r - n
+         * competitors will get a bye.
+         */
+        return log(players.size(), 2);
+    }
+
+    private int log(int x, int base) {
+        return (int) (Math.log(x) / Math.log(base));
+    }
+
+    public int getPoints(TournamentPlayerInterface player) {
+        return player.getWins() * 3 + player.getDraws();
     }
 }

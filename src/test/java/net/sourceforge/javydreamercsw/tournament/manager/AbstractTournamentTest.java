@@ -158,6 +158,14 @@ public class AbstractTournamentTest extends TestCase {
         public void updateResults(int encounterID, TournamentPlayerInterface player, EncounterResult result) throws TournamentException {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
+
+        public int getMinimumAmountOfRounds() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        public int getPoints(TournamentPlayerInterface player) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
     }
 
     private String printArray(int[] array) {
