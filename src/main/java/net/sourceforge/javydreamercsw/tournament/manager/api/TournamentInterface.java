@@ -1,5 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager.api;
 
+import java.util.List;
 import java.util.Map;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
@@ -87,4 +88,26 @@ public interface TournamentInterface {
     public void updateResults(int encounterID,
             TournamentPlayerInterface player, EncounterResult result)
             throws TournamentException;
+
+    /**
+     * Get the current rankings.
+     *
+     * @return current rankings
+     */
+    public Map<Integer, List<TournamentPlayerInterface>> getRankings();
+
+    /**
+     * If no one drops, the amount of minimum rounds expected based on entries.
+     *
+     * @return amount of minimum rounds expected based on entries
+     */
+    public int getMinimumAmountOfRounds();
+
+    /**
+     * Amount of points in the tournament.
+     *
+     * @param player player to get points from.
+     * @return points in the tournament
+     */
+    public int getPoints(TournamentPlayerInterface player);
 }

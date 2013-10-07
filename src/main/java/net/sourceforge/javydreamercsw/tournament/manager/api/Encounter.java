@@ -59,7 +59,7 @@ public class Encounter {
             }
         }
         if (target != null) {
-            LOG.log(Level.INFO, "Updating result for player: {0} to: {1}",
+            LOG.log(Level.FINE, "Updating result for player: {0} to: {1}",
                     new Object[]{player.getName(), result});
             for (TournamentPlayerInterface p : target.getTeamMembers()) {
                 switch (result) {
@@ -69,6 +69,8 @@ public class Encounter {
                     case DRAW:
                         player.draw();
                         break;
+                    case NO_SHOW:
+                    //Fall thru
                     case LOSS:
                         p.loss();
                         break;
@@ -113,5 +115,17 @@ public class Encounter {
      */
     public int getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Team t : teams.keySet()) {
+            if (!sb.toString().isEmpty()) {
+                sb.append(" vs. ");
+            }
+            sb.append(t.toString());
+        }
+        return "Encounter " + id + " (" + sb.toString() + ")";
     }
 }
