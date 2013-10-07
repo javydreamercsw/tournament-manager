@@ -9,10 +9,12 @@ import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
+import net.sourceforge.javydreamercsw.tournament.manager.api.ResultListener;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -89,6 +91,9 @@ public class Elimination extends AbstractTournament
                         //Apply result to this team
                         for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
                             encounter.updateResult(target, result);
+                            for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
+                                listener.updateResults(encounter);
+                            }
                         }
                     } else {
                         //Depending on the result for the target team assign result for the others
@@ -97,6 +102,9 @@ public class Elimination extends AbstractTournament
                                 //All others are losers
                                 for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
                                     encounter.updateResult(target, EncounterResult.LOSS);
+                                    for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
+                                        listener.updateResults(encounter);
+                                    }
                                 }
                                 break;
                             case NO_SHOW:
@@ -105,12 +113,18 @@ public class Elimination extends AbstractTournament
                                 //All others are winners
                                 for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
                                     encounter.updateResult(target, EncounterResult.WIN);
+                                    for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
+                                        listener.updateResults(encounter);
+                                    }
                                 }
                                 break;
                             case DRAW:
                                 //Everyone drew
                                 for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
                                     encounter.updateResult(target, EncounterResult.DRAW);
+                                    for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
+                                        listener.updateResults(encounter);
+                                    }
                                 }
                                 break;
                             default:
