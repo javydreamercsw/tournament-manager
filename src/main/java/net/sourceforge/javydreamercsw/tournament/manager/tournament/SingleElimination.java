@@ -53,41 +53,7 @@ public class SingleElimination extends AbstractTournament
                         LOG.log(Level.SEVERE, null, ex);
                     }
                 }
-                Map<Integer, Encounter> pairings
-                        = new HashMap<Integer, Encounter>();
-                int[] exclude = new int[]{};
-                Random rnd = new Random();
-                while (exclude.length < playersCopy.size() && playersCopy.size() > 1) {
-                    int player1
-                            = getRandomWithExclusion(rnd, 0,
-                                    playersCopy.size() - 1, exclude);
-                    exclude = ArrayUtils.add(exclude, player1);
-                    if (exclude.length == playersCopy.size()) {
-                        //Only one player left, pair with Bye
-                        LOG.log(Level.FINE, "Pairing {0} vs. BYE",
-                                playersCopy.get(player1).getName());
-                        pairings.put(encounterCount,
-                                new Encounter(encounterCount,
-                                        playersCopy.get(player1), bye));
-                        try {
-                            //Assign the win already, BYE always losses
-                            pairings.get(encounterCount)
-                                    .updateResult(playersCopy.get(player1),
-                                            EncounterResult.WIN);
-                        } catch (TournamentException ex) {
-                            LOG.log(Level.SEVERE, null, ex);
-                        }
-                    } else {
-                        int player2 = getRandomWithExclusion(rnd, 0,
-                                playersCopy.size() - 1, exclude);
-                        pairings.put(encounterCount,
-                                new Encounter(encounterCount, playersCopy.get(player1),
-                                        playersCopy.get(player2)));
-                        exclude = ArrayUtils.add(exclude, player2);
-                    }
-                    encounterCount++;
-                }
-                pairingHistory.put(getRound(), pairings);
+                super.getPairings();
             }
         }
         return pairingHistory.get(getRound());
