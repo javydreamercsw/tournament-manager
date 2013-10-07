@@ -40,7 +40,8 @@ public class SingleElimination extends AbstractTournament
                 List<TournamentPlayerInterface> toRemove
                         = new ArrayList<TournamentPlayerInterface>();
                 for (TournamentPlayerInterface p : players) {
-                    if (p.getLosses() > 0) {
+                    //Loss or draw gets you eliminated
+                    if (p.getLosses() > 0 || p.getDraws() > 0) {
                         toRemove.add(p);
                     }
                 }
@@ -126,6 +127,8 @@ public class SingleElimination extends AbstractTournament
                                     encounter.updateResult(target, EncounterResult.LOSS);
                                 }
                                 break;
+                            case NO_SHOW:
+                            //Fall thru
                             case LOSS:
                                 //All others are winners
                                 for (TournamentPlayerInterface target : entry2.getKey().getTeamMembers()) {
