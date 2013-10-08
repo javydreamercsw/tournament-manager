@@ -25,7 +25,7 @@ public class Team {
     }
 
     public Team(TournamentPlayerInterface p1) {
-        teamMembers = new ArrayList<TournamentPlayerInterface>();
+        teamMembers = new ArrayList<>();
         teamMembers.add(p1);
         name = "";
     }

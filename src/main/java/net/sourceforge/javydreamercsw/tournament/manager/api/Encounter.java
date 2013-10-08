@@ -15,7 +15,7 @@ import net.sourceforge.javydreamercsw.tournament.manager.Team;
 public class Encounter {
 
     private final Map<Team, EncounterResult> teams
-            = new HashMap<Team, EncounterResult>();
+            = new HashMap<>();
     private final int id;
     private static final Logger LOG
             = Logger.getLogger(Encounter.class.getName());

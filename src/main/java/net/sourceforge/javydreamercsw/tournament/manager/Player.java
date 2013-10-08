@@ -16,7 +16,7 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
  */
 public class Player implements TournamentPlayerInterface {
 
-    private final Map<String, Object> variables = new HashMap<String, Object>();
+    private final Map<String, Object> variables = new HashMap<>();
 
     public Player(String name) {
         variables.put(Variables.PLAYER_NAME.getDisplayName(), name);

@@ -39,7 +39,7 @@ public abstract class AbstractTournament implements TournamentInterface {
     /**
      * Players that registered.
      */
-    protected final List<TournamentPlayerInterface> players = new ArrayList<TournamentPlayerInterface>();
+    protected final List<TournamentPlayerInterface> players = new ArrayList<>();
     /**
      * Current list of active players. This is an exact copy of players before
      * the tournament starts. After it starts, players that get eliminated or
@@ -47,7 +47,7 @@ public abstract class AbstractTournament implements TournamentInterface {
      *
      * The last at the end only the winner(s) will be on the list.
      */
-    protected final List<TournamentPlayerInterface> playersCopy = new ArrayList<TournamentPlayerInterface>();
+    protected final List<TournamentPlayerInterface> playersCopy = new ArrayList<>();
     /**
      * Default BYE player.
      */
@@ -56,7 +56,7 @@ public abstract class AbstractTournament implements TournamentInterface {
      * History of the pairings for the tournament.
      */
     protected final Map<Integer, Map<Integer, Encounter>> pairingHistory
-            = new LinkedHashMap<Integer, Map<Integer, Encounter>>();
+            = new LinkedHashMap<>();
     private final static Logger LOG
             = Logger.getLogger(AbstractTournament.class.getSimpleName());
 
@@ -168,7 +168,7 @@ public abstract class AbstractTournament implements TournamentInterface {
 
     public Map<Integer, List<TournamentPlayerInterface>> getRankings() {
         Map<Integer, List<TournamentPlayerInterface>> rankings
-                = new TreeMap<Integer, List<TournamentPlayerInterface>>(new Comparator<Integer>() {
+                = new TreeMap<>(new Comparator<Integer>() {
 
                     public int compare(Integer o1, Integer o2) {
                         return o2.compareTo(o1);
@@ -178,7 +178,7 @@ public abstract class AbstractTournament implements TournamentInterface {
             int points = getPoints(player);
             if (rankings.get(points) == null) {
                 List<TournamentPlayerInterface> list
-                        = new ArrayList<TournamentPlayerInterface>();
+                        = new ArrayList<>();
                 list.add(player);
                 rankings.put(points, list);
             } else {
@@ -215,7 +215,7 @@ public abstract class AbstractTournament implements TournamentInterface {
         synchronized (playersCopy) {
             if (pairingHistory.get(getRound()) == null) {
                 Map<Integer, Encounter> pairings
-                        = new HashMap<Integer, Encounter>();
+                        = new HashMap<>();
                 int[] exclude = new int[]{};
                 Random rnd = new Random();
                 while (exclude.length < playersCopy.size() && playersCopy.size() > 1) {
