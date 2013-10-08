@@ -46,7 +46,7 @@ public class Elimination extends AbstractTournament
             if (pairingHistory.get(getRound()) == null) {
                 //Remove teams with loses from tournament
                 List<TournamentPlayerInterface> toRemove
-                        = new ArrayList<TournamentPlayerInterface>();
+                        = new ArrayList<>();
                 for (TournamentPlayerInterface p : playersCopy) {
                     //Loss or draw gets you eliminated
                     if (p.getLosses() + p.getDraws() >= eliminations) {

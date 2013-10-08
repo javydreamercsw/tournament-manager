@@ -2,9 +2,6 @@ package net.sourceforge.javydreamercsw.tournament.manager;
 
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import net.sourceforge.javydreamercsw.tournament.manager.tournament.AbstractTournament;
-import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -145,10 +142,6 @@ public class AbstractTournamentTest extends TestCase {
 
         public String getName() {
             return "Test";
-        }
-
-        public Map<Integer, Encounter> getPairings() {
-            return new HashMap<Integer, Encounter>();
         }
 
         public void showPairings() {

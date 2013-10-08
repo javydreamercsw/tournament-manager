@@ -55,7 +55,7 @@ public class TeamTest {
     @Test
     public void testToString() {
         System.out.println("toString");
-        List<TournamentPlayerInterface> players = new ArrayList<TournamentPlayerInterface>();
+        List<TournamentPlayerInterface> players = new ArrayList<>();
         players.add(new Player("Test 1"));
         players.add(new Player("Test 2"));
         Team instance = new Team(players.get(0));

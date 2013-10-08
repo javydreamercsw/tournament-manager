@@ -234,7 +234,7 @@ public class EliminationTest {
             }
             instance.displayRankings();
             //To store the amount of points on each ranking spot.
-            List<Integer> points = new ArrayList<Integer>();
+            List<Integer> points = new ArrayList<>();
             for (Entry<Integer, List<TournamentPlayerInterface>> rankings : instance.getRankings().entrySet()) {
                 if (rankings.getValue().size() > 0) {
                     int max = -1;
