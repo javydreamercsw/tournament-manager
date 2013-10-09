@@ -12,6 +12,7 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
 import net.sourceforge.javydreamercsw.tournament.manager.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.junit.Test;
@@ -55,22 +56,22 @@ public class EliminationTest {
         }
         for (int i = 0; i < limit; i++) {
             try {
-                instance.addPlayer(new Player("Player #" + i));
+                instance.addTeam(new Team(new Player("Player #" + i)));
             } catch (TournamentSignupException ex) {
                 LOG.log(Level.SEVERE, null, ex);
                 fail();
             }
         }
-        LOG.log(Level.INFO, "Amount of registered players: {0}",
-                instance.getAmountOfPlayers());
+        LOG.log(Level.INFO, "Amount of registered teams: {0}",
+                instance.getAmountOfTeams());
         Map<Integer, Encounter> result = instance.getPairings();
         printPairings(result);
         LOG.log(Level.INFO, "Amount of pairings: {0}", result.size());
-        assertEquals(instance.getAmountOfPlayers() / 2, result.size());
-        int players = instance.getAmountOfPlayers();
-        Encounter e = result.values().toArray(new Encounter[]{})[instance.getAmountOfPlayers() / 2 - 1];
-        TournamentPlayerInterface t
-                = e.getEncounterSummary().keySet().toArray(new Team[]{})[0].getTeamMembers().get(0);
+        assertEquals(instance.getAmountOfTeams() / 2, result.size());
+        int players = instance.getAmountOfTeams();
+        Encounter e = result.values().toArray(new Encounter[]{})[instance.getAmountOfTeams() / 2 - 1];
+        TeamInterface t
+                = e.getEncounterSummary().keySet().toArray(new Team[]{})[0];
         try {
             LOG.log(Level.INFO, "Updating result for: {0} encounter id: {1}",
                     new Object[]{t.getName(), e.getId()});
@@ -92,7 +93,7 @@ public class EliminationTest {
             LOG.log(Level.SEVERE, null, ex);
             fail();
         }
-        assertEquals(players - 1, instance.getAmountOfPlayers());
+        assertEquals(players - 1, instance.getAmountOfTeams());
         //Redo with odd entries
         LOG.info("Odd amount of entries -----------------------");
         instance = new Elimination(1);
@@ -103,20 +104,20 @@ public class EliminationTest {
         }
         for (int i = 0; i < limit; i++) {
             try {
-                instance.addPlayer(new Player("Player #" + i));
+                instance.addTeam(new Team(new Player("Player #" + i)));
             } catch (TournamentSignupException ex) {
                 LOG.log(Level.SEVERE, null, ex);
                 fail();
             }
         }
         LOG.log(Level.INFO, "Amount of registered players: {0}",
-                instance.getAmountOfPlayers());
+                instance.getAmountOfTeams());
         result = instance.getPairings();
         LOG.log(Level.INFO, "Amount of pairings: {0}", result.size());
-        assertEquals(instance.getAmountOfPlayers() / 2 + 1, result.size());
-        players = instance.getAmountOfPlayers();
-        e = result.values().toArray(new Encounter[]{})[instance.getAmountOfPlayers() / 2 - 1];
-        t = e.getEncounterSummary().keySet().toArray(new Team[]{})[0].getTeamMembers().get(0);
+        assertEquals(instance.getAmountOfTeams() / 2 + 1, result.size());
+        players = instance.getAmountOfTeams();
+        e = result.values().toArray(new Encounter[]{})[instance.getAmountOfTeams() / 2 - 1];
+        t = e.getEncounterSummary().keySet().toArray(new Team[]{})[0];
         try {
             instance.updateResults(e.getId(), t, EncounterResult.UNDECIDED);
         } catch (TournamentException ex) {
@@ -135,7 +136,7 @@ public class EliminationTest {
             LOG.log(Level.SEVERE, null, ex);
             fail();
         }
-        assertEquals(players - 1, instance.getAmountOfPlayers());
+        assertEquals(players - 1, instance.getAmountOfTeams());
     }
 
     private void printPairings(Map<Integer, Encounter> result) {
@@ -162,33 +163,33 @@ public class EliminationTest {
             int limit = new Random().nextInt(1000) + 100;
             for (int y = 0; y < limit; y++) {
                 try {
-                    instance.addPlayer(new Player("Player #" + y));
+                    instance.addTeam(new Team(new Player("Player #" + y)));
                 } catch (TournamentSignupException ex) {
                     LOG.log(Level.SEVERE, null, ex);
                     fail();
                 }
             }
             LOG.log(Level.INFO, "Amount of registered players: {0}",
-                    instance.getAmountOfPlayers());
+                    instance.getAmountOfTeams());
             LOG.log(Level.INFO, "Amount of expected rounds: {0}",
                     instance.getMinimumAmountOfRounds());
             boolean ignore = false;
-            while (instance.getAmountOfPlayers() > 1) {
+            while (instance.getAmountOfTeams() > 1) {
                 try {
                     instance.nextRound();
-                    if (instance.playersCopy.size() > 1) {
+                    if (instance.teamsCopy.size() > 1) {
                         LOG.log(Level.INFO, "Round {0}", instance.getRound());
                         LOG.info("Pairings...");
                         assertFalse(instance.roundComplete());
                         LOG.info("Simulating results...");
                         for (Entry<Integer, Encounter> entry : instance.getPairings().entrySet()) {
                             Encounter encounter = entry.getValue();
-                            TournamentPlayerInterface player1
+                            TeamInterface player1
                                     = encounter.getEncounterSummary().keySet().toArray(
-                                            new Team[]{})[0].getTeamMembers().get(0);
-                            TournamentPlayerInterface player2
+                                            new Team[]{})[0];
+                            TeamInterface player2
                                     = encounter.getEncounterSummary().keySet().toArray(
-                                            new Team[]{})[1].getTeamMembers().get(0);
+                                            new Team[]{})[1];
                             //Make sure is not paired against BYE
                             if (!player1.equals(instance.bye) && !player2.equals(instance.bye)) {
                                 //Random Result
@@ -197,7 +198,7 @@ public class EliminationTest {
                                 instance.updateResults(encounter.getId(), player1,
                                         EncounterResult.values()[result]);
                             }
-                            if (player1.equals(instance.bye) || player2.equals(instance.bye) && instance.playersCopy.size() == 1) {
+                            if (player1.equals(instance.bye) || player2.equals(instance.bye) && instance.teamsCopy.size() == 1) {
                                 //Only one player left, we got a winner!
                                 ignore = true;
                                 break;
@@ -213,20 +214,21 @@ public class EliminationTest {
                 assertTrue(instance.roundComplete());
             }
             //Random player drop
-            if (instance.playersCopy.size() > 1 && random.nextBoolean()) {
-                TournamentPlayerInterface toDrop
-                        = instance.playersCopy.get(random.nextInt(instance.getAmountOfPlayers()));
+            if (instance.teamsCopy.size() > 1 && random.nextBoolean()) {
+                TeamInterface toDrop
+                        = instance.teamsCopy.get(random.nextInt(instance.getAmountOfTeams()));
                 LOG.log(Level.INFO, "Player: {0} dropped!", toDrop.getName());
                 try {
-                    instance.removePlayer(toDrop);
+                    instance.removeTeam(toDrop);
                 } catch (TournamentSignupException ex) {
                     LOG.log(Level.SEVERE, null, ex);
                     fail();
                 }
             }
-            if (instance.playersCopy.size() > 0) {
-                TournamentPlayerInterface winner = instance.playersCopy.get(0);
-                assertTrue(winner.getLosses() + winner.getDraws() < eliminations);
+            if (instance.teamsCopy.size() > 0) {
+                TeamInterface winner = instance.teamsCopy.get(0);
+                assertTrue(winner.getTeamMembers().get(0).getLosses()
+                        + winner.getTeamMembers().get(0).getDraws() < eliminations);
                 LOG.log(Level.INFO, "Tournament winner: {0}", winner);
             } else {
                 //They drew in the finals
@@ -235,13 +237,13 @@ public class EliminationTest {
             instance.displayRankings();
             //To store the amount of points on each ranking spot.
             List<Integer> points = new ArrayList<>();
-            for (Entry<Integer, List<TournamentPlayerInterface>> rankings : instance.getRankings().entrySet()) {
+            for (Entry<Integer, List<TeamInterface>> rankings : instance.getRankings().entrySet()) {
                 if (rankings.getValue().size() > 0) {
                     int max = -1;
-                    for (TournamentPlayerInterface player : rankings.getValue()) {
+                    for (TeamInterface team : rankings.getValue()) {
                         //Everyone tied has same amount of points
-                        assertTrue(max == -1 || instance.getPoints(player) == max);
-                        max = instance.getPoints(player);
+                        assertTrue(max == -1 || instance.getPoints(team) == max);
+                        max = instance.getPoints(team);
                     }
                     points.add(max);
                 }

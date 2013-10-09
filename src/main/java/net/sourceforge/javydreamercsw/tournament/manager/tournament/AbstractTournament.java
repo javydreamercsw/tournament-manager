@@ -3,6 +3,7 @@
  */
 package net.sourceforge.javydreamercsw.tournament.manager.tournament;
 
+import java.text.MessageFormat;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.apache.commons.lang3.ArrayUtils;
@@ -37,21 +39,21 @@ public abstract class AbstractTournament implements TournamentInterface {
      */
     protected int round = 0;
     /**
-     * Players that registered.
+     * Teams that registered.
      */
-    protected final List<TournamentPlayerInterface> players = new ArrayList<>();
+    protected final List<TeamInterface> teams = new ArrayList<>();
     /**
-     * Current list of active players. This is an exact copy of players before
-     * the tournament starts. After it starts, players that get eliminated or
-     * drop out are no longer on this list.
+     * Current list of active teams. This is an exact copy of teams before the
+     * tournament starts. After it starts, teams that get eliminated or drop out
+     * are no longer on this list.
      *
      * The last at the end only the winner(s) will be on the list.
      */
-    protected final List<TournamentPlayerInterface> playersCopy = new ArrayList<>();
+    protected final List<TeamInterface> teamsCopy = new ArrayList<>();
     /**
      * Default BYE player.
      */
-    protected final Player bye = new Player("BYE");
+    protected final TeamInterface bye = new Team(new Player("BYE"));
     /**
      * History of the pairings for the tournament.
      */
@@ -59,51 +61,86 @@ public abstract class AbstractTournament implements TournamentInterface {
             = new LinkedHashMap<>();
     private final static Logger LOG
             = Logger.getLogger(AbstractTournament.class.getSimpleName());
+    
+       /**
+     * Amount of points for a win.
+     */
+    private final int winPoints;
 
+    /**
+     * Amount of points for a loss.
+     */
+    private final int lossPoints;
+
+    /**
+     * Amount of points for a draw.
+     */
+    private final int drawPoints;
+
+    public AbstractTournament(int winPoints, int lossPoints, int drawPoints) {
+        this.winPoints = winPoints;
+        this.lossPoints = lossPoints;
+        this.drawPoints = drawPoints;
+    }
+
+    @Override
     public int getRound() {
         return round;
     }
 
-    public void addPlayer(TournamentPlayerInterface player) throws TournamentSignupException {
-        if (playersCopy.contains(player)) {
-            throw new TournamentSignupException("TournamentPlayerInterface already signed: "
-                    + player.get(Variables.PLAYER_NAME.getDisplayName()));
-        } else {
-            //Loop thru playersCopy to check for name
-            boolean found = false;
-            for (TournamentPlayerInterface p : playersCopy) {
-                if (player.get(Variables.PLAYER_NAME.getDisplayName())
-                        .equals(p.get(Variables.PLAYER_NAME.getDisplayName()))) {
-                    found = true;
-                    break;
+    @Override
+    public void addTeam(TeamInterface team) throws TournamentSignupException {
+        //Loop thru teamsCopy to check for name
+        boolean found = false;
+        for (TeamInterface t : teamsCopy) {
+            for (TournamentPlayerInterface tpi : t.getTeamMembers()) {
+                for (TournamentPlayerInterface newtpi : team.getTeamMembers()) {
+                    if (tpi.get(Variables.PLAYER_NAME.getDisplayName())
+                            .equals(newtpi.get(Variables.PLAYER_NAME.getDisplayName()))) {
+                        found = true;
+                        break;
+                    }
                 }
             }
-            if (!found) {
-                playersCopy.add(player);
-                players.add(player);
-            }
+        }
+        if (!found) {
+            teamsCopy.add(team);
+            teams.add(team);
+        } else {
+            throw new TournamentSignupException(
+                    MessageFormat.format(
+                            "Team already signed: {0}",
+                            team));
         }
     }
 
-    public void removePlayer(TournamentPlayerInterface player) throws TournamentSignupException {
-        //Loop thru playersCopy to check for name
+    @Override
+    public void removeTeam(TeamInterface team) throws TournamentSignupException {
+        //Loop thru teamsCopy to check for name
         boolean found = false;
-        for (TournamentPlayerInterface p : playersCopy) {
-            if (player.get(Variables.PLAYER_NAME.getDisplayName()).
-                    equals(p.get(Variables.PLAYER_NAME.getDisplayName()))) {
-                playersCopy.remove(p);
-                //If we haven't started remove it from the overall list as well.
-                if (round == 0) {
-                    players.remove(p);
+        List<TeamInterface> toRemove = new ArrayList<>();
+        for (TeamInterface existingTeam : teamsCopy) {
+            for (TournamentPlayerInterface player : existingTeam.getTeamMembers()) {
+                for (TournamentPlayerInterface newPlayer : team.getTeamMembers()) {
+                    if (player.getName().equals(newPlayer.getName())) {
+                        toRemove.add(existingTeam);
+                        found = true;
+                        break;
+                    }
                 }
-                found = true;
-                break;
+            }
+        }
+        for (TeamInterface remove : toRemove) {
+            teamsCopy.remove(remove);
+            //If we haven't started remove it from the overall list as well.
+            if (round == 0) {
+                teams.remove(remove);
             }
         }
         if (!found) {
             throw new TournamentSignupException(
-                    "Unable to remove player. TournamentPlayerInterface not found: "
-                    + player.get(Variables.PLAYER_NAME.getDisplayName()));
+                    MessageFormat.format(
+                            "Unable to remove Team. Team not found: {0}", team));
         }
     }
 
@@ -139,6 +176,7 @@ public abstract class AbstractTournament implements TournamentInterface {
         return random;
     }
 
+    @Override
     public void nextRound() throws TournamentException {
         //Increase round
         round++;
@@ -146,15 +184,17 @@ public abstract class AbstractTournament implements TournamentInterface {
         getPairings();
     }
 
-    public int getAmountOfPlayers() {
-        return playersCopy.size();
+    @Override
+    public int getAmountOfTeams() {
+        return teamsCopy.size();
     }
 
+    @Override
     public boolean roundComplete() {
         boolean result = true;
         //Check that all encounters have a set value.
         for (Encounter e : getPairings().values()) {
-            for (Map.Entry<Team, EncounterResult> entry
+            for (Map.Entry<TeamInterface, EncounterResult> entry
                     : e.getEncounterSummary().entrySet()) {
                 if (entry.getValue().equals(EncounterResult.UNDECIDED)) {
                     LOG.log(Level.FINE,
@@ -166,19 +206,20 @@ public abstract class AbstractTournament implements TournamentInterface {
         return result;
     }
 
-    public Map<Integer, List<TournamentPlayerInterface>> getRankings() {
-        Map<Integer, List<TournamentPlayerInterface>> rankings
+    @Override
+    public Map<Integer, List<TeamInterface>> getRankings() {
+        Map<Integer, List<TeamInterface>> rankings
                 = new TreeMap<>(new Comparator<Integer>() {
 
+                    @Override
                     public int compare(Integer o1, Integer o2) {
                         return o2.compareTo(o1);
                     }
                 });
-        for (TournamentPlayerInterface player : players) {
+        for (TeamInterface player : teams) {
             int points = getPoints(player);
             if (rankings.get(points) == null) {
-                List<TournamentPlayerInterface> list
-                        = new ArrayList<>();
+                List<TeamInterface> list = new ArrayList<>();
                 list.add(player);
                 rankings.put(points, list);
             } else {
@@ -190,60 +231,61 @@ public abstract class AbstractTournament implements TournamentInterface {
 
     public void displayRankings() {
         int i = 1;
-        for (Entry<Integer, List<TournamentPlayerInterface>> entry : getRankings().entrySet()) {
-            List<TournamentPlayerInterface> tied = entry.getValue();
+        for (Entry<Integer, List<TeamInterface>> entry : getRankings().entrySet()) {
+            List<TeamInterface> tied = entry.getValue();
             String value;
             StringBuilder sb = new StringBuilder();
             if (tied.size() > 3) {
-                value = tied.size() + " tied";
+                value = MessageFormat.format("{0} tied", tied.size());
             } else {
-                for (TournamentPlayerInterface p : tied) {
+                for (TeamInterface t : tied) {
                     if (!sb.toString().isEmpty()) {
                         sb.append(", ");
                     }
-                    sb.append(p.toString());
+                    sb.append(t.toString());
                 }
                 value = sb.toString();
             }
-            System.out.println(i + ". " + "(" + entry.getKey() + ") " + value);
+            System.out.println(MessageFormat.format("{0}. ({1}) {2}", i,
+                    entry.getKey(), value));
             i++;
         }
     }
 
     @Override
     public Map<Integer, Encounter> getPairings() {
-        synchronized (playersCopy) {
+        synchronized (teamsCopy) {
             if (pairingHistory.get(getRound()) == null) {
                 Map<Integer, Encounter> pairings
                         = new HashMap<>();
                 int[] exclude = new int[]{};
                 Random rnd = new Random();
-                while (exclude.length < playersCopy.size() && playersCopy.size() > 1) {
+                while (exclude.length < teamsCopy.size() && teamsCopy.size() > 1) {
                     int player1
                             = getRandomWithExclusion(rnd, 0,
-                                    playersCopy.size() - 1, exclude);
+                                    teamsCopy.size() - 1, exclude);
                     exclude = ArrayUtils.add(exclude, player1);
-                    if (exclude.length == playersCopy.size()) {
+                    if (exclude.length == teamsCopy.size()) {
                         //Only one player left, pair with Bye
                         LOG.log(Level.FINE, "Pairing {0} vs. BYE",
-                                playersCopy.get(player1).getName());
+                                teamsCopy.get(player1).getName());
                         pairings.put(encounterCount,
                                 new Encounter(encounterCount,
-                                        playersCopy.get(player1), bye));
+                                        teamsCopy.get(player1), bye));
                         try {
                             //Assign the win already, BYE always losses
                             pairings.get(encounterCount)
-                                    .updateResult(playersCopy.get(player1),
+                                    .updateResult(teamsCopy.get(player1),
                                             EncounterResult.WIN);
                         } catch (TournamentException ex) {
                             LOG.log(Level.SEVERE, null, ex);
                         }
                     } else {
                         int player2 = getRandomWithExclusion(rnd, 0,
-                                playersCopy.size() - 1, exclude);
+                                teamsCopy.size() - 1, exclude);
                         pairings.put(encounterCount,
-                                new Encounter(encounterCount, playersCopy.get(player1),
-                                        playersCopy.get(player2)));
+                                new Encounter(encounterCount, teamsCopy.get(player1),
+                                        teamsCopy.get(player2)));
                         exclude = ArrayUtils.add(exclude, player2);
                     }
                     encounterCount++;
@@ -252,5 +294,35 @@ public abstract class AbstractTournament implements TournamentInterface {
             }
         }
         return pairingHistory.get(getRound());
+    }
+
+    @Override
+    public TeamInterface getWinnerTeam() {
+        TeamInterface winner = null;
+        if (round > 1) {
+            winner = (TeamInterface) teamsCopy.toArray()[0];
+        }
+        return winner;
+    }
+    
+    @Override
+    public int getWinPoints() {
+        return winPoints;
+    }
+
+    @Override
+    public int getLossPoints() {
+        return lossPoints;
+    }
+
+    @Override
+    public int getDrawPoints() {
+        return drawPoints;
+    }
+    
+    @Override
+    public int getPoints(TeamInterface team) {
+        return team.getTeamMembers().get(0).getWins() * getWinPoints()
+                + team.getTeamMembers().get(0).getDraws() * getDrawPoints();
     }
 }

@@ -1,5 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
+import java.text.MessageFormat;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import net.sourceforge.javydreamercsw.tournament.manager.tournament.AbstractTournament;
 import java.util.Random;
@@ -7,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
-import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -51,21 +52,21 @@ public class AbstractTournamentTest extends TestCase {
     }
 
     /**
-     * Test of addPlayer method, of class AbstractTournament.
+     * Test of addTeam method, of class AbstractTournament.
      */
     public void testAddPlayer() {
         System.out.println("addPlayer");
-        Player player = new Player("Test");
+        TeamInterface team = new Team(new Player("Test"));
         AbstractTournament instance = new AbstractTournamentImpl();
         try {
-            instance.addPlayer(player);
+            instance.addTeam(team);
         } catch (TournamentSignupException ex) {
             Logger.getLogger(AbstractTournamentTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
         }
         boolean failure = false;
         try {
-            instance.addPlayer(player);
+            instance.addTeam(team);
         } catch (TournamentSignupException ex) {
             //Fails as expected
             failure = true;
@@ -74,28 +75,28 @@ public class AbstractTournamentTest extends TestCase {
     }
 
     /**
-     * Test of removePlayer method, of class AbstractTournament.
+     * Test of removeTeam method, of class AbstractTournament.
      */
     public void testRemovePlayer() {
         System.out.println("removePlayer");
-        Player player = new Player("Test");
+        TeamInterface team = new Team(new Player("Test"));
         AbstractTournament instance = new AbstractTournamentImpl();
         boolean failure = false;
         try {
-            instance.removePlayer(player);
+            instance.removeTeam(team);
         } catch (TournamentSignupException ex) {
             //As expected
             failure = true;
         }
         assertTrue(failure);
         try {
-            instance.addPlayer(player);
+            instance.addTeam(team);
         } catch (TournamentSignupException ex) {
             Logger.getLogger(AbstractTournamentTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
         }
         try {
-            instance.removePlayer(player);
+            instance.removeTeam(team);
         } catch (TournamentSignupException ex) {
             Logger.getLogger(AbstractTournamentTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
@@ -114,23 +115,23 @@ public class AbstractTournamentTest extends TestCase {
         int[] exclude = null;
         AbstractTournament instance = new AbstractTournamentImpl();
         int result = instance.getRandomWithExclusion(rnd, start, end, exclude);
-        System.out.println("Result: " + result);
+        System.out.println(MessageFormat.format("Result: {0}", result));
         assertTrue(result >= start);
         assertTrue(result <= end);
         exclude = ArrayUtils.add(exclude, result);
-        System.out.println(tries + " tries excluding: " + printArray(exclude));
+        System.out.println(MessageFormat.format("{0} tries excluding: {1}", tries, printArray(exclude)));
         for (int i = 0; i < tries; i++) {
             result = instance.getRandomWithExclusion(rnd, start, end, exclude);
-            System.out.println("Result: " + result);
+            System.out.println(MessageFormat.format("Result: {0}", result));
             assertTrue(result != exclude[0]);
             assertTrue(result >= start);
             assertTrue(result <= end);
         }
         exclude = ArrayUtils.add(exclude, result);
-        System.out.println(tries + " tries excluding: " + printArray(exclude));
+        System.out.println(MessageFormat.format("{0} tries excluding: {1}", tries, printArray(exclude)));
         for (int i = 0; i < tries; i++) {
             result = instance.getRandomWithExclusion(rnd, start, end, exclude);
-            System.out.println("Result: " + result);
+            System.out.println(MessageFormat.format("Result: {0}", result));
             assertTrue(result >= start);
             assertTrue(result <= end);
             assertTrue(result != exclude[0]);
@@ -140,23 +141,27 @@ public class AbstractTournamentTest extends TestCase {
 
     public class AbstractTournamentImpl extends AbstractTournament {
 
+        public AbstractTournamentImpl() {
+            super(3, 0, 1);
+        }
+
+        @Override
         public String getName() {
             return "Test";
         }
 
+        @Override
         public void showPairings() {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
-        public void updateResults(int encounterID, TournamentPlayerInterface player, EncounterResult result) throws TournamentException {
+        @Override
+        public void updateResults(int encounterID, TeamInterface team, EncounterResult result) throws TournamentException {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
+        @Override
         public int getMinimumAmountOfRounds() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        public int getPoints(TournamentPlayerInterface player) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }

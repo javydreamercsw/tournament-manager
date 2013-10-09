@@ -1,5 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager.api;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,7 +15,7 @@ import net.sourceforge.javydreamercsw.tournament.manager.Team;
  */
 public class Encounter {
 
-    private final Map<Team, EncounterResult> teams
+    private final Map<TeamInterface, EncounterResult> teams
             = new HashMap<>();
     private final int id;
     private static final Logger LOG
@@ -28,10 +29,10 @@ public class Encounter {
      * @param team2
      * @param t additional teams (optional)
      */
-    public Encounter(int id, Team team1, Team team2, Team... t) {
+    public Encounter(int id, TeamInterface team1, TeamInterface team2, TeamInterface... t) {
         teams.put(team1, EncounterResult.UNDECIDED);
         teams.put(team2, EncounterResult.UNDECIDED);
-        for (Team team : t) {
+        for (TeamInterface team : t) {
             teams.put(team, EncounterResult.UNDECIDED);
         }
         this.id = id;
@@ -41,33 +42,33 @@ public class Encounter {
      * Create an encounter between two players.
      *
      * @param id encounter id
-     * @param p1 player 1
-     * @param p2 player 2
+     * @param team1 team 1
+     * @param team2 team 2
      */
-    public Encounter(int id, TournamentPlayerInterface p1, TournamentPlayerInterface p2) {
-        teams.put(new Team(p1), EncounterResult.UNDECIDED);
-        teams.put(new Team(p2), EncounterResult.UNDECIDED);
+    public Encounter(int id, TournamentPlayerInterface team1, TournamentPlayerInterface team2) {
+        teams.put(new Team(team1), EncounterResult.UNDECIDED);
+        teams.put(new Team(team2), EncounterResult.UNDECIDED);
         this.id = id;
     }
 
-    public void updateResult(TournamentPlayerInterface player,
+    public void updateResult(TeamInterface team,
             EncounterResult result) throws TournamentException {
-        Team target = null;
-        for (Entry<Team, EncounterResult> entry : getEncounterSummary().entrySet()) {
-            if (entry.getKey().getTeamMembers().contains(player)) {
+        TeamInterface target = null;
+        for (Entry<TeamInterface, EncounterResult> entry : getEncounterSummary().entrySet()) {
+            if (entry.getKey().getTeamMembers().contains(team.getTeamMembers().get(0))) {
                 target = entry.getKey();
             }
         }
         if (target != null) {
             LOG.log(Level.FINE, "Updating result for player: {0} to: {1}",
-                    new Object[]{player.getName(), result});
+                    new Object[]{team.getName(), result});
             for (TournamentPlayerInterface p : target.getTeamMembers()) {
                 switch (result) {
                     case WIN:
                         p.win();
                         break;
                     case DRAW:
-                        player.draw();
+                        p.draw();
                         break;
                     case NO_SHOW:
                     //Fall thru
@@ -75,20 +76,20 @@ public class Encounter {
                         p.loss();
                         break;
                     case UNDECIDED:
-                        throw new TournamentException("Unexpected result: " + result);
+                        throw new TournamentException(MessageFormat.format("Unexpected result: {0}", result));
                     default:
-                        throw new TournamentException("Invalid result: " + result);
+                        throw new TournamentException(MessageFormat.format("Invalid result: {0}", result));
                 }
             }
         } else {
-            throw new TournamentException("TournamentPlayerInterface not part of this encounter: " + player.getName());
+            throw new TournamentException(MessageFormat.format("TournamentPlayerInterface not part of this encounter: {0}", team.getName()));
         }
     }
 
     /**
      * @return the teams
      */
-    public Map<Team, EncounterResult> getEncounterSummary() {
+    public Map<TeamInterface, EncounterResult> getEncounterSummary() {
         return teams;
     }
 
@@ -120,12 +121,12 @@ public class Encounter {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Team t : teams.keySet()) {
+        for (TeamInterface t : teams.keySet()) {
             if (!sb.toString().isEmpty()) {
                 sb.append(" vs. ");
             }
             sb.append(t.toString());
         }
-        return "Encounter " + id + " (" + sb.toString() + ")";
+        return MessageFormat.format("Encounter {0} ({1})", id, sb.toString());
     }
 }
