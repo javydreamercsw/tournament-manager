@@ -1,5 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager.tournament;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
@@ -13,7 +14,6 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
 import net.sourceforge.javydreamercsw.tournament.manager.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
-import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -56,7 +56,7 @@ public class EliminationTest {
         }
         for (int i = 0; i < limit; i++) {
             try {
-                instance.addTeam(new Team(new Player("Player #" + i)));
+                instance.addTeam(new Team(new Player(MessageFormat.format("Player #{0}", i))));
             } catch (TournamentSignupException ex) {
                 LOG.log(Level.SEVERE, null, ex);
                 fail();
@@ -104,7 +104,7 @@ public class EliminationTest {
         }
         for (int i = 0; i < limit; i++) {
             try {
-                instance.addTeam(new Team(new Player("Player #" + i)));
+                instance.addTeam(new Team(new Player(MessageFormat.format("Player #{0}", i))));
             } catch (TournamentSignupException ex) {
                 LOG.log(Level.SEVERE, null, ex);
                 fail();
@@ -163,7 +163,7 @@ public class EliminationTest {
             int limit = new Random().nextInt(1000) + 100;
             for (int y = 0; y < limit; y++) {
                 try {
-                    instance.addTeam(new Team(new Player("Player #" + y)));
+                    instance.addTeam(new Team(new Player(MessageFormat.format("Player #{0}", y))));
                 } catch (TournamentSignupException ex) {
                     LOG.log(Level.SEVERE, null, ex);
                     fail();
