@@ -1,5 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
+import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
@@ -8,7 +9,7 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInt
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class Team {
+public class Team implements TeamInterface {
 
     private final String name;
 
@@ -33,6 +34,7 @@ public class Team {
     /**
      * @return the teamMembers
      */
+    @Override
     public List<TournamentPlayerInterface> getTeamMembers() {
         return teamMembers;
     }
@@ -40,6 +42,7 @@ public class Team {
     /**
      * @return the name
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -58,5 +61,17 @@ public class Team {
             sb.append(")");
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean hasMember(TournamentPlayerInterface member) {
+        boolean found = false;
+        for (TournamentPlayerInterface player : getTeamMembers()) {
+            if (player.getName().equals(member.getName())) {
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 }

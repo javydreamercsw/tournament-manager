@@ -21,7 +21,7 @@ public interface TournamentInterface {
     /**
      * Get the pairings for the current round.
      *
-     * @return pairings for the current round
+     * @return pairings for the current round. Null if there's a clear winner.
      */
     public Map<Integer, Encounter> getPairings();
 
@@ -37,18 +37,18 @@ public interface TournamentInterface {
      *
      * @throws TournamentSignupException
      *
-     * @param player TournamentPlayerInterface to add
+     * @param team TournamentPlayerInterface to add
      */
-    public void addPlayer(TournamentPlayerInterface player)
+    public void addTeam(TeamInterface team)
             throws TournamentSignupException;
 
     /**
      * Remove a player.
      *
-     * @param player TournamentPlayerInterface to remove.
+     * @param team TournamentPlayerInterface to remove.
      * @throws TournamentSignupException
      */
-    public void removePlayer(TournamentPlayerInterface player)
+    public void removeTeam(TeamInterface team)
             throws TournamentSignupException;
 
     /**
@@ -59,11 +59,11 @@ public interface TournamentInterface {
     public void nextRound() throws TournamentException;
 
     /**
-     * Amount of active players.
+     * Amount of active teams.
      *
-     * @return active players
+     * @return active teams
      */
-    public int getAmountOfPlayers();
+    public int getAmountOfTeams();
 
     /**
      * Display pairings in text.
@@ -81,12 +81,12 @@ public interface TournamentInterface {
      * Update results.
      *
      * @param encounterID encounter id to update results for
-     * @param player TournamentPlayerInterface
+     * @param team TournamentPlayerInterface
      * @param result Encounter
      * @throws TournamentException
      */
     public void updateResults(int encounterID,
-            TournamentPlayerInterface player, EncounterResult result)
+            TeamInterface team, EncounterResult result)
             throws TournamentException;
 
     /**
@@ -94,7 +94,7 @@ public interface TournamentInterface {
      *
      * @return current rankings
      */
-    public Map<Integer, List<TournamentPlayerInterface>> getRankings();
+    public Map<Integer, List<TeamInterface>> getRankings();
 
     /**
      * If no one drops, the amount of minimum rounds expected based on entries.
@@ -106,8 +106,30 @@ public interface TournamentInterface {
     /**
      * Amount of points in the tournament.
      *
-     * @param player player to get points from.
+     * @param team player to get points from.
      * @return points in the tournament
      */
-    public int getPoints(TournamentPlayerInterface player);
+    public int getPoints(TeamInterface team);
+
+    /**
+     * @return the winPoints
+     */
+    public int getWinPoints();
+
+    /**
+     * @return the lossPoints
+     */
+    public int getLossPoints();
+
+    /**
+     * @return the drawPoints
+     */
+    public int getDrawPoints();
+
+    /**
+     * Get the winning team.
+     *
+     * @return winning team
+     */
+    public TeamInterface getWinnerTeam();
 }
