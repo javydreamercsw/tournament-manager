@@ -113,7 +113,7 @@ public class AbstractTournamentTest extends TestCase {
         int start = 1;
         int end = 100;
         int tries = end * 100;
-        int[] exclude = null;
+        Integer[] exclude = null;
         AbstractTournament instance = new AbstractTournamentImpl();
         int result = instance.getRandomWithExclusion(rnd, start, end, exclude);
         System.out.println(MessageFormat.format("Result: {0}", result));
@@ -207,7 +207,7 @@ public class AbstractTournamentTest extends TestCase {
         }
     }
 
-    private String printArray(int[] array) {
+    private String printArray(Integer[] array) {
         StringBuilder sb = new StringBuilder();
         for (Object o : array) {
             if (!sb.toString().trim().isEmpty()) {

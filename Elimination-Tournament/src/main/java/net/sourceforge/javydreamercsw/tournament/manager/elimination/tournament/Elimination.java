@@ -3,15 +3,18 @@ package net.sourceforge.javydreamercsw.tournament.manager.elimination.tournament
 import net.sourceforge.javydreamercsw.tournament.manager.AbstractTournament;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -25,6 +28,7 @@ public class Elimination extends AbstractTournament
     private static final Logger LOG
             = Logger.getLogger(Elimination.class.getName());
     private final int eliminations;
+    private final boolean pairAlikeRecords = false;
 
     public Elimination(int eliminations) {
         super(3, 0, 1);
@@ -69,9 +73,80 @@ public class Elimination extends AbstractTournament
                         LOG.log(Level.SEVERE, null, ex);
                     }
                 }
-                super.getPairings();
+                if (pairAlikeRecords) {
+                    Map<Integer, Encounter> pairings
+                            = new HashMap<>();
+                    Integer[] exclude;
+                    Random rnd = new Random();
+                    //This will hold the reminder unpaired player due to odd number of players with same record.
+                    TeamInterface pending = null;
+                    for (Entry<Integer, List<TeamInterface>> rankings : getRankings().entrySet()) {
+                        //Pair all people with same ranking together
+                        exclude = new Integer[]{};
+                        List<TeamInterface> players = rankings.getValue();
+                        if (pending != null) {
+                            //We got someone pending from previous level, pair with him
+                            //Pair them
+                            TeamInterface opp = null;
+                            int lucky;
+                            while (opp == null && exclude.length < players.size()) {
+                                lucky = rnd.nextInt(players.size());
+                                opp = players.get(lucky);
+                                //Exclude the unlucky one from the rest of processing
+                                exclude = ArrayUtils.add(exclude, lucky);
+                                if (isTeamActive(opp)) {
+                                    addPairing(pairings, pending, opp);
+                                    LOG.log(Level.INFO, "Pairing {0} from higher level with {1}",
+                                            new Object[]{pending, opp});
+                                    pending = null;
+                                } else {
+                                    opp = null;
+                                }
+                            }
+                        }
+
+                        if (players.size() % 2 != 0) {
+                            //Someone will pair with someone in a lower level, lucky...
+                            int lucky = rnd.nextInt(players.size());
+                            pending = players.get(lucky);
+                            //Exclude the lucky one from the rest of processing
+                            exclude = ArrayUtils.add(exclude, lucky);
+                            LOG.log(Level.INFO, "Pairing {0} with lower level", pending);
+                        }
+                        //We have an even number, pair them together
+                        while (exclude.length < players.size()) {
+                            int player1
+                                    = getRandomWithExclusion(rnd, 0,
+                                            players.size() - 1, exclude);
+                            exclude = ArrayUtils.add(exclude, player1);
+                            int player2
+                                    = getRandomWithExclusion(rnd, 0,
+                                            players.size() - 1, exclude);
+                            exclude = ArrayUtils.add(exclude, player2);
+                            TeamInterface team1 = players.get(player1);
+                            TeamInterface team2 = players.get(player2);
+                            //Pair them
+                            if (isTeamActive(team1) && isTeamActive(team2)) {
+                                addPairing(pairings, team1, team2);
+                            }
+                        }
+                    }
+                    if (pending != null) {
+                        if (getTeamsCopy().size() == 1) {
+                            //Got our winner
+                        } else {
+                            //We got someone pending. Pair with him BYE
+                            addPairing(pairings, pending, bye);
+                            LOG.log(Level.INFO, "Pairing {0} with BYE", pending);
+                        }
+                    }
+                    pairingHistory.put(getRound(), pairings);
+                } else {
+                    super.getPairings();
+                }
             }
         }
+
         return pairingHistory.get(getRound());
     }
 
@@ -96,5 +171,9 @@ public class Elimination extends AbstractTournament
          * competitors will get a bye.
          */
         return log(teams.size(), 2);
+    }
+
+    protected boolean isTeamActive(TeamInterface team) {
+        return getTeamsCopy().contains(team);
     }
 }

@@ -15,7 +15,7 @@ import net.sourceforge.javydreamercsw.tournament.manager.Team;
  */
 public class Encounter {
 
-    private final Map<TeamInterface, EncounterResult> teams
+    private final Map<TeamInterface, EncounterResult> results
             = new HashMap<>();
     private final int id;
     private static final Logger LOG
@@ -30,10 +30,10 @@ public class Encounter {
      * @param t additional teams (optional)
      */
     public Encounter(int id, TeamInterface team1, TeamInterface team2, TeamInterface... t) {
-        teams.put(team1, EncounterResult.UNDECIDED);
-        teams.put(team2, EncounterResult.UNDECIDED);
+        results.put(team1, EncounterResult.UNDECIDED);
+        results.put(team2, EncounterResult.UNDECIDED);
         for (TeamInterface team : t) {
-            teams.put(team, EncounterResult.UNDECIDED);
+            results.put(team, EncounterResult.UNDECIDED);
         }
         this.id = id;
     }
@@ -46,8 +46,8 @@ public class Encounter {
      * @param team2 team 2
      */
     public Encounter(int id, TournamentPlayerInterface team1, TournamentPlayerInterface team2) {
-        teams.put(new Team(team1), EncounterResult.UNDECIDED);
-        teams.put(new Team(team2), EncounterResult.UNDECIDED);
+        results.put(new Team(team1), EncounterResult.UNDECIDED);
+        results.put(new Team(team2), EncounterResult.UNDECIDED);
         this.id = id;
     }
 
@@ -90,7 +90,7 @@ public class Encounter {
      * @return the teams
      */
     public Map<TeamInterface, EncounterResult> getEncounterSummary() {
-        return teams;
+        return results;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class Encounter {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 19 * hash + (this.teams != null ? this.teams.hashCode() : 0);
+        hash = 19 * hash + (this.results != null ? this.results.hashCode() : 0);
         hash = 19 * hash + this.id;
         return hash;
     }
@@ -121,7 +121,7 @@ public class Encounter {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (TeamInterface t : teams.keySet()) {
+        for (TeamInterface t : results.keySet()) {
             if (!sb.toString().isEmpty()) {
                 sb.append(" vs. ");
             }
