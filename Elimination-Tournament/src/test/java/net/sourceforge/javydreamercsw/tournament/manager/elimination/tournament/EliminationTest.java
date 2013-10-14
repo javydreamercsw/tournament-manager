@@ -74,7 +74,7 @@ public class EliminationTest {
         int players = instance.getAmountOfTeams();
         Encounter e = result.values().toArray(new Encounter[]{})[instance.getAmountOfTeams() / 2 - 1];
         TeamInterface t
-                = e.getEncounterSummary().keySet().toArray(new Team[]{})[0];
+                = e.getEncounterSummary().keySet().toArray(new TeamInterface[]{})[0];
         try {
             LOG.log(Level.INFO, "Updating result for: {0} encounter id: {1}",
                     new Object[]{t.getName(), e.getId()});
@@ -120,7 +120,7 @@ public class EliminationTest {
         assertEquals(instance.getAmountOfTeams() / 2 + 1, result.size());
         players = instance.getAmountOfTeams();
         e = result.values().toArray(new Encounter[]{})[instance.getAmountOfTeams() / 2 - 1];
-        t = e.getEncounterSummary().keySet().toArray(new Team[]{})[0];
+        t = e.getEncounterSummary().keySet().toArray(new TeamInterface[]{})[0];
         try {
             instance.updateResults(e.getId(), t, EncounterResult.UNDECIDED);
         } catch (TournamentException ex) {
@@ -145,7 +145,7 @@ public class EliminationTest {
     private void printPairings(Map<Integer, Encounter> result) {
         for (Entry<Integer, Encounter> entry : result.entrySet()) {
             Encounter encounter = entry.getValue();
-            Team[] teams = encounter.getEncounterSummary().keySet().toArray(new Team[]{});
+            TeamInterface[] teams = encounter.getEncounterSummary().keySet().toArray(new TeamInterface[]{});
             LOG.log(Level.INFO, "{0}: {1} vs. {2}", new Object[]{entry.getKey(),
                 teams[0].toString(), teams[1].toString()});
         }
@@ -166,7 +166,8 @@ public class EliminationTest {
             int limit = new Random().nextInt(1000) + 100;
             for (int y = 0; y < limit; y++) {
                 try {
-                    instance.addTeam(new Team(new Player(MessageFormat.format("Player #{0}", y))));
+                    instance.addTeam(new Team(
+                            new Player(MessageFormat.format("Player #{0}", (y + 1)))));
                 } catch (TournamentSignupException ex) {
                     LOG.log(Level.SEVERE, null, ex);
                     fail();
@@ -187,9 +188,10 @@ public class EliminationTest {
                         LOG.info("Simulating results...");
                         for (Entry<Integer, Encounter> entry : instance.getPairings().entrySet()) {
                             Encounter encounter = entry.getValue();
+                            LOG.info(encounter.toString());
                             TeamInterface player1
                                     = encounter.getEncounterSummary().keySet().toArray(
-                                            new Team[]{})[0];
+                                            new TeamInterface[]{})[0];
                             TeamInterface player2
                                     = encounter.getEncounterSummary().keySet().toArray(
                                             new Team[]{})[1];
