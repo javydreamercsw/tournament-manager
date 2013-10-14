@@ -8,15 +8,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
-import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
-import net.sourceforge.javydreamercsw.tournament.manager.api.ResultListener;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
-import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -84,64 +79,11 @@ public class Elimination extends AbstractTournament
     public void showPairings() {
         Map<Integer, Encounter> pairings = getPairings();
         for (Entry<Integer, Encounter> entry : pairings.entrySet()) {
-            System.out.println(MessageFormat.format("{0} vs. {1}",
+            LOG.info(MessageFormat.format("{0} vs. {1}",
                     entry.getValue().getEncounterSummary().keySet().toArray(
-                            new Team[]{})[0].getTeamMembers().get(0).toString(),
+                            new TeamInterface[]{})[0].getTeamMembers().get(0).toString(),
                     entry.getValue().getEncounterSummary().keySet().toArray(
-                            new Team[]{})[1].getTeamMembers().get(0).toString()));
-        }
-    }
-
-    @Override
-    public void updateResults(int encounterId,
-            TeamInterface team, EncounterResult result)
-            throws TournamentException {
-        //Normal processing of results
-        for (Map.Entry<Integer, Map<Integer, Encounter>> entry : pairingHistory.entrySet()) {
-            if (entry.getValue().containsKey(encounterId)) {
-                //Found round
-                Encounter encounter = entry.getValue().get(encounterId);
-                Map<TeamInterface, EncounterResult> encounterSummary
-                        = encounter.getEncounterSummary();
-                for (Map.Entry<TeamInterface, EncounterResult> entry2 : encounterSummary.entrySet()) {
-                    if (entry2.getKey().hasMember(team.getTeamMembers().get(0))) {
-                        //Apply result to this team
-                        encounter.updateResult(entry2.getKey(), result);
-                        for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
-                            listener.updateResults(encounter);
-                        }
-                    } else {
-                        //Depending on the result for the target team assign result for the others
-                        switch (result) {
-                            case WIN:
-                                //All others are losers
-                                encounter.updateResult(entry2.getKey(), EncounterResult.LOSS);
-                                for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
-                                    listener.updateResults(encounter);
-                                }
-                                break;
-                            case NO_SHOW:
-                            //Fall thru
-                            case LOSS:
-                                //All others are winners
-                                encounter.updateResult(entry2.getKey(), EncounterResult.WIN);
-                                for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
-                                    listener.updateResults(encounter);
-                                }
-                                break;
-                            case DRAW:
-                                //Everyone drew
-                                encounter.updateResult(entry2.getKey(), EncounterResult.DRAW);
-                                for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
-                                    listener.updateResults(encounter);
-                                }
-                                break;
-                            default:
-                                throw new TournamentException(MessageFormat.format("Unhandled result: {0}", result));
-                        }
-                    }
-                }
-            }
+                            new TeamInterface[]{})[1].getTeamMembers().get(0).toString()));
         }
     }
 
@@ -154,9 +96,5 @@ public class Elimination extends AbstractTournament
          * competitors will get a bye.
          */
         return log(teams.size(), 2);
-    }
-
-    private int log(int x, int base) {
-        return (int) (Math.log(x) / Math.log(base));
     }
 }

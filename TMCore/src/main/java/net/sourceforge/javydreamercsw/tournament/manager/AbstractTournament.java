@@ -22,11 +22,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
 import net.sourceforge.javydreamercsw.tournament.manager.api.NoShowListener;
+import net.sourceforge.javydreamercsw.tournament.manager.api.ResultListener;
 import net.sourceforge.javydreamercsw.tournament.manager.api.RoundTimeListener;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.apache.commons.lang3.ArrayUtils;
+import org.openide.util.Lookup;
 
 public abstract class AbstractTournament implements TournamentInterface {
 
@@ -385,5 +387,62 @@ public abstract class AbstractTournament implements TournamentInterface {
         if (roundTimeListeners.contains(rtl)) {
             roundTimeListeners.remove(rtl);
         }
+    }
+
+    @Override
+    public void updateResults(int encounterId,
+            TeamInterface team, EncounterResult result)
+            throws TournamentException {
+        //Normal processing of results
+        for (Map.Entry<Integer, Map<Integer, Encounter>> entry : pairingHistory.entrySet()) {
+            if (entry.getValue().containsKey(encounterId)) {
+                //Found round
+                Encounter encounter = entry.getValue().get(encounterId);
+                Map<TeamInterface, EncounterResult> encounterSummary
+                        = encounter.getEncounterSummary();
+                for (Map.Entry<TeamInterface, EncounterResult> entry2 : encounterSummary.entrySet()) {
+                    if (entry2.getKey().hasMember(team.getTeamMembers().get(0))) {
+                        //Apply result to this team
+                        encounter.updateResult(entry2.getKey(), result);
+                        for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
+                            listener.updateResults(encounter);
+                        }
+                    } else {
+                        //Depending on the result for the target team assign result for the others
+                        switch (result) {
+                            case WIN:
+                                //All others are losers
+                                encounter.updateResult(entry2.getKey(), EncounterResult.LOSS);
+                                for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
+                                    listener.updateResults(encounter);
+                                }
+                                break;
+                            case NO_SHOW:
+                            //Fall thru
+                            case LOSS:
+                                //All others are winners
+                                encounter.updateResult(entry2.getKey(), EncounterResult.WIN);
+                                for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
+                                    listener.updateResults(encounter);
+                                }
+                                break;
+                            case DRAW:
+                                //Everyone drew
+                                encounter.updateResult(entry2.getKey(), EncounterResult.DRAW);
+                                for (ResultListener listener : Lookup.getDefault().lookupAll(ResultListener.class)) {
+                                    listener.updateResults(encounter);
+                                }
+                                break;
+                            default:
+                                throw new TournamentException(MessageFormat.format("Unhandled result: {0}", result));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected int log(int x, int base) {
+        return (int) (Math.log(x) / Math.log(base));
     }
 }
