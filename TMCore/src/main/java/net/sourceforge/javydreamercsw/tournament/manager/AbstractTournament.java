@@ -171,8 +171,8 @@ public abstract class AbstractTournament implements TournamentInterface {
                     exclude == null ? "null" : exclude.length});
         int range = end - start + 1
                 - (exclude == null ? 0 : exclude.length);
-        assert range > 0 : 
-                MessageFormat.format("end: {0} start: {1} exlude: {2}", 
+        assert range > 0 :
+                MessageFormat.format("end: {0} start: {1} exlude: {2}",
                         end, start, exclude == null ? "null" : exclude.length);
         int random = start + rnd.nextInt(range);
         if (exclude != null) {
@@ -270,36 +270,26 @@ public abstract class AbstractTournament implements TournamentInterface {
                         = new HashMap<>();
                 Integer[] exclude = new Integer[]{};
                 Random rnd = new Random();
-                    while (exclude.length < getTeamsCopy().size() && getTeamsCopy().size() > 1) {
-                        int player1
-                                = getRandomWithExclusion(rnd, 0,
-                                        getTeamsCopy().size() - 1, exclude);
-                        exclude = ArrayUtils.add(exclude, player1);
-                        if (exclude.length == getTeamsCopy().size()) {
-                            //Only one player left, pair with Bye
-                            LOG.log(Level.FINE, "Pairing {0} vs. BYE",
-                                    getTeamsCopy().get(player1).getName());
-                            pairings.put(encounterCount,
-                                    new Encounter(encounterCount,
-                                            getTeamsCopy().get(player1), bye));
-                            try {
-                                //Assign the win already, BYE always losses
-                                pairings.get(encounterCount)
-                                        .updateResult(getTeamsCopy().get(player1),
-                                                EncounterResult.WIN);
-                            } catch (TournamentException ex) {
-                                LOG.log(Level.SEVERE, null, ex);
-                            }
-                        } else {
-                            int player2 = getRandomWithExclusion(rnd, 0,
+                while (exclude.length < getTeamsCopy().size() && getTeamsCopy().size() > 1) {
+                    int player1
+                            = getRandomWithExclusion(rnd, 0,
                                     getTeamsCopy().size() - 1, exclude);
-                            pairings.put(encounterCount,
-                                    new Encounter(encounterCount, getTeamsCopy().get(player1),
-                                            getTeamsCopy().get(player2)));
-                            exclude = ArrayUtils.add(exclude, player2);
-                        }
-                        encounterCount++;
+                    exclude = ArrayUtils.add(exclude, player1);
+                    if (exclude.length == getTeamsCopy().size()) {
+                        //Only one player left, pair with Bye
+                        LOG.log(Level.FINE, "Pairing {0} vs. BYE",
+                                getTeamsCopy().get(player1).getName());
+                        addPairing(pairings,
+                                getTeamsCopy().get(player1), bye);
+                    } else {
+                        int player2 = getRandomWithExclusion(rnd, 0,
+                                getTeamsCopy().size() - 1, exclude);
+                        addPairing(pairings,
+                                getTeamsCopy().get(player1),
+                                getTeamsCopy().get(player2));
+                        exclude = ArrayUtils.add(exclude, player2);
                     }
+                }
                 pairingHistory.put(getRound(), pairings);
             }
         }
@@ -446,5 +436,33 @@ public abstract class AbstractTournament implements TournamentInterface {
 
     protected int log(int x, int base) {
         return (int) (Math.log(x) / Math.log(base));
+    }
+
+    protected void addPairing(Map<Integer, Encounter> pairings,
+            TeamInterface player1, TeamInterface player2) {
+        pairings.put(encounterCount,
+                new Encounter(encounterCount,
+                        player1,
+                        player2));
+        if (player1 == bye) {
+            try {
+                //Assign the win already, BYE always losses
+                pairings.get(encounterCount)
+                        .updateResult(player2,
+                                EncounterResult.WIN);
+            } catch (TournamentException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
+        } else if (player2 == bye) {
+            try {
+                //Assign the win already, BYE always losses
+                pairings.get(encounterCount)
+                        .updateResult(player1,
+                                EncounterResult.WIN);
+            } catch (TournamentException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
+        }
+        encounterCount++;
     }
 }
