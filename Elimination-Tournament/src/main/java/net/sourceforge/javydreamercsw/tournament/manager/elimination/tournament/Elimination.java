@@ -15,7 +15,6 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.ResultListener;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
-import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -159,9 +158,5 @@ public class Elimination extends AbstractTournament
 
     private int log(int x, int base) {
         return (int) (Math.log(x) / Math.log(base));
-    }
-
-    public int getPoints(TournamentPlayerInterface player) {
-        return player.getWins() * 3 + player.getDraws();
     }
 }

@@ -32,9 +32,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.mycompany</groupId>
+            <groupId>net.sourceforge.javydreamercsw</groupId>
             <artifactId>TMCore</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
