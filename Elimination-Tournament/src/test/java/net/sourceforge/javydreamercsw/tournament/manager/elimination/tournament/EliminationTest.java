@@ -160,7 +160,7 @@ public class EliminationTest {
         Random random = new Random();
         for (int i = 0; i < 100; i++) {
             LOG.log(Level.INFO, "Simulation #{0}", (i + 1));
-            int eliminations = random.nextInt(2) + 1;
+            int eliminations = 1;//random.nextInt(2) + 1;
             LOG.log(Level.INFO, "Eliminations: {0}", eliminations);
             Elimination instance = new Elimination(eliminations);
             int limit = new Random().nextInt(1000) + 100;
