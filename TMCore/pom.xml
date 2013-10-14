@@ -7,7 +7,7 @@
         <artifactId>Tournament-Manager</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>com.mycompany</groupId>
+    <groupId>net.sourceforge.javydreamercsw</groupId>
     <artifactId>TMCore</artifactId>
     <name>Tournament Manager Core</name>
     <url>http://maven.apache.org</url>
@@ -37,6 +37,17 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util-lookup</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-projectapi</artifactId>
+            <version>${netbeans.version}</version>
             <type>jar</type>
         </dependency>
     </dependencies>

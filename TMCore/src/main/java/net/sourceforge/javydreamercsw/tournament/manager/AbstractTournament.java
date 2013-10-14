@@ -21,6 +21,8 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
+import net.sourceforge.javydreamercsw.tournament.manager.api.NoShowListener;
+import net.sourceforge.javydreamercsw.tournament.manager.api.RoundTimeListener;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
@@ -59,8 +61,8 @@ public abstract class AbstractTournament implements TournamentInterface {
             = new LinkedHashMap<>();
     private final static Logger LOG
             = Logger.getLogger(AbstractTournament.class.getSimpleName());
-    
-       /**
+
+    /**
      * Amount of points for a win.
      */
     private final int winPoints;
@@ -74,6 +76,12 @@ public abstract class AbstractTournament implements TournamentInterface {
      * Amount of points for a draw.
      */
     private final int drawPoints;
+    private long no_show_time;
+    private long round_time;
+    private final List<NoShowListener> noShowListeners
+            = new ArrayList<>();
+    private final List<RoundTimeListener> roundTimeListeners
+            = new ArrayList<>();
 
     public AbstractTournament(int winPoints, int lossPoints, int drawPoints) {
         this.winPoints = winPoints;
@@ -302,7 +310,7 @@ public abstract class AbstractTournament implements TournamentInterface {
         }
         return winner;
     }
-    
+
     @Override
     public int getWinPoints() {
         return winPoints;
@@ -317,7 +325,7 @@ public abstract class AbstractTournament implements TournamentInterface {
     public int getDrawPoints() {
         return drawPoints;
     }
-    
+
     @Override
     public int getPoints(TeamInterface team) {
         return team.getTeamMembers().get(0).getWins() * getWinPoints()
@@ -329,5 +337,53 @@ public abstract class AbstractTournament implements TournamentInterface {
      */
     public List<TeamInterface> getTeamsCopy() {
         return teamsCopy;
+    }
+
+    @Override
+    public void setNoShowTime(long time) {
+        this.no_show_time = time;
+    }
+
+    @Override
+    public long getNoShowTime() {
+        return this.no_show_time;
+    }
+
+    @Override
+    public void setRoundTime(long time) {
+        this.round_time = time;
+    }
+
+    @Override
+    public long getRoundTime() {
+        return this.round_time;
+    }
+
+    @Override
+    public void addNoShowListener(NoShowListener nsl) {
+        if (!noShowListeners.contains(nsl)) {
+            noShowListeners.add(nsl);
+        }
+    }
+
+    @Override
+    public void removeNoShowListener(NoShowListener nsl) {
+        if (noShowListeners.contains(nsl)) {
+            noShowListeners.remove(nsl);
+        }
+    }
+
+    @Override
+    public void addRoundTimeListener(RoundTimeListener rtl) {
+        if (!roundTimeListeners.contains(rtl)) {
+            roundTimeListeners.add(rtl);
+        }
+    }
+
+    @Override
+    public void removeRoundTimeListener(RoundTimeListener rtl) {
+        if (roundTimeListeners.contains(rtl)) {
+            roundTimeListeners.remove(rtl);
+        }
     }
 }

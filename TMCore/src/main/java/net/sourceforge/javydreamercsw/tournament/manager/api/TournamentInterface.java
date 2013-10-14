@@ -132,4 +132,60 @@ public interface TournamentInterface {
      * @return winning team
      */
     public TeamInterface getWinnerTeam();
+
+    /**
+     * Set the time allowed before no shows (milliseconds from pairings).
+     *
+     * @param time Date of no show.
+     */
+    public void setNoShowTime(long time);
+
+    /**
+     * Get the no show time.
+     *
+     * @return time allowed before no shows (milliseconds from pairings)
+     */
+    public long getNoShowTime();
+
+    /**
+     * Set the time for the round to end (milliseconds from pairings).
+     *
+     * @param time round end time.
+     */
+    public void setRoundTime(long time);
+
+    /**
+     * Get the round time.
+     *
+     * @return time for the round to end (milliseconds from pairings)
+     */
+    public long getRoundTime();
+
+    /**
+     * Add a no show listener.
+     *
+     * @param nsl no show listener
+     */
+    public void addNoShowListener(NoShowListener nsl);
+
+    /**
+     * Remove a no show listener.
+     *
+     * @param nsl no show listener
+     */
+    public void removeNoShowListener(NoShowListener nsl);
+
+    /**
+     * Add a round time listener.
+     *
+     * @param rtl round time listener
+     */
+    public void addRoundTimeListener(RoundTimeListener rtl);
+
+    /**
+     * Remove a round time listener.
+     *
+     * @param rtl round time listener
+     */
+    public void removeRoundTimeListener(RoundTimeListener rtl);
 }
