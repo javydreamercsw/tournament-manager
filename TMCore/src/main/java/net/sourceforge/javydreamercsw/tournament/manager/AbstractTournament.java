@@ -35,7 +35,7 @@ public abstract class AbstractTournament implements TournamentInterface {
     /**
      * Encounter id
      */
-    protected int encounterCount = 0;
+    protected int encounterCount = 1;
     /**
      * Current round number
      */
@@ -161,7 +161,7 @@ public abstract class AbstractTournament implements TournamentInterface {
      * @param exclude numbers to exclude.
      * @return random number.
      */
-    public int getRandomWithExclusion(Random rnd, int start, int end, int[] exclude) {
+    public int getRandomWithExclusion(Random rnd, int start, int end, Integer[] exclude) {
         //Make sure exclude is sorted
         if (exclude != null) {
             Arrays.sort(exclude);
@@ -171,7 +171,8 @@ public abstract class AbstractTournament implements TournamentInterface {
                     exclude == null ? "null" : exclude.length});
         int range = end - start + 1
                 - (exclude == null ? 0 : exclude.length);
-        assert range > 0;
+        assert range > 0 : "end: " + end + " start: " + start + " exlude: "
+                + (exclude == null ? "null" : exclude.length);
         int random = start + rnd.nextInt(range);
         if (exclude != null) {
             for (int ex : exclude) {
@@ -266,38 +267,38 @@ public abstract class AbstractTournament implements TournamentInterface {
             if (pairingHistory.get(getRound()) == null) {
                 Map<Integer, Encounter> pairings
                         = new HashMap<>();
-                int[] exclude = new int[]{};
+                Integer[] exclude = new Integer[]{};
                 Random rnd = new Random();
-                while (exclude.length < getTeamsCopy().size() && getTeamsCopy().size() > 1) {
-                    int player1
-                            = getRandomWithExclusion(rnd, 0,
+                    while (exclude.length < getTeamsCopy().size() && getTeamsCopy().size() > 1) {
+                        int player1
+                                = getRandomWithExclusion(rnd, 0,
+                                        getTeamsCopy().size() - 1, exclude);
+                        exclude = ArrayUtils.add(exclude, player1);
+                        if (exclude.length == getTeamsCopy().size()) {
+                            //Only one player left, pair with Bye
+                            LOG.log(Level.FINE, "Pairing {0} vs. BYE",
+                                    getTeamsCopy().get(player1).getName());
+                            pairings.put(encounterCount,
+                                    new Encounter(encounterCount,
+                                            getTeamsCopy().get(player1), bye));
+                            try {
+                                //Assign the win already, BYE always losses
+                                pairings.get(encounterCount)
+                                        .updateResult(getTeamsCopy().get(player1),
+                                                EncounterResult.WIN);
+                            } catch (TournamentException ex) {
+                                LOG.log(Level.SEVERE, null, ex);
+                            }
+                        } else {
+                            int player2 = getRandomWithExclusion(rnd, 0,
                                     getTeamsCopy().size() - 1, exclude);
-                    exclude = ArrayUtils.add(exclude, player1);
-                    if (exclude.length == getTeamsCopy().size()) {
-                        //Only one player left, pair with Bye
-                        LOG.log(Level.FINE, "Pairing {0} vs. BYE",
-                                getTeamsCopy().get(player1).getName());
-                        pairings.put(encounterCount,
-                                new Encounter(encounterCount,
-                                        getTeamsCopy().get(player1), bye));
-                        try {
-                            //Assign the win already, BYE always losses
-                            pairings.get(encounterCount)
-                                    .updateResult(getTeamsCopy().get(player1),
-                                            EncounterResult.WIN);
-                        } catch (TournamentException ex) {
-                            LOG.log(Level.SEVERE, null, ex);
+                            pairings.put(encounterCount,
+                                    new Encounter(encounterCount, getTeamsCopy().get(player1),
+                                            getTeamsCopy().get(player2)));
+                            exclude = ArrayUtils.add(exclude, player2);
                         }
-                    } else {
-                        int player2 = getRandomWithExclusion(rnd, 0,
-                                getTeamsCopy().size() - 1, exclude);
-                        pairings.put(encounterCount,
-                                new Encounter(encounterCount, getTeamsCopy().get(player1),
-                                        getTeamsCopy().get(player2)));
-                        exclude = ArrayUtils.add(exclude, player2);
+                        encounterCount++;
                     }
-                    encounterCount++;
-                }
                 pairingHistory.put(getRound(), pairings);
             }
         }
