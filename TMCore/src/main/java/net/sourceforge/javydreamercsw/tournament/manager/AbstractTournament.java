@@ -171,8 +171,9 @@ public abstract class AbstractTournament implements TournamentInterface {
                     exclude == null ? "null" : exclude.length});
         int range = end - start + 1
                 - (exclude == null ? 0 : exclude.length);
-        assert range > 0 : "end: " + end + " start: " + start + " exlude: "
-                + (exclude == null ? "null" : exclude.length);
+        assert range > 0 : 
+                MessageFormat.format("end: {0} start: {1} exlude: {2}", 
+                        end, start, exclude == null ? "null" : exclude.length);
         int random = start + rnd.nextInt(range);
         if (exclude != null) {
             for (int ex : exclude) {
