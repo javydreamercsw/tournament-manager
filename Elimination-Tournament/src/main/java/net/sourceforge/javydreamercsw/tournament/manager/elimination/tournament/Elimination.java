@@ -204,18 +204,6 @@ public class Elimination extends AbstractTournament
     }
 
     @Override
-    public void showPairings() {
-        Map<Integer, Encounter> pairings = getPairings();
-        for (Entry<Integer, Encounter> entry : pairings.entrySet()) {
-            LOG.info(MessageFormat.format("{0} vs. {1}",
-                    entry.getValue().getEncounterSummary().keySet().toArray(
-                            new TeamInterface[]{})[0].getTeamMembers().get(0).toString(),
-                    entry.getValue().getEncounterSummary().keySet().toArray(
-                            new TeamInterface[]{})[1].getTeamMembers().get(0).toString()));
-        }
-    }
-
-    @Override
     public int getMinimumAmountOfRounds() {
         /**
          * Assuming two competitors per match, if there are n competitors, there
