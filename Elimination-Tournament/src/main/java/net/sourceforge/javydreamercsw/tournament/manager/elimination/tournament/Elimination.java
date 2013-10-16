@@ -72,7 +72,7 @@ public class Elimination extends AbstractTournament
     @Override
     public boolean isTeamActive(TeamInterface t) {
         boolean result = false;
-        for (TeamInterface team : getTeamsCopy()) {
+        for (TeamInterface team : getActiveTeams()) {
             for (TournamentPlayerInterface player : team.getTeamMembers()) {
                 for (TournamentPlayerInterface p : t.getTeamMembers()) {
                     if (player.getName().equals(p.getName())) {
@@ -87,12 +87,12 @@ public class Elimination extends AbstractTournament
 
     @Override
     public Map<Integer, Encounter> getPairings() {
-        synchronized (getTeamsCopy()) {
+        synchronized (getActiveTeams()) {
             if (pairingHistory.get(getRound()) == null) {
                 //Remove teams with loses from tournament
                 List<TeamInterface> toRemove
                         = new ArrayList<>();
-                for (TeamInterface team : getTeamsCopy()) {
+                for (TeamInterface team : getActiveTeams()) {
                     //Loss or draw gets you eliminated
                     if (team.getTeamMembers().get(0).getLosses()
                             + team.getTeamMembers().get(0).getDraws() >= eliminations) {
@@ -175,7 +175,7 @@ public class Elimination extends AbstractTournament
                         }
                     }
                     if (pending != null) {
-                        if (getTeamsCopy().size() == 1) {
+                        if (getActiveTeams().size() == 1) {
                             //Got our winner
                         } else {
                             //We got someone pending. Pair with him BYE

@@ -2,6 +2,9 @@ package net.sourceforge.javydreamercsw.tournament.manager.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import net.sourceforge.javydreamercsw.tournament.manager.Player;
+import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 /**
@@ -10,6 +13,11 @@ import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignup
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
 public interface TournamentInterface {
+
+    /**
+     * Default BYE player.
+     */
+    public final TeamInterface bye = new Team(new Player("BYE"));
 
     /**
      * Get tournament name.
@@ -94,7 +102,7 @@ public interface TournamentInterface {
      *
      * @return current rankings
      */
-    public Map<Integer, List<TeamInterface>> getRankings();
+    public TreeMap<Integer, List<TeamInterface>> getRankings();
 
     /**
      * If no one drops, the amount of minimum rounds expected based on entries.
@@ -196,4 +204,16 @@ public interface TournamentInterface {
      * @return true if still active
      */
     public boolean isTeamActive(TeamInterface t);
+
+    /**
+     * List of teams still active.
+     *
+     * @return teams still active
+     */
+    public List<TeamInterface> getActiveTeams();
+
+    /**
+     * Display rankings.
+     */
+    public void displayRankings();
 }
