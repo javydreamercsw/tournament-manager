@@ -31,18 +31,37 @@ public class Elimination extends AbstractTournament
     private final int eliminations;
     private final boolean pairAlikeRecords;
 
+    /**
+     * Provide eliminations and pairing option. Defaults to 3 points for a win,
+     * 0 for loses and 1 for draws.
+     *
+     * @param eliminations amount of eliminations before elimination
+     * @param pairAlikeRecords true to pair alike records, false for random
+     */
     public Elimination(int eliminations, boolean pairAlikeRecords) {
         super(3, 0, 1);
         this.eliminations = eliminations;
         this.pairAlikeRecords = pairAlikeRecords;
     }
 
+    /**
+     * Provide eliminations and pairing option. Defaults to one elimination, 3
+     * points for a win, 0 for loses, 1 for draws and random pairing.
+     */
     public Elimination() {
         super(3, 0, 1);
         this.eliminations = 1;
         this.pairAlikeRecords = false;
     }
 
+    /**
+     *
+     * @param eliminations amount of eliminations before elimination
+     * @param winPoints points to be allocated for a win
+     * @param lossPoints points to be allocated for a loss
+     * @param drawPoints points to be allocated for a draw
+     * @param pairAlikeRecords true to pair alike records, false for random
+     */
     public Elimination(int eliminations, int winPoints, int lossPoints,
             int drawPoints, boolean pairAlikeRecords) {
         super(winPoints, lossPoints, drawPoints);
