@@ -1,5 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
@@ -34,10 +35,11 @@ public class Player implements TournamentPlayerInterface {
 
     @Override
     public String toString() {
-        return get(Variables.PLAYER_NAME.getDisplayName()) + " ("
-                + get(Variables.WINS.getDisplayName()) + "-"
-                + get(Variables.LOSSES.getDisplayName()) + "-"
-                + get(Variables.DRAWS.getDisplayName()) + ")";
+        return MessageFormat.format("{0} ({1}-{2}-{3})",
+                get(Variables.PLAYER_NAME.getDisplayName()),
+                get(Variables.WINS.getDisplayName()),
+                get(Variables.LOSSES.getDisplayName()),
+                get(Variables.DRAWS.getDisplayName()));
     }
 
     @Override

@@ -39,7 +39,7 @@ public class EliminationTest {
     @Test
     public void testGetName() {
         LOG.info("getName");
-        Elimination instance = new Elimination(1);
+        Elimination instance = new Elimination();
         assertFalse(instance.getName().trim().isEmpty());
     }
 
@@ -51,7 +51,7 @@ public class EliminationTest {
         LOG.info("getPairings");
         //Even entries
         LOG.info("Even amount of entries -----------------------");
-        Elimination instance = new Elimination(1);
+        Elimination instance = new Elimination();
         int limit = new Random().nextInt(1000) + 100;
         if (limit % 2 != 0) {
             //Not even, add one
@@ -99,7 +99,7 @@ public class EliminationTest {
         assertEquals(players - 1, instance.getAmountOfTeams());
         //Redo with odd entries
         LOG.info("Odd amount of entries -----------------------");
-        instance = new Elimination(1);
+        instance = new Elimination();
         limit = new Random().nextInt(1000) + 100;
         if (limit % 2 == 0) {
             //Not odd, add one
@@ -162,7 +162,8 @@ public class EliminationTest {
             LOG.log(Level.INFO, "Simulation #{0}", (i + 1));
             int eliminations = random.nextInt(2) + 1;
             LOG.log(Level.INFO, "Eliminations: {0}", eliminations);
-            Elimination instance = new Elimination(eliminations);
+            Elimination instance = new Elimination(eliminations,
+                    random.nextBoolean());
             int limit = new Random().nextInt(1000) + 100;
             for (int y = 0; y < limit; y++) {
                 try {
@@ -188,7 +189,6 @@ public class EliminationTest {
                         LOG.info("Simulating results...");
                         for (Entry<Integer, Encounter> entry : instance.getPairings().entrySet()) {
                             Encounter encounter = entry.getValue();
-                            LOG.info(encounter.toString());
                             TeamInterface player1
                                     = encounter.getEncounterSummary().keySet().toArray(
                                             new TeamInterface[]{})[0];
@@ -203,7 +203,8 @@ public class EliminationTest {
                                 instance.updateResults(encounter.getId(), player1,
                                         EncounterResult.values()[result]);
                             }
-                            if (player1.equals(instance.bye) || player2.equals(instance.bye) && instance.getTeamsCopy().size() == 1) {
+                            if (player1.equals(instance.bye) || player2.equals(instance.bye)
+                                    && instance.getTeamsCopy().size() == 1) {
                                 //Only one player left, we got a winner!
                                 ignore = true;
                                 break;
