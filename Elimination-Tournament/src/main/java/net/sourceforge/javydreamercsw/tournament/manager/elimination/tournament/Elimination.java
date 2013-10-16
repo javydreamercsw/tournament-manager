@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -28,27 +29,51 @@ public class Elimination extends AbstractTournament
     private static final Logger LOG
             = Logger.getLogger(Elimination.class.getName());
     private final int eliminations;
-    private final boolean pairAlikeRecords = false;
+    private final boolean pairAlikeRecords;
 
-    public Elimination(int eliminations) {
+    public Elimination(int eliminations, boolean pairAlikeRecords) {
         super(3, 0, 1);
         this.eliminations = eliminations;
+        this.pairAlikeRecords = pairAlikeRecords;
     }
 
     public Elimination() {
         super(3, 0, 1);
         this.eliminations = 1;
+        this.pairAlikeRecords = false;
     }
 
     public Elimination(int eliminations, int winPoints, int lossPoints,
-            int drawPoints) {
+            int drawPoints, boolean pairAlikeRecords) {
         super(winPoints, lossPoints, drawPoints);
         this.eliminations = eliminations;
+        this.pairAlikeRecords = pairAlikeRecords;
     }
 
     @Override
     public String getName() {
         return "Single Elimination";
+    }
+
+    /**
+     * Check if the team has not been eliminated/dropped
+     *
+     * @param t team to check
+     * @return true if still active
+     */
+    protected boolean isTeamActive(TeamInterface t) {
+        boolean result = false;
+        for (TeamInterface team : getTeamsCopy()) {
+            for (TournamentPlayerInterface player : team.getTeamMembers()) {
+                for (TournamentPlayerInterface p : t.getTeamMembers()) {
+                    if (player.getName().equals(p.getName())) {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -83,7 +108,14 @@ public class Elimination extends AbstractTournament
                     for (Entry<Integer, List<TeamInterface>> rankings : getRankings().entrySet()) {
                         //Pair all people with same ranking together
                         exclude = new Integer[]{};
-                        List<TeamInterface> players = rankings.getValue();
+                        List<TeamInterface> rankPlayers = rankings.getValue();
+                        List<TeamInterface> players = new ArrayList<>();
+                        //Only use active players
+                        for (TeamInterface p : rankPlayers) {
+                            if (isTeamActive(p)) {
+                                players.add(p);
+                            }
+                        }
                         if (pending != null) {
                             //We got someone pending from previous level, pair with him
                             //Pair them
@@ -114,7 +146,9 @@ public class Elimination extends AbstractTournament
                             LOG.log(Level.INFO, "Pairing {0} with lower level", pending);
                         }
                         //We have an even number, pair them together
-                        while (exclude.length < players.size()) {
+                        while (players.size() - exclude.length >= 2) {
+                            LOG.log(Level.FINE, "exclude {0} players: {1}",
+                                    new Object[]{exclude.length, players.size()});
                             int player1
                                     = getRandomWithExclusion(rnd, 0,
                                             players.size() - 1, exclude);
@@ -171,9 +205,5 @@ public class Elimination extends AbstractTournament
          * competitors will get a bye.
          */
         return log(teams.size(), 2);
-    }
-
-    protected boolean isTeamActive(TeamInterface team) {
-        return getTeamsCopy().contains(team);
     }
 }
