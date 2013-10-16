@@ -84,11 +84,21 @@ public abstract class AbstractTournament implements TournamentInterface {
             = new ArrayList<>();
     private final List<RoundTimeListener> roundTimeListeners
             = new ArrayList<>();
+    protected final boolean pairAlikeRecords;
+
+    public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
+            boolean pairAlikeRecords) {
+        this.winPoints = winPoints;
+        this.lossPoints = lossPoints;
+        this.drawPoints = drawPoints;
+        this.pairAlikeRecords = pairAlikeRecords;
+    }
 
     public AbstractTournament(int winPoints, int lossPoints, int drawPoints) {
         this.winPoints = winPoints;
         this.lossPoints = lossPoints;
         this.drawPoints = drawPoints;
+        this.pairAlikeRecords = false;
     }
 
     @Override
@@ -266,31 +276,110 @@ public abstract class AbstractTournament implements TournamentInterface {
     public Map<Integer, Encounter> getPairings() {
         synchronized (getTeamsCopy()) {
             if (pairingHistory.get(getRound()) == null) {
-                Map<Integer, Encounter> pairings
-                        = new HashMap<>();
-                Integer[] exclude = new Integer[]{};
-                Random rnd = new Random();
-                while (exclude.length < getTeamsCopy().size() && getTeamsCopy().size() > 1) {
-                    int player1
-                            = getRandomWithExclusion(rnd, 0,
-                                    getTeamsCopy().size() - 1, exclude);
-                    exclude = ArrayUtils.add(exclude, player1);
-                    if (exclude.length == getTeamsCopy().size()) {
-                        //Only one player left, pair with Bye
-                        LOG.log(Level.FINE, "Pairing {0} vs. BYE",
-                                getTeamsCopy().get(player1).getName());
-                        addPairing(pairings,
-                                getTeamsCopy().get(player1), bye);
-                    } else {
-                        int player2 = getRandomWithExclusion(rnd, 0,
-                                getTeamsCopy().size() - 1, exclude);
-                        addPairing(pairings,
-                                getTeamsCopy().get(player1),
-                                getTeamsCopy().get(player2));
-                        exclude = ArrayUtils.add(exclude, player2);
+                if (pairAlikeRecords) {
+                    Map<Integer, Encounter> pairings
+                            = new HashMap<>();
+                    Integer[] exclude;
+                    Random rnd = new Random();
+                    //This will hold the reminder unpaired player due to odd number of players with same record.
+                    TeamInterface pending = null;
+                    for (Entry<Integer, List<TeamInterface>> rankings : getRankings().entrySet()) {
+                        //Pair all people with same ranking together
+                        exclude = new Integer[]{};
+                        List<TeamInterface> rankPlayers = rankings.getValue();
+                        List<TeamInterface> players = new ArrayList<>();
+                        //Only use active players
+                        for (TeamInterface p : rankPlayers) {
+                            if (isTeamActive(p)) {
+                                players.add(p);
+                            }
+                        }
+                        if (pending != null) {
+                            //We got someone pending from previous level, pair with him
+                            //Pair them
+                            TeamInterface opp = null;
+                            int lucky;
+                            while (opp == null && exclude.length < players.size()) {
+                                lucky = rnd.nextInt(players.size());
+                                opp = players.get(lucky);
+                                //Exclude the unlucky one from the rest of processing
+                                exclude = ArrayUtils.add(exclude, lucky);
+                                if (isTeamActive(opp)) {
+                                    addPairing(pairings, pending, opp);
+                                    LOG.log(Level.INFO, "Pairing {0} from higher level with {1}",
+                                            new Object[]{pending, opp});
+                                    pending = null;
+                                } else {
+                                    opp = null;
+                                }
+                            }
+                        }
+
+                        if (players.size() % 2 != 0) {
+                            //Someone will pair with someone in a lower level, lucky...
+                            int lucky = rnd.nextInt(players.size());
+                            pending = players.get(lucky);
+                            //Exclude the lucky one from the rest of processing
+                            exclude = ArrayUtils.add(exclude, lucky);
+                            LOG.log(Level.INFO, "Pairing {0} with lower level", pending);
+                        }
+                        //We have an even number, pair them together
+                        while (players.size() - exclude.length >= 2) {
+                            LOG.log(Level.FINE, "exclude {0} players: {1}",
+                                    new Object[]{exclude.length, players.size()});
+                            int player1
+                                    = getRandomWithExclusion(rnd, 0,
+                                            players.size() - 1, exclude);
+                            exclude = ArrayUtils.add(exclude, player1);
+                            int player2
+                                    = getRandomWithExclusion(rnd, 0,
+                                            players.size() - 1, exclude);
+                            exclude = ArrayUtils.add(exclude, player2);
+                            TeamInterface team1 = players.get(player1);
+                            TeamInterface team2 = players.get(player2);
+                            //Pair them
+                            if (isTeamActive(team1) && isTeamActive(team2)) {
+                                addPairing(pairings, team1, team2);
+                            }
+                        }
                     }
+                    if (pending != null) {
+                        if (getTeamsCopy().size() == 1) {
+                            //Got our winner
+                        } else {
+                            //We got someone pending. Pair with him BYE
+                            addPairing(pairings, pending, bye);
+                            LOG.log(Level.INFO, "Pairing {0} with BYE", pending);
+                        }
+                    }
+                    pairingHistory.put(getRound(), pairings);
+                } else {
+                    Map<Integer, Encounter> pairings
+                            = new HashMap<>();
+                    Integer[] exclude = new Integer[]{};
+                    Random rnd = new Random();
+                    while (exclude.length < getTeamsCopy().size() && getTeamsCopy().size() > 1) {
+                        int player1
+                                = getRandomWithExclusion(rnd, 0,
+                                        getTeamsCopy().size() - 1, exclude);
+                        exclude = ArrayUtils.add(exclude, player1);
+                        if (exclude.length == getTeamsCopy().size()) {
+                            //Only one player left, pair with Bye
+                            LOG.log(Level.FINE, "Pairing {0} vs. BYE",
+                                    getTeamsCopy().get(player1).getName());
+                            addPairing(pairings,
+                                    getTeamsCopy().get(player1), bye);
+                        } else {
+                            int player2 = getRandomWithExclusion(rnd, 0,
+                                    getTeamsCopy().size() - 1, exclude);
+                            addPairing(pairings,
+                                    getTeamsCopy().get(player1),
+                                    getTeamsCopy().get(player2));
+                            exclude = ArrayUtils.add(exclude, player2);
+                        }
+                    }
+                    pairingHistory.put(getRound(), pairings);
                 }
-                pairingHistory.put(getRound(), pairings);
             }
         }
         return pairingHistory.get(getRound());
@@ -476,5 +565,11 @@ public abstract class AbstractTournament implements TournamentInterface {
                     entry.getValue().getEncounterSummary().keySet().toArray(
                             new TeamInterface[]{})[1].getTeamMembers().get(0).toString()));
         }
+    }
+
+    @Override
+    public boolean isTeamActive(TeamInterface t) {
+        //Always active by default.
+        return true;
     }
 }

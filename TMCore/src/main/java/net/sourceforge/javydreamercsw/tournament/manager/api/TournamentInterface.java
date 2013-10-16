@@ -188,4 +188,12 @@ public interface TournamentInterface {
      * @param rtl round time listener
      */
     public void removeRoundTimeListener(RoundTimeListener rtl);
+
+    /**
+     * Check if the team has not been eliminated/dropped
+     *
+     * @param t team to check
+     * @return true if still active
+     */
+    public boolean isTeamActive(TeamInterface t);
 }

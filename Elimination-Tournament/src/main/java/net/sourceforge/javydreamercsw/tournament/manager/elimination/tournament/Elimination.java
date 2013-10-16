@@ -1,7 +1,6 @@
 package net.sourceforge.javydreamercsw.tournament.manager.elimination.tournament;
 
 import net.sourceforge.javydreamercsw.tournament.manager.AbstractTournament;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +28,6 @@ public class Elimination extends AbstractTournament
     private static final Logger LOG
             = Logger.getLogger(Elimination.class.getName());
     private final int eliminations;
-    private final boolean pairAlikeRecords;
 
     /**
      * Provide eliminations and pairing option. Defaults to 3 points for a win,
@@ -39,9 +37,8 @@ public class Elimination extends AbstractTournament
      * @param pairAlikeRecords true to pair alike records, false for random
      */
     public Elimination(int eliminations, boolean pairAlikeRecords) {
-        super(3, 0, 1);
+        super(3, 0, 1, pairAlikeRecords);
         this.eliminations = eliminations;
-        this.pairAlikeRecords = pairAlikeRecords;
     }
 
     /**
@@ -49,9 +46,8 @@ public class Elimination extends AbstractTournament
      * points for a win, 0 for loses, 1 for draws and random pairing.
      */
     public Elimination() {
-        super(3, 0, 1);
+        super(3, 0, 1, false);
         this.eliminations = 1;
-        this.pairAlikeRecords = false;
     }
 
     /**
@@ -64,9 +60,8 @@ public class Elimination extends AbstractTournament
      */
     public Elimination(int eliminations, int winPoints, int lossPoints,
             int drawPoints, boolean pairAlikeRecords) {
-        super(winPoints, lossPoints, drawPoints);
+        super(winPoints, lossPoints, drawPoints, pairAlikeRecords);
         this.eliminations = eliminations;
-        this.pairAlikeRecords = pairAlikeRecords;
     }
 
     @Override
@@ -74,13 +69,8 @@ public class Elimination extends AbstractTournament
         return "Single Elimination";
     }
 
-    /**
-     * Check if the team has not been eliminated/dropped
-     *
-     * @param t team to check
-     * @return true if still active
-     */
-    protected boolean isTeamActive(TeamInterface t) {
+    @Override
+    public boolean isTeamActive(TeamInterface t) {
         boolean result = false;
         for (TeamInterface team : getTeamsCopy()) {
             for (TournamentPlayerInterface player : team.getTeamMembers()) {
