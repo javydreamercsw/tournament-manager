@@ -53,10 +53,6 @@ public abstract class AbstractTournament implements TournamentInterface {
      */
     private final List<TeamInterface> teamsCopy = new ArrayList<>();
     /**
-     * Default BYE player.
-     */
-    public final TeamInterface bye = new Team(new Player("BYE"));
-    /**
      * History of the pairings for the tournament.
      */
     protected final Map<Integer, Map<Integer, Encounter>> pairingHistory
@@ -110,7 +106,7 @@ public abstract class AbstractTournament implements TournamentInterface {
     public void addTeam(TeamInterface team) throws TournamentSignupException {
         //Loop thru teamsCopy to check for name
         boolean found = false;
-        for (TeamInterface t : getTeamsCopy()) {
+        for (TeamInterface t : getActiveTeams()) {
             for (TournamentPlayerInterface tpi : t.getTeamMembers()) {
                 for (TournamentPlayerInterface newtpi : team.getTeamMembers()) {
                     if (tpi.get(Variables.PLAYER_NAME.getDisplayName())
@@ -122,7 +118,7 @@ public abstract class AbstractTournament implements TournamentInterface {
             }
         }
         if (!found) {
-            getTeamsCopy().add(team);
+            getActiveTeams().add(team);
             teams.add(team);
         } else {
             throw new TournamentSignupException(
@@ -137,7 +133,7 @@ public abstract class AbstractTournament implements TournamentInterface {
         //Loop thru teamsCopy to check for name
         boolean found = false;
         List<TeamInterface> toRemove = new ArrayList<>();
-        for (TeamInterface existingTeam : getTeamsCopy()) {
+        for (TeamInterface existingTeam : getActiveTeams()) {
             for (TournamentPlayerInterface player : existingTeam.getTeamMembers()) {
                 for (TournamentPlayerInterface newPlayer : team.getTeamMembers()) {
                     if (player.getName().equals(newPlayer.getName())) {
@@ -149,7 +145,7 @@ public abstract class AbstractTournament implements TournamentInterface {
             }
         }
         for (TeamInterface remove : toRemove) {
-            getTeamsCopy().remove(remove);
+            getActiveTeams().remove(remove);
             //If we haven't started remove it from the overall list as well.
             if (round == 0) {
                 teams.remove(remove);
@@ -206,7 +202,7 @@ public abstract class AbstractTournament implements TournamentInterface {
 
     @Override
     public int getAmountOfTeams() {
-        return getTeamsCopy().size();
+        return getActiveTeams().size();
     }
 
     @Override
@@ -227,8 +223,8 @@ public abstract class AbstractTournament implements TournamentInterface {
     }
 
     @Override
-    public Map<Integer, List<TeamInterface>> getRankings() {
-        Map<Integer, List<TeamInterface>> rankings
+    public TreeMap<Integer, List<TeamInterface>> getRankings() {
+        TreeMap<Integer, List<TeamInterface>> rankings
                 = new TreeMap<>(new Comparator<Integer>() {
 
                     @Override
@@ -249,6 +245,7 @@ public abstract class AbstractTournament implements TournamentInterface {
         return rankings;
     }
 
+    @Override
     public void displayRankings() {
         int i = 1;
         for (Entry<Integer, List<TeamInterface>> entry : getRankings().entrySet()) {
@@ -274,7 +271,7 @@ public abstract class AbstractTournament implements TournamentInterface {
 
     @Override
     public Map<Integer, Encounter> getPairings() {
-        synchronized (getTeamsCopy()) {
+        synchronized (getActiveTeams()) {
             if (pairingHistory.get(getRound()) == null) {
                 if (pairAlikeRecords) {
                     Map<Integer, Encounter> pairings
@@ -344,7 +341,7 @@ public abstract class AbstractTournament implements TournamentInterface {
                         }
                     }
                     if (pending != null) {
-                        if (getTeamsCopy().size() == 1) {
+                        if (getActiveTeams().size() == 1) {
                             //Got our winner
                         } else {
                             //We got someone pending. Pair with him BYE
@@ -358,23 +355,23 @@ public abstract class AbstractTournament implements TournamentInterface {
                             = new HashMap<>();
                     Integer[] exclude = new Integer[]{};
                     Random rnd = new Random();
-                    while (exclude.length < getTeamsCopy().size() && getTeamsCopy().size() > 1) {
+                    while (exclude.length < getActiveTeams().size() && getActiveTeams().size() > 1) {
                         int player1
                                 = getRandomWithExclusion(rnd, 0,
-                                        getTeamsCopy().size() - 1, exclude);
+                                        getActiveTeams().size() - 1, exclude);
                         exclude = ArrayUtils.add(exclude, player1);
-                        if (exclude.length == getTeamsCopy().size()) {
+                        if (exclude.length == getActiveTeams().size()) {
                             //Only one player left, pair with Bye
                             LOG.log(Level.FINE, "Pairing {0} vs. BYE",
-                                    getTeamsCopy().get(player1).getName());
+                                    getActiveTeams().get(player1).getName());
                             addPairing(pairings,
-                                    getTeamsCopy().get(player1), bye);
+                                    getActiveTeams().get(player1), bye);
                         } else {
                             int player2 = getRandomWithExclusion(rnd, 0,
-                                    getTeamsCopy().size() - 1, exclude);
+                                    getActiveTeams().size() - 1, exclude);
                             addPairing(pairings,
-                                    getTeamsCopy().get(player1),
-                                    getTeamsCopy().get(player2));
+                                    getActiveTeams().get(player1),
+                                    getActiveTeams().get(player2));
                             exclude = ArrayUtils.add(exclude, player2);
                         }
                     }
@@ -389,7 +386,7 @@ public abstract class AbstractTournament implements TournamentInterface {
     public TeamInterface getWinnerTeam() {
         TeamInterface winner = null;
         if (round > 1) {
-            winner = (TeamInterface) getTeamsCopy().toArray()[0];
+            winner = (TeamInterface) getActiveTeams().toArray()[0];
         }
         return winner;
     }
@@ -418,7 +415,8 @@ public abstract class AbstractTournament implements TournamentInterface {
     /**
      * @return the teamsCopy
      */
-    public List<TeamInterface> getTeamsCopy() {
+    @Override
+    public List<TeamInterface> getActiveTeams() {
         return teamsCopy;
     }
 
