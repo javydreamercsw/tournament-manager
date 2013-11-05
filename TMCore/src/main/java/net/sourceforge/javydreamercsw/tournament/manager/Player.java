@@ -3,6 +3,7 @@ package net.sourceforge.javydreamercsw.tournament.manager;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
 
@@ -78,5 +79,10 @@ public class Player implements TournamentPlayerInterface {
     @Override
     public String getName() {
         return ((String) get(Variables.PLAYER_NAME.getDisplayName()));
+    }
+
+    @Override
+    public int getID() {
+        return UUID.randomUUID().hashCode();
     }
 }
