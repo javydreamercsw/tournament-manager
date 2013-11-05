@@ -56,4 +56,11 @@ public interface TournamentPlayerInterface {
      * Update record to add a win.
      */
     void win();
+
+    /**
+     * Get the player ID.
+     *
+     * @return player ID
+     */
+    int getID();
 }
