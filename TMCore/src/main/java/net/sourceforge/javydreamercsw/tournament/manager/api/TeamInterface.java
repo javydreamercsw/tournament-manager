@@ -17,9 +17,10 @@ public interface TeamInterface {
      * @return the team members
      */
     List<TournamentPlayerInterface> getTeamMembers();
-    
+
     /**
      * Checks if a player is part of this team.
+     *
      * @param member member to look for.
      * @return true if found
      */

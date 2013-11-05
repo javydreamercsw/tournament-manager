@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
@@ -569,5 +570,10 @@ public abstract class AbstractTournament implements TournamentInterface {
     public boolean isTeamActive(TeamInterface t) {
         //Always active by default.
         return true;
+    }
+
+    @Override
+    public int getId() {
+        return UUID.randomUUID().hashCode();
     }
 }
