@@ -216,4 +216,11 @@ public interface TournamentInterface {
      * Display rankings.
      */
     public void displayRankings();
+
+    /**
+     * Return the ID for this tournament.
+     *
+     * @return ID for this tournament
+     */
+    public int getId();
 }
