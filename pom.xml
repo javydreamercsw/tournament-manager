@@ -44,7 +44,8 @@
         <module>TMCore</module>
         <module>Elimination-Tournament</module>
         <module>Swiss-Tournament</module>
-    </modules>
+    <module>Database-Storage</module>
+  </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.version>RELEASE74</netbeans.version>
