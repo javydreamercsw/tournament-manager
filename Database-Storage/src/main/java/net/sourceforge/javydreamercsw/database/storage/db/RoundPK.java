@@ -9,6 +9,9 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.TableGenerator;
 
 /**
  *
@@ -16,8 +19,16 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 public class RoundPK implements Serializable {
+
     @Basic(optional = false)
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "RoundGen")
+    @TableGenerator(name = "RoundGen", table = "tm_id",
+            pkColumnName = "table_name",
+            valueColumnName = "last_id",
+            pkColumnValue = "round",
+            allocationSize = 1,
+            initialValue = 1)
     private int id;
     @Basic(optional = false)
     @Column(name = "tournament_id")
@@ -26,8 +37,7 @@ public class RoundPK implements Serializable {
     public RoundPK() {
     }
 
-    public RoundPK(int id, int tournamentId) {
-        this.id = id;
+    public RoundPK(int tournamentId) {
         this.tournamentId = tournamentId;
     }
 

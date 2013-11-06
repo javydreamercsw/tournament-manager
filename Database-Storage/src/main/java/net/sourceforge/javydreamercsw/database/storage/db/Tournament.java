@@ -11,11 +11,14 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -31,9 +34,17 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Tournament.findById", query = "SELECT t FROM Tournament t WHERE t.id = :id"),
     @NamedQuery(name = "Tournament.findByName", query = "SELECT t FROM Tournament t WHERE t.name = :name")})
 public class Tournament implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TournamentGen")
+    @TableGenerator(name = "TournamentGen", table = "tm_id",
+            pkColumnName = "table_name",
+            valueColumnName = "last_id",
+            pkColumnValue = "tournament",
+            allocationSize = 1,
+            initialValue = 1)
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
@@ -47,12 +58,7 @@ public class Tournament implements Serializable {
     public Tournament() {
     }
 
-    public Tournament(Integer id) {
-        this.id = id;
-    }
-
-    public Tournament(Integer id, String name) {
-        this.id = id;
+    public Tournament(String name) {
         this.name = name;
     }
 
