@@ -10,6 +10,7 @@ import java.util.List;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -31,15 +32,19 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Match.findById", query = "SELECT m FROM Match m WHERE m.matchPK.id = :id"),
     @NamedQuery(name = "Match.findByRoundId", query = "SELECT m FROM Match m WHERE m.matchPK.roundId = :roundId")})
 public class Match implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected MatchPK matchPK;
     @JoinTable(name = "match_has_team", joinColumns = {
-        @JoinColumn(name = "match_id", referencedColumnName = "id")}, inverseJoinColumns = {
+        @JoinColumn(name = "match_id", referencedColumnName = "id"),
+        @JoinColumn(name = "round_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "team_id", referencedColumnName = "id")})
     @ManyToMany
     private List<Team> teamList;
-    @JoinColumn(name = "round_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumns({
+        @JoinColumn(name = "round_id", referencedColumnName = "id", insertable = false, updatable = false),
+        @JoinColumn(name = "tournament_id", referencedColumnName = "id", insertable = false, updatable = false)})
     @ManyToOne(optional = false)
     private Round round;
 
