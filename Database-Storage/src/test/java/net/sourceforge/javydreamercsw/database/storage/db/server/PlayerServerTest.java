@@ -1,29 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.javydreamercsw.database.storage.db.server;
 
+import net.sourceforge.javydreamercsw.database.storage.db.AbstractServerTest;
 import net.sourceforge.javydreamercsw.database.storage.db.Record;
 import net.sourceforge.javydreamercsw.database.storage.db.Team;
-import net.sourceforge.javydreamercsw.tournament.manager.Player;
+import net.sourceforge.javydreamercsw.database.storage.db.TestHelper;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Before;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class PlayerServerTest {
+public class PlayerServerTest extends AbstractServerTest {
 
     public PlayerServerTest() {
-    }
-
-    @Before
-    public void setUp() {
-        DataBaseManager.setPU("TestTMPU");
     }
 
     /**
@@ -33,7 +23,7 @@ public class PlayerServerTest {
     public void testWrite2DB() {
         System.out.println("write2DB");
         DataBaseManager.setPU("TestTMPU");
-        PlayerServer instance = new PlayerServer(new Player("Test"));
+        PlayerServer instance = TestHelper.createPlayer("Test");
         assertTrue(instance.write2DB() > 0);
         assertEquals(0, instance.getRecordList().size());
         assertEquals(0, instance.getTeamList().size());
