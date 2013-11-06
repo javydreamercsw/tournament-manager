@@ -62,4 +62,10 @@ public final class PlayerServer extends Player implements DatabaseEntity<Player>
         target.setRecordList(source.getRecordList());
         target.setTeamList(source.getTeamList());
     }
+
+    @Override
+    public Player getEntity() {
+        return new PlayerJpaController(
+                DataBaseManager.getEntityManagerFactory()).findPlayer(getId());
+    }
 }

@@ -20,4 +20,11 @@ public interface DatabaseEntity<T> {
      * @param source
      */
     void update(T target, T source);
+
+    /**
+     * Get the underlying entity
+     *
+     * @return
+     */
+    T getEntity();
 }
