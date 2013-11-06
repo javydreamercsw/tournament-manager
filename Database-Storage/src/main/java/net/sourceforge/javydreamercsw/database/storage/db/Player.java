@@ -10,6 +10,8 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -17,6 +19,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -32,9 +35,17 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Player.findById", query = "SELECT p FROM Player p WHERE p.id = :id"),
     @NamedQuery(name = "Player.findByName", query = "SELECT p FROM Player p WHERE p.name = :name")})
 public class Player implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "PlayerGen")
+    @TableGenerator(name = "PlayerGen", table = "tm_id",
+            pkColumnName = "table_name",
+            valueColumnName = "last_id",
+            pkColumnValue = "player",
+            allocationSize = 1,
+            initialValue = 1)
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
@@ -51,12 +62,7 @@ public class Player implements Serializable {
     public Player() {
     }
 
-    public Player(Integer id) {
-        this.id = id;
-    }
-
-    public Player(Integer id, String name) {
-        this.id = id;
+    public Player(String name) {
         this.name = name;
     }
 

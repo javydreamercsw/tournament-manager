@@ -55,8 +55,8 @@ public class Match implements Serializable {
         this.matchPK = matchPK;
     }
 
-    public Match(int id, int roundId) {
-        this.matchPK = new MatchPK(id, roundId);
+    public Match(int roundId) {
+        this.matchPK = new MatchPK(roundId);
     }
 
     public MatchPK getMatchPK() {

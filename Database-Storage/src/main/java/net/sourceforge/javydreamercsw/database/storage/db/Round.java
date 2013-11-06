@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Round.findById", query = "SELECT r FROM Round r WHERE r.roundPK.id = :id"),
     @NamedQuery(name = "Round.findByTournamentId", query = "SELECT r FROM Round r WHERE r.roundPK.tournamentId = :tournamentId")})
 public class Round implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected RoundPK roundPK;
@@ -47,8 +48,8 @@ public class Round implements Serializable {
         this.roundPK = roundPK;
     }
 
-    public Round(int id, int tournamentId) {
-        this.roundPK = new RoundPK(id, tournamentId);
+    public Round(int tournamentId) {
+        this.roundPK = new RoundPK(tournamentId);
     }
 
     public RoundPK getRoundPK() {

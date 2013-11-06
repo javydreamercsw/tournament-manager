@@ -9,6 +9,9 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.TableGenerator;
 
 /**
  *
@@ -16,7 +19,15 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 public class MatchPK implements Serializable {
+
     @Basic(optional = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "MatchGen")
+    @TableGenerator(name = "MatchGen", table = "tm_id",
+            pkColumnName = "table_name",
+            valueColumnName = "last_id",
+            pkColumnValue = "match",
+            allocationSize = 1,
+            initialValue = 1)
     @Column(name = "id")
     private int id;
     @Basic(optional = false)
@@ -26,8 +37,7 @@ public class MatchPK implements Serializable {
     public MatchPK() {
     }
 
-    public MatchPK(int id, int roundId) {
-        this.id = id;
+    public MatchPK(int roundId) {
         this.roundId = roundId;
     }
 

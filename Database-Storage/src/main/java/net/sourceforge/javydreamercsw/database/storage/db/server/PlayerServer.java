@@ -16,33 +16,41 @@ public final class PlayerServer extends Player implements DatabaseEntity<Player>
 
     public PlayerServer(TournamentPlayerInterface p) {
         setName(p.getName());
-        setId(p.getID());
         setRecordList(new ArrayList<Record>());
         setTeamList(new ArrayList<Team>());
+        setId(0);
     }
 
     public PlayerServer(Player p) {
-        update((PlayerServer) this, p);
+        Player player = new PlayerJpaController(
+                DataBaseManager.getEntityManagerFactory()).findPlayer(p.getId());
+        update((PlayerServer) this, player);
     }
 
     @Override
     public int write2DB() {
         PlayerJpaController controller
                 = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
-        if (getId() < 1) {
-            //New one
-            Player player = new Player();
+        if (getId() > 0) {
+            //Update
+            Player player = controller.findPlayer(getId());
             update(player, this);
             try {
+                controller.edit(player);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } else {
+            //New one
+            Player player = new Player();
+            try {
+                update(player, this);
                 controller.create(player);
+                setId(player.getId());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
             setId(player.getId());
-        } else {
-            //Update
-            Player player = controller.findPlayer(getId());
-            update(player, this);
         }
         return getId();
     }

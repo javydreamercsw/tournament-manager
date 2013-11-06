@@ -46,13 +46,13 @@ public class PlayerJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Team> attachedTeamList = new ArrayList<Team>();
+            List<Team> attachedTeamList = new ArrayList<>();
             for (Team teamListTeamToAttach : player.getTeamList()) {
                 teamListTeamToAttach = em.getReference(teamListTeamToAttach.getClass(), teamListTeamToAttach.getId());
                 attachedTeamList.add(teamListTeamToAttach);
             }
             player.setTeamList(attachedTeamList);
-            List<Record> attachedRecordList = new ArrayList<Record>();
+            List<Record> attachedRecordList = new ArrayList<>();
             for (Record recordListRecordToAttach : player.getRecordList()) {
                 recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getId());
                 attachedRecordList.add(recordListRecordToAttach);
@@ -90,14 +90,14 @@ public class PlayerJpaController implements Serializable {
             List<Team> teamListNew = player.getTeamList();
             List<Record> recordListOld = persistentPlayer.getRecordList();
             List<Record> recordListNew = player.getRecordList();
-            List<Team> attachedTeamListNew = new ArrayList<Team>();
+            List<Team> attachedTeamListNew = new ArrayList<>();
             for (Team teamListNewTeamToAttach : teamListNew) {
                 teamListNewTeamToAttach = em.getReference(teamListNewTeamToAttach.getClass(), teamListNewTeamToAttach.getId());
                 attachedTeamListNew.add(teamListNewTeamToAttach);
             }
             teamListNew = attachedTeamListNew;
             player.setTeamList(teamListNew);
-            List<Record> attachedRecordListNew = new ArrayList<Record>();
+            List<Record> attachedRecordListNew = new ArrayList<>();
             for (Record recordListNewRecordToAttach : recordListNew) {
                 recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getId());
                 attachedRecordListNew.add(recordListNewRecordToAttach);

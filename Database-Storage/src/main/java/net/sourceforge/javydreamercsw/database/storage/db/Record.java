@@ -10,11 +10,14 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -32,9 +35,17 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Record.findByLoses", query = "SELECT r FROM Record r WHERE r.loses = :loses"),
     @NamedQuery(name = "Record.findByDraws", query = "SELECT r FROM Record r WHERE r.draws = :draws")})
 public class Record implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "RecordGen")
+    @TableGenerator(name = "RecordGen", table = "tm_id",
+            pkColumnName = "table_name",
+            valueColumnName = "last_id",
+            pkColumnValue = "record",
+            allocationSize = 1,
+            initialValue = 1)
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
@@ -54,12 +65,7 @@ public class Record implements Serializable {
     public Record() {
     }
 
-    public Record(Integer id) {
-        this.id = id;
-    }
-
-    public Record(Integer id, int wins, int loses, int draws) {
-        this.id = id;
+    public Record(int wins, int loses, int draws) {
         this.wins = wins;
         this.loses = loses;
         this.draws = draws;

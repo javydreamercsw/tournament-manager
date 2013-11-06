@@ -10,10 +10,35 @@
         <class>net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam</class>
         <class>net.sourceforge.javydreamercsw.database.storage.db.Tournament</class>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://eqvsrd00:3306/tournament?zeroDateTimeBehavior=convertToNull"/>
-            <property name="javax.persistence.jdbc.password" value="arthrocare"/>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.user" value="root"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:data/tournament-manager"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="vm_user"/>
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+            <property name="eclipselink.logging.logger" value="org.eclipse.persistence.logging.DefaultSessionLog"/>
+            <property name="eclipselink.logging.level" value="SEVERE"/>
+            <property name="eclipselink.jdbc.sequence-connection-pool" value="true"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="TestTMPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>net.sourceforge.javydreamercsw.database.storage.db.Round</class>
+        <class>net.sourceforge.javydreamercsw.database.storage.db.Player</class>
+        <class>net.sourceforge.javydreamercsw.database.storage.db.Record</class>
+        <class>net.sourceforge.javydreamercsw.database.storage.db.Match</class>
+        <class>net.sourceforge.javydreamercsw.database.storage.db.Team</class>
+        <class>net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam</class>
+        <class>net.sourceforge.javydreamercsw.database.storage.db.Tournament</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:data/test/tournament-manager"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="vm_user"/>
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+            <property name="eclipselink.logging.logger" value="org.eclipse.persistence.logging.DefaultSessionLog"/>
+            <property name="eclipselink.logging.level" value="SEVERE"/>
+            <property name="eclipselink.jdbc.sequence-connection-pool" value="true"/>
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
         </properties>
     </persistence-unit>
 </persistence>
