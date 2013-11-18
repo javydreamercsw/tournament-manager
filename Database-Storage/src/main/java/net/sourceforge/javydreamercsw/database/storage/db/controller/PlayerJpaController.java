@@ -18,7 +18,6 @@ import javax.persistence.EntityManagerFactory;
 import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.database.storage.db.Record;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
 /**
  *
@@ -35,7 +34,7 @@ public class PlayerJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Player player) throws PreexistingEntityException, Exception {
+    public void create(Player player) {
         if (player.getTeamList() == null) {
             player.setTeamList(new ArrayList<Team>());
         }
@@ -68,11 +67,6 @@ public class PlayerJpaController implements Serializable {
                 recordListRecord = em.merge(recordListRecord);
             }
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findPlayer(player.getId()) != null) {
-                throw new PreexistingEntityException("Player " + player + " already exists.", ex);
-            }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();
@@ -135,7 +129,8 @@ public class PlayerJpaController implements Serializable {
             if (msg == null || msg.length() == 0) {
                 Integer id = player.getId();
                 if (findPlayer(id) == null) {
-                    throw new NonexistentEntityException("The player with id " + id + " no longer exists.");
+                    throw new NonexistentEntityException("The player with id "
+                            + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -156,7 +151,8 @@ public class PlayerJpaController implements Serializable {
                 player = em.getReference(Player.class, id);
                 player.getId();
             } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The player with id " + id + " no longer exists.", enfe);
+                throw new NonexistentEntityException("The player with id "
+                        + id + " no longer exists.", enfe);
             }
             List<Team> teamList = player.getTeamList();
             for (Team teamListTeam : teamList) {

@@ -81,4 +81,12 @@ public class Swiss extends AbstractTournament implements TournamentInterface {
          */
         return log(teams.size(), 2);
     }
+
+    @Override
+    public TournamentInterface createTournament(List<TeamInterface> teams, 
+            int winPoints, int lossPoints, int drawPoints) {
+        Swiss swiss = new Swiss(winPoints, lossPoints,  drawPoints);
+        swiss.teams.addAll(teams);
+        return swiss;
+    }
 }

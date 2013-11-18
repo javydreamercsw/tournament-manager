@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
@@ -82,6 +81,7 @@ public abstract class AbstractTournament implements TournamentInterface {
     private final List<RoundTimeListener> roundTimeListeners
             = new ArrayList<>();
     protected final boolean pairAlikeRecords;
+    private int id = -1;
 
     public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
             boolean pairAlikeRecords) {
@@ -409,8 +409,8 @@ public abstract class AbstractTournament implements TournamentInterface {
 
     @Override
     public int getPoints(TeamInterface team) {
-        return team.getTeamMembers().get(0).getWins() * getWinPoints()
-                + team.getTeamMembers().get(0).getDraws() * getDrawPoints();
+        return team.getTeamMembers().get(0).getRecord().getWins() * getWinPoints()
+                + team.getTeamMembers().get(0).getRecord().getDraws() * getDrawPoints();
     }
 
     /**
@@ -573,7 +573,22 @@ public abstract class AbstractTournament implements TournamentInterface {
     }
 
     @Override
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
     public int getId() {
-        return UUID.randomUUID().hashCode();
+        return id;
+    }
+
+    @Override
+    public Map<Integer, Encounter> getRound(int round) {
+        return pairingHistory.get(round);
+    }
+
+    @Override
+    public void setRound(int round, Map<Integer, Encounter> encounters) {
+        pairingHistory.put(round, encounters);
     }
 }

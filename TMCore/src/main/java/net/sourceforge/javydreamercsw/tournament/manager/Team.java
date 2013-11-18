@@ -4,6 +4,8 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
+import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RecordInterface;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -12,23 +14,26 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInt
 public class Team implements TeamInterface {
 
     private final String name;
-
+    private RecordInterface record = null;
     private final List<TournamentPlayerInterface> teamMembers;
 
     public Team(List<TournamentPlayerInterface> teamMembers) {
         this.teamMembers = teamMembers;
         name = "";
+        record = Lookup.getDefault().lookup(RecordInterface.class).getNewInstance();
     }
 
     public Team(String name, List<TournamentPlayerInterface> teamMembers) {
         this.name = name;
         this.teamMembers = teamMembers;
+        record = Lookup.getDefault().lookup(RecordInterface.class).getNewInstance();
     }
 
     public Team(TournamentPlayerInterface p1) {
         teamMembers = new ArrayList<>();
         teamMembers.add(p1);
         name = "";
+        record = Lookup.getDefault().lookup(RecordInterface.class).getNewInstance();
     }
 
     /**
@@ -73,5 +78,15 @@ public class Team implements TeamInterface {
             }
         }
         return found;
+    }
+
+    @Override
+    public RecordInterface getRecord() {
+        return record;
+    }
+
+    @Override
+    public TeamInterface createTeam(String name, List<TournamentPlayerInterface> teamMembers) {
+        return new Team(name, teamMembers);
     }
 }

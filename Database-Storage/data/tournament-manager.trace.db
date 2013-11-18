@@ -1,0 +1,33 @@
+11-18 13:51:21 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:28 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+INSERT INTO `match_result_type` (`id`, `type`) VALUES (1, 'result.win') [42102-174]
+11-18 13:51:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:29 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:32 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:33 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:33 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:35 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:35 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]
+11-18 13:51:36 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "MATCH_RESULT_TYPE" not found; SQL statement:
+select * from match_result_type [42102-174]

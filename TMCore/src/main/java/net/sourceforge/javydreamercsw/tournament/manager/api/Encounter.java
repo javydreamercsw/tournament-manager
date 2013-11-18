@@ -65,15 +65,15 @@ public class Encounter {
             for (TournamentPlayerInterface p : target.getTeamMembers()) {
                 switch (result) {
                     case WIN:
-                        p.win();
+                        p.getRecord().win();
                         break;
                     case DRAW:
-                        p.draw();
+                        p.getRecord().draw();
                         break;
                     case NO_SHOW:
                     //Fall thru
                     case LOSS:
-                        p.loss();
+                        p.getRecord().loss();
                         break;
                     case UNDECIDED:
                         throw new TournamentException(MessageFormat.format("Unexpected result: {0}", result));

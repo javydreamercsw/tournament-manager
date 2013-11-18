@@ -13,13 +13,19 @@ import org.openide.util.Exceptions;
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class RoundServer extends Round implements DatabaseEntity<Round> {
+public final class RoundServer extends Round implements DatabaseEntity<Round> {
 
     public RoundServer(Tournament t) {
         super(t.getId());
         setRoundPK(new RoundPK(t.getId()));
         setMatchList(new ArrayList<Match>());
         setTournament(t);
+    }
+
+    public RoundServer(Round r) {
+        RoundJpaController controller
+                = new RoundJpaController(DataBaseManager.getEntityManagerFactory());
+        update((RoundServer) this, controller.findRound(r.getRoundPK()));
     }
 
     @Override

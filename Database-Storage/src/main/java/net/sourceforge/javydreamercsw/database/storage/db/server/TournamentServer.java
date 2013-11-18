@@ -11,13 +11,30 @@ import org.openide.util.Exceptions;
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class TournamentServer extends Tournament implements DatabaseEntity<Tournament> {
+public final class TournamentServer extends Tournament implements DatabaseEntity<Tournament> {
 
     public TournamentServer(String name) {
         super(name);
         setId(0);
         setRoundList(new ArrayList<Round>());
         setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
+        setWinPoints(0);
+        setDrawPoints(0);
+        setLossPoints(0);
+    }
+
+    public TournamentServer(String name, int winPoints, int drawPoints, int lossPoints) {
+        super(name);
+        setId(0);
+        setRoundList(new ArrayList<Round>());
+        setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
+        setWinPoints(winPoints);
+        setDrawPoints(drawPoints);
+        setLossPoints(lossPoints);
+    }
+
+    public TournamentServer(Tournament t) {
+        update((TournamentServer) this, t);
     }
 
     @Override
@@ -52,6 +69,9 @@ public class TournamentServer extends Tournament implements DatabaseEntity<Tourn
         target.setName(source.getName());
         target.setRoundList(source.getRoundList());
         target.setTournamentHasTeamList(source.getTournamentHasTeamList());
+        target.setDrawPoints(source.getDrawPoints());
+        target.setWinPoints(source.getDrawPoints());
+        target.setLossPoints(source.getLossPoints());
     }
 
     @Override

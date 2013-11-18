@@ -35,6 +35,16 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Tournament.findByName", query = "SELECT t FROM Tournament t WHERE t.name = :name")})
 public class Tournament implements Serializable {
 
+    @Basic(optional = false)
+    @Column(name = "winPoints")
+    private int winPoints;
+    @Basic(optional = false)
+    @Column(name = "drawPoints")
+    private int drawPoints;
+    @Basic(optional = false)
+    @Column(name = "lossPoints")
+    private int lossPoints;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -119,6 +129,30 @@ public class Tournament implements Serializable {
     @Override
     public String toString() {
         return "net.sourceforge.javydreamercsw.database.storage.db.Tournament[ id=" + id + " ]";
+    }
+
+    public int getWinPoints() {
+        return winPoints;
+    }
+
+    public void setWinPoints(int winPoints) {
+        this.winPoints = winPoints;
+    }
+
+    public int getDrawPoints() {
+        return drawPoints;
+    }
+
+    public void setDrawPoints(int drawPoints) {
+        this.drawPoints = drawPoints;
+    }
+
+    public int getLossPoints() {
+        return lossPoints;
+    }
+
+    public void setLossPoints(int lossPoints) {
+        this.lossPoints = lossPoints;
     }
 
 }

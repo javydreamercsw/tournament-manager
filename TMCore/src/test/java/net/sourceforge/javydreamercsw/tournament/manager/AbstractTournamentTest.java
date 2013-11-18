@@ -1,6 +1,7 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
 import java.text.MessageFormat;
+import java.util.List;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import java.util.Random;
 import java.util.logging.Level;
@@ -10,6 +11,7 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
 import net.sourceforge.javydreamercsw.tournament.manager.api.NoShowListener;
 import net.sourceforge.javydreamercsw.tournament.manager.api.RoundTimeListener;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -203,6 +205,11 @@ public class AbstractTournamentTest extends TestCase {
 
         @Override
         public void removeRoundTimeListener(RoundTimeListener rtl) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public TournamentInterface createTournament(List<TeamInterface> teams, int winPoints, int lossPoints, int drawPoints) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }

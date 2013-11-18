@@ -23,10 +23,9 @@ public interface StorageInterface {
      * Save tournament.
      *
      * @param id tournament id to load
-     * @return Loaded tournament
      * @throws StorageException
      */
-    public TournamentInterface loadTournament(int id) throws StorageException;
+    public void loadTournament(int id) throws StorageException;
 
     /**
      * Initialize the storage.

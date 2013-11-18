@@ -50,16 +50,16 @@ public class EncounterTest {
             Encounter instance = new Encounter(1, team1, team2);
             instance.updateResult(team1, EncounterResult.WIN);
             instance.updateResult(team2, EncounterResult.LOSS);
-            assertEquals(1, team1.getTeamMembers().get(0).getWins());
-            assertEquals(1, team2.getTeamMembers().get(0).getLosses());
+            assertEquals(1, team1.getTeamMembers().get(0).getRecord().getWins());
+            assertEquals(1, team2.getTeamMembers().get(0).getRecord().getLosses());
             instance.updateResult(team1, EncounterResult.LOSS);
             instance.updateResult(team2, EncounterResult.WIN);
-            assertEquals(1, team2.getTeamMembers().get(0).getWins());
-            assertEquals(1, team1.getTeamMembers().get(0).getLosses());
+            assertEquals(1, team2.getTeamMembers().get(0).getRecord().getWins());
+            assertEquals(1, team1.getTeamMembers().get(0).getRecord().getLosses());
             instance.updateResult(team1, EncounterResult.DRAW);
             instance.updateResult(team2, EncounterResult.DRAW);
-            assertEquals(1, team1.getTeamMembers().get(0).getDraws());
-            assertEquals(1, team2.getTeamMembers().get(0).getDraws());
+            assertEquals(1, team1.getTeamMembers().get(0).getRecord().getDraws());
+            assertEquals(1, team2.getTeamMembers().get(0).getRecord().getDraws());
         } catch (TournamentException ex) {
             Logger.getLogger(EncounterTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();

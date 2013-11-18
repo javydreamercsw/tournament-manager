@@ -1,8 +1,11 @@
 package net.sourceforge.javydreamercsw.database.storage.db.server;
 
+import net.sourceforge.javydreamercsw.tournament.manager.api.storage.StorageException;
+
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @param <T>
  */
 public interface DatabaseEntity<T> {
 
@@ -10,8 +13,9 @@ public interface DatabaseEntity<T> {
      * Update database.
      *
      * @return new id
+     * @throws StorageException
      */
-    int write2DB();
+    int write2DB() throws StorageException;
 
     /**
      * Update the entity

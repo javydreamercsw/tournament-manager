@@ -19,7 +19,6 @@ import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
 import net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
 /**
  *
@@ -36,7 +35,7 @@ public class TournamentJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Tournament tournament) throws PreexistingEntityException, Exception {
+    public void create(Tournament tournament) {
         if (tournament.getRoundList() == null) {
             tournament.setRoundList(new ArrayList<Round>());
         }
@@ -79,11 +78,6 @@ public class TournamentJpaController implements Serializable {
                 }
             }
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findTournament(tournament.getId()) != null) {
-                throw new PreexistingEntityException("Tournament " + tournament + " already exists.", ex);
-            }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();

@@ -8,13 +8,14 @@ import net.sourceforge.javydreamercsw.database.storage.db.Team;
 import net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.TeamJpaController;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import org.openide.util.Exceptions;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class TeamServer extends Team implements DatabaseEntity<Team> {
+public final class TeamServer extends Team implements DatabaseEntity<Team> {
 
     public TeamServer(String name, List<Player> players) {
         setId(0);
@@ -22,6 +23,10 @@ public class TeamServer extends Team implements DatabaseEntity<Team> {
         setName(name);
         setPlayerList(players);
         setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
+    }
+
+    public TeamServer(Team t) {
+        update((TeamServer) this, t);
     }
 
     @Override
@@ -63,5 +68,28 @@ public class TeamServer extends Team implements DatabaseEntity<Team> {
     @Override
     public Team getEntity() {
         return new TeamJpaController(DataBaseManager.getEntityManagerFactory()).findTeam(getId());
+    }
+
+    public static boolean hasMembers(Team team, List<TournamentPlayerInterface> teamMembers) {
+        boolean found = false;
+        //If it's not even the same size, don't bother
+        if (teamMembers.size() == team.getPlayerList().size()) {
+            for (TournamentPlayerInterface pi : teamMembers) {
+                boolean internalFound = false;
+                for (Player p : team.getPlayerList()) {
+                    if (p.getId().equals(pi.getID())) {
+                        internalFound = true;
+                        break;
+                    }
+                }
+                if (!internalFound) {
+                    found = false;
+                    break;
+                } else {
+                    found = true;
+                }
+            }
+        }
+        return found;
     }
 }
