@@ -2,21 +2,42 @@ package net.sourceforge.javydreamercsw.database.storage.db.server;
 
 import java.util.ArrayList;
 import net.sourceforge.javydreamercsw.database.storage.db.Match;
+import net.sourceforge.javydreamercsw.database.storage.db.MatchPK;
 import net.sourceforge.javydreamercsw.database.storage.db.Round;
 import net.sourceforge.javydreamercsw.database.storage.db.Team;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.MatchJpaController;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
 import org.openide.util.Exceptions;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class MatchServer extends Match implements DatabaseEntity<Match> {
+public final class MatchServer extends Match implements DatabaseEntity<Match> {
+
+    public MatchServer(int round, int match) throws TournamentException {
+        MatchJpaController controller
+                = new MatchJpaController(DataBaseManager.getEntityManagerFactory());
+        MatchPK pk = new MatchPK(round);
+        pk.setId(match);
+        Match m = controller.findMatch(pk);
+        if (m == null) {
+            throw new TournamentException("Unable to find match: " + pk);
+        } else {
+            update((MatchServer) this, m);
+        }
+    }
 
     public MatchServer(Round r) {
         super(r.getRoundPK().getId());
         setRound(r);
         setTeamList(new ArrayList<Team>());
+    }
+
+    public MatchServer(Match m) {
+        MatchJpaController controller
+                = new MatchJpaController(DataBaseManager.getEntityManagerFactory());
+        update((MatchServer) this, controller.findMatch(m.getMatchPK()));
     }
 
     @Override

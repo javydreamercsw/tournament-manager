@@ -18,7 +18,6 @@ import javax.persistence.EntityManagerFactory;
 import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.database.storage.db.Record;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
 /**
  *
@@ -35,7 +34,7 @@ public class RecordJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Record record) throws PreexistingEntityException, Exception {
+    public void create(Record record) {
         if (record.getTournamentHasTeamList() == null) {
             record.setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
         }
@@ -68,11 +67,6 @@ public class RecordJpaController implements Serializable {
                 playerListPlayer = em.merge(playerListPlayer);
             }
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findRecord(record.getId()) != null) {
-                throw new PreexistingEntityException("Record " + record + " already exists.", ex);
-            }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();

@@ -1,15 +1,12 @@
 package net.sourceforge.javydreamercsw.tournament.manager.api;
 
+import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RecordInterface;
+
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
 public interface TournamentPlayerInterface {
-
-    /**
-     * Update record to add a draw.
-     */
-    void draw();
 
     /**
      * Get the value for the specified key.
@@ -20,20 +17,6 @@ public interface TournamentPlayerInterface {
     Object get(String key);
 
     /**
-     * Get amount of draws.
-     *
-     * @return amount of draws
-     */
-    int getDraws();
-
-    /**
-     * Get amount of losses.
-     *
-     * @return amount of losses
-     */
-    int getLosses();
-
-    /**
      * Get player name.
      *
      * @return player name
@@ -41,26 +24,28 @@ public interface TournamentPlayerInterface {
     String getName();
 
     /**
-     * Get amount of wins.
-     *
-     * @return amount winds
-     */
-    int getWins();
-
-    /**
-     * Update record to add a loss.
-     */
-    void loss();
-
-    /**
-     * Update record to add a win.
-     */
-    void win();
-
-    /**
      * Get the player ID.
      *
      * @return player ID
      */
     int getID();
+
+    /**
+     * Get the player's record.
+     *
+     * @return
+     */
+    RecordInterface getRecord();
+
+    /**
+     * Create an instance of this player interface.
+     *
+     * @param name player name
+     * @param wins
+     * @param loses
+     * @param draws
+     * @return instance
+     */
+    TournamentPlayerInterface createInstance(String name, int wins,
+            int loses, int draws);
 }

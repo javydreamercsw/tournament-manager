@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
+import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RecordInterface;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -13,13 +15,12 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
  */
 public class Player implements TournamentPlayerInterface {
 
+    private RecordInterface record = null;
     private final Map<String, Object> variables = new HashMap<>();
 
     public Player(String name) {
         variables.put(Variables.PLAYER_NAME.getDisplayName(), name);
-        variables.put(Variables.WINS.getDisplayName(), 0);
-        variables.put(Variables.DRAWS.getDisplayName(), 0);
-        variables.put(Variables.LOSSES.getDisplayName(), 0);
+        record = Lookup.getDefault().lookup(RecordInterface.class).getNewInstance();
         //TODO: Allow player modification
     }
 
@@ -38,42 +39,9 @@ public class Player implements TournamentPlayerInterface {
     public String toString() {
         return MessageFormat.format("{0} ({1}-{2}-{3})",
                 get(Variables.PLAYER_NAME.getDisplayName()),
-                get(Variables.WINS.getDisplayName()),
-                get(Variables.LOSSES.getDisplayName()),
-                get(Variables.DRAWS.getDisplayName()));
-    }
-
-    @Override
-    public void win() {
-        variables.put(Variables.WINS.getDisplayName(),
-                ((Integer) get(Variables.WINS.getDisplayName())) + 1);
-    }
-
-    @Override
-    public void loss() {
-        variables.put(Variables.LOSSES.getDisplayName(),
-                ((Integer) get(Variables.LOSSES.getDisplayName())) + 1);
-    }
-
-    @Override
-    public void draw() {
-        variables.put(Variables.DRAWS.getDisplayName(),
-                ((Integer) get(Variables.DRAWS.getDisplayName())) + 1);
-    }
-
-    @Override
-    public int getWins() {
-        return ((Integer) get(Variables.WINS.getDisplayName()));
-    }
-
-    @Override
-    public int getDraws() {
-        return ((Integer) get(Variables.DRAWS.getDisplayName()));
-    }
-
-    @Override
-    public int getLosses() {
-        return ((Integer) get(Variables.LOSSES.getDisplayName()));
+                getRecord().getWins(),
+                getRecord().getLosses(),
+                getRecord().getDraws());
     }
 
     @Override
@@ -84,5 +52,19 @@ public class Player implements TournamentPlayerInterface {
     @Override
     public int getID() {
         return UUID.randomUUID().hashCode();
+    }
+
+    @Override
+    public RecordInterface getRecord() {
+        return record;
+    }
+
+    @Override
+    public TournamentPlayerInterface createInstance(String name, int wins, int losses, int draws) {
+        Player player = new Player(name);
+        player.getRecord().setWins(wins);
+        player.getRecord().setLosses(losses);
+        player.getRecord().setDraws(draws);
+        return player;
     }
 }

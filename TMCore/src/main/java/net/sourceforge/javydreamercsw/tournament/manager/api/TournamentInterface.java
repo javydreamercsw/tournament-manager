@@ -41,6 +41,22 @@ public interface TournamentInterface {
     public int getRound();
 
     /**
+     * Get specific round.
+     *
+     * @param round round to look for
+     * @return round or null if not found.
+     */
+    public Map<Integer, Encounter> getRound(int round);
+
+    /**
+     * Get specific round.
+     *
+     * @param round round to look for
+     * @param encounters encounters to set to this round
+     */
+    public void setRound(int round, Map<Integer, Encounter> encounters);
+
+    /**
      * Add player.
      *
      * @throws TournamentSignupException
@@ -223,4 +239,22 @@ public interface TournamentInterface {
      * @return ID for this tournament
      */
     public int getId();
+
+    /**
+     * Set the ID for this tournament.
+     *
+     * @param id ID for this tournament
+     */
+    public void setId(int id);
+
+    /**
+     * Create a tournament.
+     * @param teams
+     * @param winPoints
+     * @param lossPoints
+     * @param drawPoints
+     * @return
+     */
+    public TournamentInterface createTournament(List<TeamInterface> teams,
+            int winPoints, int lossPoints, int drawPoints);
 }

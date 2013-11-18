@@ -94,8 +94,8 @@ public class Elimination extends AbstractTournament
                         = new ArrayList<>();
                 for (TeamInterface team : getActiveTeams()) {
                     //Loss or draw gets you eliminated
-                    if (team.getTeamMembers().get(0).getLosses()
-                            + team.getTeamMembers().get(0).getDraws() >= eliminations) {
+                    if (team.getTeamMembers().get(0).getRecord().getLosses()
+                            + team.getTeamMembers().get(0).getRecord().getDraws() >= eliminations) {
                         toRemove.add(team);
                     }
                 }
@@ -202,5 +202,13 @@ public class Elimination extends AbstractTournament
          * competitors will get a bye.
          */
         return log(teams.size(), 2);
+    }
+
+    @Override
+    public TournamentInterface createTournament(List<TeamInterface> teams,
+            int winPoints, int lossPoints, int drawPoints) {
+        Elimination swiss = new Elimination(1, winPoints, lossPoints, drawPoints, true);
+        swiss.teams.addAll(teams);
+        return swiss;
     }
 }

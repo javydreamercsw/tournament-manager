@@ -7,6 +7,7 @@ package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -16,6 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -32,6 +34,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Match.findById", query = "SELECT m FROM Match m WHERE m.matchPK.id = :id"),
     @NamedQuery(name = "Match.findByRoundId", query = "SELECT m FROM Match m WHERE m.matchPK.roundId = :roundId")})
 public class Match implements Serializable {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "match")
+    private List<MatchHasTeam> matchHasTeamList;
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -109,4 +114,12 @@ public class Match implements Serializable {
         return "net.sourceforge.javydreamercsw.database.storage.db.Match[ matchPK=" + matchPK + " ]";
     }
 
+    @XmlTransient
+    public List<MatchHasTeam> getMatchHasTeamList() {
+        return matchHasTeamList;
+    }
+
+    public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList) {
+        this.matchHasTeamList = matchHasTeamList;
+    }
 }

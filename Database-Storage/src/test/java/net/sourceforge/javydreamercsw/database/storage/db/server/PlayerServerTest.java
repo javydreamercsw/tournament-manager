@@ -1,8 +1,9 @@
 package net.sourceforge.javydreamercsw.database.storage.db.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.sourceforge.javydreamercsw.database.storage.db.AbstractServerTest;
-import net.sourceforge.javydreamercsw.database.storage.db.Record;
-import net.sourceforge.javydreamercsw.database.storage.db.Team;
+import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.database.storage.db.TestHelper;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -22,15 +23,17 @@ public class PlayerServerTest extends AbstractServerTest {
     @Test
     public void testWrite2DB() {
         System.out.println("write2DB");
-        DataBaseManager.setPU("TestTMPU");
         PlayerServer instance = TestHelper.createPlayer("Test");
         assertTrue(instance.write2DB() > 0);
         assertEquals(0, instance.getRecordList().size());
         assertEquals(0, instance.getTeamList().size());
-        instance.getRecordList().add(new Record());
+        instance.getRecordList().add(new RecordServer(0, 0, 0));
         instance.write2DB();
         assertEquals(1, instance.getRecordList().size());
-        instance.getTeamList().add(new Team());
+        List<Player> players = new ArrayList<>();
+        players.add(new PlayerServer(new net.sourceforge.javydreamercsw.tournament.manager.Player("Test 1")).getEntity());
+        players.add(new PlayerServer(new net.sourceforge.javydreamercsw.tournament.manager.Player("Test 2")).getEntity());
+        instance.getTeamList().add(new TeamServer("Test", players));
         instance.write2DB();
         assertEquals(1, instance.getTeamList().size());
     }

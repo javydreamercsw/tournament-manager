@@ -40,9 +40,9 @@ public class PlayerTest {
     public void testWin() {
         System.out.println("win");
         Player instance = new Player("Test");
-        assertEquals(0, instance.get(Variables.WINS.getDisplayName()));
-        instance.win();
-        assertEquals(1, instance.get(Variables.WINS.getDisplayName()));
+        assertEquals(0, instance.getRecord().getWins());
+        instance.getRecord().win();
+        assertEquals(1, instance.getRecord().getWins());
     }
 
     /**
@@ -52,9 +52,9 @@ public class PlayerTest {
     public void testLoss() {
         System.out.println("loss");
         Player instance = new Player("Test");
-        assertEquals(0, instance.get(Variables.LOSSES.getDisplayName()));
-        instance.loss();
-        assertEquals(1, instance.get(Variables.LOSSES.getDisplayName()));
+        assertEquals(0, instance.getRecord().getLosses());
+        instance.getRecord().loss();
+        assertEquals(1, instance.getRecord().getLosses());
     }
 
     /**
@@ -64,9 +64,9 @@ public class PlayerTest {
     public void testDraw() {
         System.out.println("draw");
         Player instance = new Player("Test");
-        assertEquals(0, instance.get(Variables.DRAWS.getDisplayName()));
-        instance.draw();
-        assertEquals(1, instance.get(Variables.DRAWS.getDisplayName()));
+        assertEquals(0, instance.getRecord().getDraws());
+        instance.getRecord().draw();
+        assertEquals(1, instance.getRecord().getDraws());
     }
 
 }

@@ -37,6 +37,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Team.findById", query = "SELECT t FROM Team t WHERE t.id = :id"),
     @NamedQuery(name = "Team.findByName", query = "SELECT t FROM Team t WHERE t.name = :name")})
 public class Team implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "team")
+    private List<MatchHasTeam> matchHasTeamList;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -131,6 +133,15 @@ public class Team implements Serializable {
     @Override
     public String toString() {
         return "net.sourceforge.javydreamercsw.database.storage.db.Team[ id=" + id + " ]";
+    }
+
+    @XmlTransient
+    public List<MatchHasTeam> getMatchHasTeamList() {
+        return matchHasTeamList;
+    }
+
+    public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList) {
+        this.matchHasTeamList = matchHasTeamList;
     }
 
 }
