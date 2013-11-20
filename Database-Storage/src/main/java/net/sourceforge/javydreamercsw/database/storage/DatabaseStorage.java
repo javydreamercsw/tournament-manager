@@ -148,34 +148,6 @@ public class DatabaseStorage implements StorageInterface {
                         ts.getLossPoints(),
                         ts.getDrawPoints());
         tournament.setId(id);
-//        for (Round round : ts.getRoundList()) {
-//            //Convert from database to interface
-//            Map<Integer, Encounter> encounters = new HashMap<>();
-//            for (Match match : round.getMatchList()) {
-//                List<TeamInterface> teams = new ArrayList<>();
-//                for (Team t : match.getTeamList()) {
-//                    Team team = new TeamServer(t).getEntity();
-//                    List< TournamentPlayerInterface> teamMembers
-//                            = new ArrayList<>();
-//                    for (Player player : team.getPlayerList()) {
-//                        int wins = 0;
-//                        int losses = 0;
-//                        int draws = 0;
-//                        for (Record record : player.getRecordList()) {
-//                            losses += record.getLoses();
-//                            wins += record.getWins();
-//                            draws += record.getDraws();
-//                        }
-//                        teamMembers.add(Lookup.getDefault().lookup(TournamentPlayerInterface.class).createInstance(player.getName(), wins, losses, draws));
-//                    }
-//                    teams.add(Lookup.getDefault().lookup(TeamInterface.class).createTeam(team.getName(), teamMembers));
-//                }
-//
-////                new Encounter(match.getMatchPK().getId(), teams);
-//                encounters.put(match.getMatchPK().getId(), null);
-//            }
-//            tournament.setRound(round.getRoundPK().getId(), encounters);
-//        }
     }
 
     @Override
