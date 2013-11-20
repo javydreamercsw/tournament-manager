@@ -3,6 +3,7 @@ package net.sourceforge.javydreamercsw.database.storage.db.server;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.javydreamercsw.database.storage.db.Match;
+import net.sourceforge.javydreamercsw.database.storage.db.MatchHasTeam;
 import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.database.storage.db.Team;
 import net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam;
@@ -19,6 +20,7 @@ public final class TeamServer extends Team implements DatabaseEntity<Team> {
 
     public TeamServer(String name, List<Player> players) {
         setId(0);
+        setMatchHasTeamList(new ArrayList<MatchHasTeam>());
         setMatchList(new ArrayList<Match>());
         setName(name);
         setPlayerList(players);
@@ -63,6 +65,7 @@ public final class TeamServer extends Team implements DatabaseEntity<Team> {
         target.setName(source.getName());
         target.setPlayerList(source.getPlayerList());
         target.setTournamentHasTeamList(source.getTournamentHasTeamList());
+        target.setMatchHasTeamList(source.getMatchHasTeamList());
     }
 
     @Override

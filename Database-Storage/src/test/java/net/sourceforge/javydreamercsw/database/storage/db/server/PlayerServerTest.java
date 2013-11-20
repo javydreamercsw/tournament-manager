@@ -27,13 +27,13 @@ public class PlayerServerTest extends AbstractServerTest {
         assertTrue(instance.write2DB() > 0);
         assertEquals(0, instance.getRecordList().size());
         assertEquals(0, instance.getTeamList().size());
-        instance.getRecordList().add(new RecordServer(0, 0, 0));
+        instance.getRecordList().add(new RecordServer(0, 0, 0).getEntity());
         instance.write2DB();
         assertEquals(1, instance.getRecordList().size());
         List<Player> players = new ArrayList<>();
         players.add(new PlayerServer(new net.sourceforge.javydreamercsw.tournament.manager.Player("Test 1")).getEntity());
         players.add(new PlayerServer(new net.sourceforge.javydreamercsw.tournament.manager.Player("Test 2")).getEntity());
-        instance.getTeamList().add(new TeamServer("Test", players));
+        instance.getTeamList().add(new TeamServer("Test", players).getEntity());
         instance.write2DB();
         assertEquals(1, instance.getTeamList().size());
     }
