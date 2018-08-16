@@ -45,7 +45,8 @@
         <module>Elimination-Tournament</module>
         <module>Swiss-Tournament</module>
     <module>Database-Storage</module>
-  </modules>
+        <module>TrueSkill</module>
+    </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.version>RELEASE80</netbeans.version>

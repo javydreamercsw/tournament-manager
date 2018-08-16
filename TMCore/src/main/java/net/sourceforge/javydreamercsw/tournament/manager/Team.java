@@ -1,23 +1,26 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
-import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.openide.util.Lookup;
+
+import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RecordInterface;
-import org.openide.util.Lookup;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class Team implements TeamInterface {
+public class Team implements TeamInterface
+{
+  private final String name;
+  private RecordInterface record = null;
+  private final List<TournamentPlayerInterface> teamMembers;
 
-    private final String name;
-    private RecordInterface record = null;
-    private final List<TournamentPlayerInterface> teamMembers;
-
-    public Team(List<TournamentPlayerInterface> teamMembers) {
+  public Team(List<TournamentPlayerInterface> teamMembers)
+  {
         this.teamMembers = teamMembers;
         name = "";
         record = Lookup.getDefault().lookup(RecordInterface.class).getNewInstance();
@@ -54,15 +57,19 @@ public class Team implements TeamInterface {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder((name.trim().isEmpty() ? "" : "Team " + name + "("));
-        for (TournamentPlayerInterface p : teamMembers) {
-            String val = sb.toString();
-            if (!val.trim().isEmpty() && !val.endsWith("(")) {
-                sb.append(", ");
-            }
-            sb.append(p.toString());
+      StringBuilder sb = new StringBuilder((name.trim().isEmpty() ? ""
+              : "Team " + name + "("));
+      teamMembers.forEach((p) ->
+      {
+        String val = sb.toString();
+        if (!val.trim().isEmpty() && !val.endsWith("("))
+        {
+          sb.append(", ");
         }
-        if (!sb.toString().trim().isEmpty() && sb.toString().startsWith("Team")) {
+        sb.append(p.toString());
+      });
+      if (!sb.toString().trim().isEmpty() && sb.toString().startsWith("Team"))
+      {
             sb.append(")");
         }
         return sb.toString();
@@ -83,10 +90,5 @@ public class Team implements TeamInterface {
     @Override
     public RecordInterface getRecord() {
         return record;
-    }
-
-    @Override
-    public TeamInterface createTeam(String name, List<TournamentPlayerInterface> teamMembers) {
-        return new Team(name, teamMembers);
-    }
+  }
 }

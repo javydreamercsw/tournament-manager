@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>net.sourceforge.javydreamercsw</groupId>
+        <artifactId>Tournament-Manager</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>TrueSkill</artifactId>
+    <packaging>jar</packaging>
+    <name>True Skill Ranking Provider</name>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>TMCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.gesundkrank.jskills</groupId>
+            <artifactId>jskills</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

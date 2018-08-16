@@ -1,42 +1,24 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.junit.Test;
+
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class EncounterTest {
-
-    public EncounterTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
+public class EncounterTest
+{
 
     /**
      * Test of updateResult method, of class Encounter.
@@ -45,8 +27,8 @@ public class EncounterTest {
     public void testUpdateResult() {
         try {
             System.out.println("updateResult");
-            TeamInterface team1 = new Team(new Player("Player 1"));
-            TeamInterface team2 = new Team(new Player("Player 2"));
+          TeamInterface team1 = new Team(new Player("Player 1", 1));
+          TeamInterface team2 = new Team(new Player("Player 2", 2));
             Encounter instance = new Encounter(1, team1, team2);
             instance.updateResult(team1, EncounterResult.WIN);
             instance.updateResult(team2, EncounterResult.LOSS);
