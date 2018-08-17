@@ -9,7 +9,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.controller.RecordJpaCo
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class RecordServer extends Record implements DatabaseEntity<Record>
+public final class RecordServer extends Record implements DatabaseEntity<Record>
 {
   private static final long serialVersionUID = 1121455691184116787L;
 
@@ -73,6 +73,7 @@ public class RecordServer extends Record implements DatabaseEntity<Record>
   @Override
   public Record getEntity()
   {
-    return new RecordJpaController(DataBaseManager.getEntityManagerFactory()).findRecord(getId());
+    return new RecordJpaController(DataBaseManager.getEntityManagerFactory())
+            .findRecord(getId());
   }
 }
