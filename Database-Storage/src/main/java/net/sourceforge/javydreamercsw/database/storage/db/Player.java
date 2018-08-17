@@ -6,7 +6,9 @@
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,99 +32,120 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(name = "player")
 @XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "Player.findAll", query = "SELECT p FROM Player p"),
-    @NamedQuery(name = "Player.findById", query = "SELECT p FROM Player p WHERE p.id = :id"),
-    @NamedQuery(name = "Player.findByName", query = "SELECT p FROM Player p WHERE p.name = :name")})
-public class Player implements Serializable {
+@NamedQueries(
+        {
+          @NamedQuery(name = "Player.findAll", query = "SELECT p FROM Player p"),
+          @NamedQuery(name = "Player.findById",
+                  query = "SELECT p FROM Player p WHERE p.id = :id"),
+          @NamedQuery(name = "Player.findByName",
+                  query = "SELECT p FROM Player p WHERE p.name = :name")
+})
+public class Player implements Serializable
+{
+  private static final long serialVersionUID = -6835135177610693037L;
+  @Id
+  @Basic(optional = false)
+  @GeneratedValue(strategy = GenerationType.TABLE, generator = "PlayerGen")
+  @TableGenerator(name = "PlayerGen", table = "tm_id",
+          pkColumnName = "table_name",
+          valueColumnName = "last_id",
+          pkColumnValue = "player",
+          allocationSize = 1,
+          initialValue = 1)
+  @Column(name = "id")
+  private Integer id;
+  @Basic(optional = false)
+  @Column(name = "name")
+  private String name;
+  @ManyToMany(mappedBy = "playerList")
+  private List<Team> teamList;
+  @JoinTable(name = "player_has_record", joinColumns =
+  {
+    @JoinColumn(name = "player_id", referencedColumnName = "id")
+  }, inverseJoinColumns =
+  {
+    @JoinColumn(name = "record_id", referencedColumnName = "id")
+  })
+  @ManyToMany
+  private List<Record> recordList;
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @Basic(optional = false)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "PlayerGen")
-    @TableGenerator(name = "PlayerGen", table = "tm_id",
-            pkColumnName = "table_name",
-            valueColumnName = "last_id",
-            pkColumnValue = "player",
-            allocationSize = 1,
-            initialValue = 1)
-    @Column(name = "id")
-    private Integer id;
-    @Basic(optional = false)
-    @Column(name = "name")
-    private String name;
-    @ManyToMany(mappedBy = "playerList")
-    private List<Team> teamList;
-    @JoinTable(name = "player_has_record", joinColumns = {
-        @JoinColumn(name = "player_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "record_id", referencedColumnName = "id")})
-    @ManyToMany
-    private List<Record> recordList;
+  public Player()
+  {
+  }
 
-    public Player() {
+  public Player(String name)
+  {
+    this.name = name;
+    this.recordList = new ArrayList<>();
+    this.teamList = new ArrayList<>();
+  }
+
+  public Integer getId()
+  {
+    return id;
+  }
+
+  public void setId(Integer id)
+  {
+    this.id = id;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  @XmlTransient
+  public List<Team> getTeamList()
+  {
+    return teamList;
+  }
+
+  public void setTeamList(List<Team> teamList)
+  {
+    this.teamList = teamList;
+  }
+
+  @XmlTransient
+  public List<Record> getRecordList()
+  {
+    return recordList;
+  }
+
+  public void setRecordList(List<Record> recordList)
+  {
+    this.recordList = recordList;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 0;
+    hash += (id != null ? id.hashCode() : 0);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object object)
+  {
+    if (!(object instanceof Player))
+    {
+      return false;
     }
+    Player other = (Player) object;
+    return !((this.id == null && other.id != null)
+            || (this.id != null && !this.id.equals(other.id)));
+  }
 
-    public Player(String name) {
-        this.name = name;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @XmlTransient
-    public List<Team> getTeamList() {
-        return teamList;
-    }
-
-    public void setTeamList(List<Team> teamList) {
-        this.teamList = teamList;
-    }
-
-    @XmlTransient
-    public List<Record> getRecordList() {
-        return recordList;
-    }
-
-    public void setRecordList(List<Record> recordList) {
-        this.recordList = recordList;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Player)) {
-            return false;
-        }
-        Player other = (Player) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "net.sourceforge.javydreamercsw.database.storage.db.Player[ id=" + id + " ]";
-    }
-
+  @Override
+  public String toString()
+  {
+    return "net.sourceforge.javydreamercsw.database.storage.db.Player[ id="
+            + id + " ]";
+  }
 }

@@ -14,7 +14,7 @@
     <class>net.sourceforge.javydreamercsw.database.storage.db.MatchResultType</class>
     <class>net.sourceforge.javydreamercsw.database.storage.db.TmId</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:data/tournament-manager;AUTO_SERVER=TRUE"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:~/TournamentManager/data/tournament-manager;AUTO_SERVER=TRUE"/>
       <property name="javax.persistence.jdbc.password" value=""/>
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
       <property name="javax.persistence.jdbc.user" value="vm_user"/>
@@ -39,7 +39,7 @@
     <class>net.sourceforge.javydreamercsw.database.storage.db.MatchResultType</class>
     <class>net.sourceforge.javydreamercsw.database.storage.db.TmId</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:data/test/tournament-manager;AUTO_SERVER=TRUE"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:./target/data/test/tournament-manager;AUTO_SERVER=TRUE"/>
       <property name="javax.persistence.jdbc.password" value=""/>
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
       <property name="javax.persistence.jdbc.user" value="vm_user"/>

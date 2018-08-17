@@ -1,6 +1,7 @@
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.util.List;
+
 import net.sourceforge.javydreamercsw.database.storage.db.server.PlayerServer;
 import net.sourceforge.javydreamercsw.database.storage.db.server.RoundServer;
 import net.sourceforge.javydreamercsw.database.storage.db.server.TeamServer;
@@ -13,7 +14,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.server.TournamentServe
 public class TestHelper {
 
     public static PlayerServer createPlayer(String name) {
-        return new PlayerServer(new net.sourceforge.javydreamercsw.tournament.manager.Player(name));
+      return new PlayerServer(new Player(name));
     }
 
     public static TournamentServer createTournament(String name) {

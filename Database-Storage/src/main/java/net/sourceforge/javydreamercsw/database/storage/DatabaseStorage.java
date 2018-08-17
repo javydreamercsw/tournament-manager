@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.openide.util.Lookup;
+
+import de.gesundkrank.jskills.IPlayer;
 import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.database.storage.db.Record;
 import net.sourceforge.javydreamercsw.database.storage.db.Team;
@@ -26,7 +30,6 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.storage.StorageException;
 import net.sourceforge.javydreamercsw.tournament.manager.api.storage.StorageInterface;
-import org.openide.util.Lookup;
 
 /**
  *
@@ -137,10 +140,10 @@ public class DatabaseStorage implements StorageInterface {
                     draws += r.getDraws();
                 }
                 players.add(Lookup.getDefault().lookup(TournamentPlayerInterface.class)
-                        .createInstance(p.getName(), wins, loss, draws));
+                      .createInstance(p.getName(), wins, loss, draws));
             }
             teams.add(Lookup.getDefault().lookup(TeamInterface.class)
-                    .createTeam(tht.getTeam().getName(), players));
+                  .createTeam(tht.getTeam().getName(), players));
         }
         TournamentInterface tournament
                 = Lookup.getDefault().lookup(TournamentInterface.class)
@@ -161,4 +164,10 @@ public class DatabaseStorage implements StorageInterface {
     public boolean isInitialized() {
         return initialized;
     }
+
+  @Override
+  public int addPlayer(IPlayer player)
+  {
+    return -1;
+  }
 }

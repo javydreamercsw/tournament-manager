@@ -6,17 +6,19 @@
 package net.sourceforge.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import net.sourceforge.javydreamercsw.database.storage.db.Team;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.database.storage.db.Record;
+import net.sourceforge.javydreamercsw.database.storage.db.Team;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
 /**
@@ -24,6 +26,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
 public class PlayerJpaController implements Serializable {
+  private static final long serialVersionUID = 5793057143248474039L;
 
     public PlayerJpaController(EntityManagerFactory emf) {
         this.emf = emf;
@@ -36,10 +39,10 @@ public class PlayerJpaController implements Serializable {
 
     public void create(Player player) {
         if (player.getTeamList() == null) {
-            player.setTeamList(new ArrayList<Team>());
+          player.setTeamList(new ArrayList<>());
         }
         if (player.getRecordList() == null) {
-            player.setRecordList(new ArrayList<Record>());
+          player.setRecordList(new ArrayList<>());
         }
         EntityManager em = null;
         try {
