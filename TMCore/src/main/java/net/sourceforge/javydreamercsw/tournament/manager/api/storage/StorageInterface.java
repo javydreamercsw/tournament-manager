@@ -3,6 +3,7 @@
  */
 package net.sourceforge.javydreamercsw.tournament.manager.api.storage;
 
+import de.gesundkrank.jskills.IPlayer;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
 
 /**
@@ -37,5 +38,13 @@ public interface StorageInterface {
      *
      * @return true if storage is initialized
      */
-    public boolean isInitialized();
+  public boolean isInitialized();
+
+  /**
+   * Add a player
+   *
+   * @param player player to add.
+   * @return id of the created player.
+   */
+  public int addPlayer(IPlayer player);
 }

@@ -1,12 +1,13 @@
 package net.sourceforge.javydreamercsw.tournament.manager.api;
 
+import de.gesundkrank.jskills.IPlayer;
 import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RecordInterface;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public interface TournamentPlayerInterface
+public interface TournamentPlayerInterface extends IPlayer
 {
 
   /**
@@ -37,6 +38,18 @@ public interface TournamentPlayerInterface
    * @return
    */
   RecordInterface getRecord();
+
+  /**
+   * Create an instance of this player interface.
+   *
+   * @param name player name
+   * @param wins amount of wins
+   * @param loses amount of loses
+   * @param draws amount of draws
+   * @return instance
+   */
+  TournamentPlayerInterface createInstance(String name, int wins,
+          int loses, int draws);
 
   /**
    * Create an instance of this player interface.

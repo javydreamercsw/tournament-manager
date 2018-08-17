@@ -2,13 +2,14 @@ package net.sourceforge.javydreamercsw.tournament.manager.api;
 
 import java.util.List;
 
+import de.gesundkrank.jskills.ITeam;
 import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RecordInterface;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public interface TeamInterface
+public interface TeamInterface extends ITeam
 {
 
   /**
@@ -35,4 +36,13 @@ public interface TeamInterface
    * @return
    */
   RecordInterface getRecord();
+
+  /**
+   * Create a team.
+   *
+   * @param name Team name.
+   * @param players Team members.
+   * @return
+   */
+  TeamInterface createTeam(String name, List<TournamentPlayerInterface> players);
 }

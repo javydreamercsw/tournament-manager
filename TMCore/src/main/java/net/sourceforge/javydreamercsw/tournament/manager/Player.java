@@ -21,6 +21,11 @@ public class Player implements TournamentPlayerInterface
   private final Map<String, Object> variables = new HashMap<>();
   private final int id;
 
+  public Player(String name)
+  {
+    this(name, -1);
+  }
+
   public Player(String name, int id)
   {
     variables.put(Variables.PLAYER_NAME.getDisplayName(), name);
@@ -67,6 +72,13 @@ public class Player implements TournamentPlayerInterface
   public RecordInterface getRecord()
   {
     return record;
+  }
+
+  @Override
+  public TournamentPlayerInterface createInstance(String name, int wins,
+          int losses, int draws)
+  {
+    return createInstance(name, -1, wins, losses, draws);
   }
 
   @Override

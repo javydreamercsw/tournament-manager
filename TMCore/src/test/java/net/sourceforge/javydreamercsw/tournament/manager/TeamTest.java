@@ -2,7 +2,7 @@ package net.sourceforge.javydreamercsw.tournament.manager;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
@@ -54,29 +54,9 @@ public class TeamTest
     Team instance = new Team(new Player("Test", 1));
     List<TournamentPlayerInterface> result = instance.getTeamMembers();
     assertEquals(1, result.size());
-    instance.getTeamMembers().add(new Player("Player 2", 2));
+    instance = new Team(Arrays.asList(new Player("Test", 1),
+            new Player("Player 2", 2)));
     result = instance.getTeamMembers();
     assertEquals(2, result.size());
-  }
-
-  /**
-   * Test of toString method, of class Team.
-   */
-  @Test
-  public void testToString()
-  {
-    System.out.println("toString");
-    List<TournamentPlayerInterface> players = new ArrayList<>();
-    players.add(new Player("Test 1", 1));
-    players.add(new Player("Test 2", 2));
-    Team instance = new Team(players.get(0));
-    assertEquals(players.get(0).toString(), instance.toString());
-    instance.getTeamMembers().add(players.get(1));
-    assertEquals(players.get(0).toString() + ", "
-            + players.get(1).toString(), instance.toString());
-    instance = new Team("Test Team", players);
-    assertEquals("Team " + instance.getName()
-            + "(" + players.get(0).toString() + ", "
-            + players.get(1).toString() + ")", instance.toString());
   }
 }
