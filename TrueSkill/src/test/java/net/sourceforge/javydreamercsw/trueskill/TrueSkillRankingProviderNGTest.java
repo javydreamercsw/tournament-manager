@@ -37,6 +37,7 @@ public class TrueSkillRankingProviderNGTest
 
   /**
    * Test of addMatch method, of class TrueSkillRankingProvider.
+   * @throws java.lang.Exception
    */
   @Test
   public void testMatch() throws Exception
