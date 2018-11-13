@@ -13,7 +13,7 @@ import javax.persistence.Embeddable;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Embeddable
 public class MatchHasTeamPK implements Serializable
@@ -35,8 +35,7 @@ public class MatchHasTeamPK implements Serializable
   {
   }
 
-  public MatchHasTeamPK(int matchId, int teamId, int matchResultId,
-          int matchResultMatchResultTypeId)
+  public MatchHasTeamPK(int matchId, int teamId, int matchResultId, int matchResultMatchResultTypeId)
   {
     this.matchId = matchId;
     this.teamId = teamId;
@@ -116,16 +115,17 @@ public class MatchHasTeamPK implements Serializable
     {
       return false;
     }
-    return this.matchResultMatchResultTypeId == other.matchResultMatchResultTypeId;
+    if (this.matchResultMatchResultTypeId != other.matchResultMatchResultTypeId)
+    {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.MatchHasTeamPK[ matchId="
-            + matchId + ", teamId=" + teamId + ", matchResultId="
-            + matchResultId + ", matchResultMatchResultTypeId="
-            + matchResultMatchResultTypeId + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.MatchHasTeamPK[ matchId=" + matchId + ", teamId=" + teamId + ", matchResultId=" + matchResultId + ", matchResultMatchResultTypeId=" + matchResultMatchResultTypeId + " ]";
   }
-
+  
 }

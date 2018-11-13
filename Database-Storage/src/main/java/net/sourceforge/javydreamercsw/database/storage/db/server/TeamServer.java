@@ -2,29 +2,29 @@ package net.sourceforge.javydreamercsw.database.storage.db.server;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.sourceforge.javydreamercsw.database.storage.db.Match;
-import net.sourceforge.javydreamercsw.database.storage.db.MatchHasTeam;
+
+import org.openide.util.Exceptions;
+
 import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.database.storage.db.Team;
-import net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.TeamJpaController;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
-import org.openide.util.Exceptions;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
 public final class TeamServer extends Team implements DatabaseEntity<Team> {
+  private static final long serialVersionUID = 2352135356546640102L;
 
     public TeamServer(String name, List<Player> players) {
         setId(0);
-        setMatchHasTeamList(new ArrayList<MatchHasTeam>());
-        setMatchList(new ArrayList<Match>());
+        setMatchHasTeamList(new ArrayList<>());
+        setMatchHasTeamList(new ArrayList<>());
         setName(name);
         setPlayerList(players);
-        setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
+        setTournamentHasTeamList(new ArrayList<>());
     }
 
     public TeamServer(Team t) {
@@ -61,7 +61,7 @@ public final class TeamServer extends Team implements DatabaseEntity<Team> {
     @Override
     public void update(Team target, Team source) {
         target.setId(source.getId());
-        target.setMatchList(source.getMatchList());
+        target.setMatchHasTeamList(source.getMatchHasTeamList());
         target.setName(source.getName());
         target.setPlayerList(source.getPlayerList());
         target.setTournamentHasTeamList(source.getTournamentHasTeamList());

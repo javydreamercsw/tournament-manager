@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,54 +20,48 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Entity
 @Table(name = "match_result_type")
 @XmlRootElement
 @NamedQueries(
-        {
-  @NamedQuery(name = "MatchResultType.findAll",
-          query = "SELECT m FROM MatchResultType m"),
-  @NamedQuery(name = "MatchResultType.findById",
-          query = "SELECT m FROM MatchResultType m WHERE m.id = :id"),
-  @NamedQuery(name = "MatchResultType.findByType",
-          query = "SELECT m FROM MatchResultType m WHERE m.type = :type")
+{
+  @NamedQuery(name = "MatchResultType.findAll", query = "SELECT m FROM MatchResultType m"),
+  @NamedQuery(name = "MatchResultType.findById", query = "SELECT m FROM MatchResultType m WHERE m.id = :id"),
+  @NamedQuery(name = "MatchResultType.findByType", query = "SELECT m FROM MatchResultType m WHERE m.type = :type")
 })
 public class MatchResultType implements Serializable
 {
-
   private static final long serialVersionUID = 1L;
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Basic(optional = false)
-  @GeneratedValue(strategy = GenerationType.TABLE,
-          generator = "MatchResultTypeGen")
-  @TableGenerator(name = "MatchResultTypeGen", table = "tm_id",
-          pkColumnName = "table_name",
-          valueColumnName = "last_id",
-          pkColumnValue = "match_result_type",
-          allocationSize = 1,
-          initialValue = 1)
   @Column(name = "id")
   private Integer id;
   @Basic(optional = false)
   @Column(name = "type")
   private String type;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "matchResultType")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "matchResultType", fetch = FetchType.LAZY)
   private List<MatchResult> matchResultList;
 
   public MatchResultType()
   {
   }
 
-  public MatchResultType(String type)
+  public MatchResultType(Integer id)
   {
+    this.id = id;
+  }
+
+  public MatchResultType(Integer id, String type)
+  {
+    this.id = id;
     this.type = type;
   }
 
@@ -118,14 +113,17 @@ public class MatchResultType implements Serializable
       return false;
     }
     MatchResultType other = (MatchResultType) object;
-    return !((this.id == null && other.id != null)
-            || (this.id != null && !this.id.equals(other.id)));
+    if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)))
+    {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.MatchResultType[ id="
-            + id + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.MatchResultType[ id=" + id + " ]";
   }
+  
 }

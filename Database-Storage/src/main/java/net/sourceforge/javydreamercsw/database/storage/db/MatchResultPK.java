@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
@@ -16,12 +11,12 @@ import javax.persistence.TableGenerator;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Embeddable
 public class MatchResultPK implements Serializable
 {
-
+  private static final long serialVersionUID = 1317423482141205015L;
   @Basic(optional = false)
   @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "MatchResultGen")
@@ -93,7 +88,7 @@ public class MatchResultPK implements Serializable
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.MatchResultPK[ id="
+    return "net.sourceforge.javydreamercsw.database.storage.db.MatchResultPK[ id=" 
             + id + ", matchResultTypeId=" + matchResultTypeId + " ]";
-  }
+  } 
 }

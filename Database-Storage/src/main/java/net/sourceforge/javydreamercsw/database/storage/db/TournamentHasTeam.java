@@ -10,8 +10,8 @@ import java.util.List;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -22,44 +22,29 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Entity
 @Table(name = "tournament_has_team")
 @XmlRootElement
 @NamedQueries(
-        {
-  @NamedQuery(name = "TournamentHasTeam.findAll",
-          query = "SELECT t FROM TournamentHasTeam t"),
-  @NamedQuery(name = "TournamentHasTeam.findByTournamentId",
-          query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.tournamentId = :tournamentId"),
-  @NamedQuery(name = "TournamentHasTeam.findByTeamId",
-          query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.teamId = :teamId")
+{
+  @NamedQuery(name = "TournamentHasTeam.findAll", query = "SELECT t FROM TournamentHasTeam t"),
+  @NamedQuery(name = "TournamentHasTeam.findByTournamentId", query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.tournamentId = :tournamentId"),
+  @NamedQuery(name = "TournamentHasTeam.findByTeamId", query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.teamId = :teamId")
 })
 public class TournamentHasTeam implements Serializable
 {
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected TournamentHasTeamPK tournamentHasTeamPK;
-  @JoinTable(name = "tournament_has_team_has_record", joinColumns =
-  {
-    @JoinColumn(name = "tournament_has_team_tournament_id",
-            referencedColumnName = "tournament_id"),
-    @JoinColumn(name = "tournament_has_team_team_id",
-            referencedColumnName = "team_id")
-  }, inverseJoinColumns =
-  {
-    @JoinColumn(name = "record_id", referencedColumnName = "id")
-  })
-  @ManyToMany
+  @ManyToMany(mappedBy = "tournamentHasTeamList", fetch = FetchType.LAZY)
   private List<Record> recordList;
-  @JoinColumn(name = "team_id", referencedColumnName = "id",
-          insertable = false, updatable = false)
-  @ManyToOne(optional = false)
+  @JoinColumn(name = "team_id", referencedColumnName = "id", insertable = false, updatable = false)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
   private Team team;
-  @JoinColumn(name = "tournament_id", referencedColumnName = "id",
-          insertable = false, updatable = false)
-  @ManyToOne(optional = false)
+  @JoinColumn(name = "tournament_id", referencedColumnName = "id", insertable = false, updatable = false)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
   private Tournament tournament;
 
   public TournamentHasTeam()
@@ -134,16 +119,17 @@ public class TournamentHasTeam implements Serializable
       return false;
     }
     TournamentHasTeam other = (TournamentHasTeam) object;
-    return !((this.tournamentHasTeamPK == null
-            && other.tournamentHasTeamPK != null)
-            || (this.tournamentHasTeamPK != null
-            && !this.tournamentHasTeamPK.equals(other.tournamentHasTeamPK)));
+    if ((this.tournamentHasTeamPK == null && other.tournamentHasTeamPK != null) || (this.tournamentHasTeamPK != null && !this.tournamentHasTeamPK.equals(other.tournamentHasTeamPK)))
+    {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam[ tournamentHasTeamPK="
-            + tournamentHasTeamPK + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam[ tournamentHasTeamPK=" + tournamentHasTeamPK + " ]";
   }
+  
 }

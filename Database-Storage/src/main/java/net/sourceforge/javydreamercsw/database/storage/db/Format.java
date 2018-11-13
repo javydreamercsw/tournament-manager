@@ -16,7 +16,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -30,44 +29,44 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Entity
-@Table(name = "team")
+@Table(name = "format")
 @XmlRootElement
 @NamedQueries(
 {
-  @NamedQuery(name = "Team.findAll", query = "SELECT t FROM Team t"),
-  @NamedQuery(name = "Team.findById", query = "SELECT t FROM Team t WHERE t.id = :id"),
-  @NamedQuery(name = "Team.findByName", query = "SELECT t FROM Team t WHERE t.name = :name")
+  @NamedQuery(name = "Format.findAll", query = "SELECT f FROM Format f"),
+  @NamedQuery(name = "Format.findById", query = "SELECT f FROM Format f WHERE f.id = :id"),
+  @NamedQuery(name = "Format.findByName", query = "SELECT f FROM Format f WHERE f.name = :name"),
+  @NamedQuery(name = "Format.findByDescription", query = "SELECT f FROM Format f WHERE f.description = :description")
 })
-public class Team implements Serializable
+public class Format implements Serializable
 {
   private static final long serialVersionUID = 1L;
   @Id
-  @Basic(optional = false)
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "TeamGen")
-  @TableGenerator(name = "TeamGen", table = "tm_id",
+  @GeneratedValue(strategy = GenerationType.TABLE, generator = "FormatGen")
+  @TableGenerator(name = "FormatGen", table = "tm_id",
           pkColumnName = "table_name",
           valueColumnName = "last_id",
-          pkColumnValue = "team",
+          pkColumnValue = "format",
           allocationSize = 1,
           initialValue = 1)
+  @Basic(optional = false)
   @Column(name = "id")
   private Integer id;
+  @Basic(optional = false)
   @Column(name = "name")
   private String name;
-  @ManyToMany(mappedBy = "teamList", fetch = FetchType.LAZY)
-  private List<Player> playerList;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "team", fetch = FetchType.LAZY)
-  private List<MatchHasTeam> matchHasTeamList;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "team", fetch = FetchType.LAZY)
-  private List<TournamentHasTeam> tournamentHasTeamList;
+  @Column(name = "description")
+  private String description;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "format", fetch = FetchType.LAZY)
+  private List<MatchEntry> matchEntryList;
 
-  public Team()
+  public Format()
   {
   }
 
-  public Team(Integer id)
+  public Format(String name)
   {
-    this.id = id;
+    this.name = name;
   }
 
   public Integer getId()
@@ -90,37 +89,25 @@ public class Team implements Serializable
     this.name = name;
   }
 
-  @XmlTransient
-  public List<Player> getPlayerList()
+  public String getDescription()
   {
-    return playerList;
+    return description;
   }
 
-  public void setPlayerList(List<Player> playerList)
+  public void setDescription(String description)
   {
-    this.playerList = playerList;
-  }
-
-  @XmlTransient
-  public List<MatchHasTeam> getMatchHasTeamList()
-  {
-    return matchHasTeamList;
-  }
-
-  public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
-  {
-    this.matchHasTeamList = matchHasTeamList;
+    this.description = description;
   }
 
   @XmlTransient
-  public List<TournamentHasTeam> getTournamentHasTeamList()
+  public List<MatchEntry> getMatchEntryList()
   {
-    return tournamentHasTeamList;
+    return matchEntryList;
   }
 
-  public void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
+  public void setMatchEntryList(List<MatchEntry> matchEntryList)
   {
-    this.tournamentHasTeamList = tournamentHasTeamList;
+    this.matchEntryList = matchEntryList;
   }
 
   @Override
@@ -135,22 +122,19 @@ public class Team implements Serializable
   public boolean equals(Object object)
   {
     // TODO: Warning - this method won't work in the case the id fields are not set
-    if (!(object instanceof Team))
+    if (!(object instanceof Format))
     {
       return false;
     }
-    Team other = (Team) object;
-    if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)))
-    {
-      return false;
-    }
-    return true;
+    Format other = (Format) object;
+    return !((this.id == null && other.id != null) 
+            || (this.id != null && !this.id.equals(other.id)));
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.Team[ id=" + id + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.Format[ id=" 
+            + id + " ]";
   }
-  
 }

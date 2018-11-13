@@ -11,6 +11,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -22,32 +23,30 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Entity
 @Table(name = "match_result")
 @XmlRootElement
 @NamedQueries(
-        {
-  @NamedQuery(name = "MatchResult.findAll",
-          query = "SELECT m FROM MatchResult m"),
+{
+  @NamedQuery(name = "MatchResult.findAll", query = "SELECT m FROM MatchResult m"),
   @NamedQuery(name = "MatchResult.findById",
           query = "SELECT m FROM MatchResult m WHERE m.matchResultPK.id = :id"),
-  @NamedQuery(name = "MatchResult.findByMatchResultTypeId",
+  @NamedQuery(name = "MatchResult.findByMatchResultTypeId", 
           query = "SELECT m FROM MatchResult m WHERE m.matchResultPK.matchResultTypeId = :matchResultTypeId")
 })
 public class MatchResult implements Serializable
 {
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "matchResult")
-  private List<MatchHasTeam> matchHasTeamList;
-
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected MatchResultPK matchResultPK;
-  @JoinColumn(name = "match_result_type_id", referencedColumnName = "id",
+  @JoinColumn(name = "match_result_type_id", referencedColumnName = "id", 
           insertable = false, updatable = false)
-  @ManyToOne(optional = false)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
   private MatchResultType matchResultType;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "matchResult", fetch = FetchType.LAZY)
+  private List<MatchHasTeam> matchHasTeamList;
 
   public MatchResult()
   {
@@ -83,6 +82,17 @@ public class MatchResult implements Serializable
     this.matchResultType = matchResultType;
   }
 
+  @XmlTransient
+  public List<MatchHasTeam> getMatchHasTeamList()
+  {
+    return matchHasTeamList;
+  }
+
+  public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
+  {
+    this.matchHasTeamList = matchHasTeamList;
+  }
+
   @Override
   public int hashCode()
   {
@@ -100,25 +110,17 @@ public class MatchResult implements Serializable
       return false;
     }
     MatchResult other = (MatchResult) object;
-    return !((this.matchResultPK == null && other.matchResultPK != null)
-            || (this.matchResultPK != null && !this.matchResultPK.equals(other.matchResultPK)));
+    if ((this.matchResultPK == null && other.matchResultPK != null) || (this.matchResultPK != null && !this.matchResultPK.equals(other.matchResultPK)))
+    {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.MatchResult[ matchResultPK="
-            + matchResultPK + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.MatchResult[ matchResultPK=" + matchResultPK + " ]";
   }
-
-  @XmlTransient
-  public List<MatchHasTeam> getMatchHasTeamList()
-  {
-    return matchHasTeamList;
-  }
-
-  public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
-  {
-    this.matchHasTeamList = matchHasTeamList;
-  }
+  
 }

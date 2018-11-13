@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import org.openide.util.Exceptions;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.PlayerJpaController;
+import net.sourceforge.javydreamercsw.database.storage.db.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 
 /**

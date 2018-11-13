@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
@@ -19,7 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Entity
 @Table(name = "match_has_team")
@@ -27,42 +28,48 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries(
         {
           @NamedQuery(name = "MatchHasTeam.findAll", query = "SELECT m FROM MatchHasTeam m"),
-  @NamedQuery(name = "MatchHasTeam.findByMatchId",
-          query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchId = :matchId"),
-  @NamedQuery(name = "MatchHasTeam.findByTeamId",
-          query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.teamId = :teamId"),
-  @NamedQuery(name = "MatchHasTeam.findByMatchResultId",
-          query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchResultId = :matchResultId"),
-  @NamedQuery(name = "MatchHasTeam.findByMatchResultMatchResultTypeId",
-          query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchResultMatchResultTypeId = :matchResultMatchResultTypeId")
-})
+          @NamedQuery(name = "MatchHasTeam.findByMatchId",
+                  query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchId = :matchId"),
+          @NamedQuery(name = "MatchHasTeam.findByTeamId",
+                  query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.teamId = :teamId"),
+          @NamedQuery(name = "MatchHasTeam.findByMatchResultId",
+                  query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchResultId = :matchResultId"),
+          @NamedQuery(name = "MatchHasTeam.findByMatchResultMatchResultTypeId",
+                  query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchResultMatchResultTypeId = :matchResultMatchResultTypeId")
+        })
 public class MatchHasTeam implements Serializable
 {
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected MatchHasTeamPK matchHasTeamPK;
-  @JoinColumn(name = "team_id", referencedColumnName = "id",
-          insertable = false, updatable = false)
-  @ManyToOne(optional = false)
-  private Team team;
   @JoinColumns(
           {
-            @JoinColumn(name = "match_id", referencedColumnName = "id",
-                    insertable = false, updatable = false),
-            @JoinColumn(name = "round_id", referencedColumnName = "id")
+            @JoinColumn(name = "match_id", referencedColumnName = "id", 
+                    insertable = false,
+                    updatable = false),
+            @JoinColumn(name = "round_id", referencedColumnName = "id", 
+                    insertable = false,
+                    updatable = false),
+            @JoinColumn(name = "format_id", referencedColumnName = "id", 
+                    insertable = false,
+                    updatable = false)
           })
-  @ManyToOne(optional = false)
-  private Match match;
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  private MatchEntry matchEntry;
   @JoinColumns(
           {
             @JoinColumn(name = "match_result_id", referencedColumnName = "id",
                     insertable = false, updatable = false),
             @JoinColumn(name = "match_result_match_result_type_id",
-                    referencedColumnName = "match_result_type_id",
-                    insertable = false, updatable = false)
+                    referencedColumnName = "match_result_type_id", insertable = false,
+                    updatable = false)
           })
-  @ManyToOne(optional = false)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
   private MatchResult matchResult;
+  @JoinColumn(name = "team_id", referencedColumnName = "id", insertable = false,
+          updatable = false)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  private Team team;
 
   public MatchHasTeam()
   {
@@ -73,11 +80,9 @@ public class MatchHasTeam implements Serializable
     this.matchHasTeamPK = matchHasTeamPK;
   }
 
-  public MatchHasTeam(int matchId, int teamId, int matchResultId,
-          int matchResultMatchResultTypeId)
+  public MatchHasTeam(int matchId, int teamId, int matchResultId, int matchResultMatchResultTypeId)
   {
-    this.matchHasTeamPK = new MatchHasTeamPK(matchId, teamId, matchResultId,
-            matchResultMatchResultTypeId);
+    this.matchHasTeamPK = new MatchHasTeamPK(matchId, teamId, matchResultId, matchResultMatchResultTypeId);
   }
 
   public MatchHasTeamPK getMatchHasTeamPK()
@@ -90,24 +95,14 @@ public class MatchHasTeam implements Serializable
     this.matchHasTeamPK = matchHasTeamPK;
   }
 
-  public Team getTeam()
+  public MatchEntry getMatchEntry()
   {
-    return team;
+    return matchEntry;
   }
 
-  public void setTeam(Team team)
+  public void setMatchEntry(MatchEntry matchEntry)
   {
-    this.team = team;
-  }
-
-  public Match getMatch()
-  {
-    return match;
-  }
-
-  public void setMatch(Match match)
-  {
-    this.match = match;
+    this.matchEntry = matchEntry;
   }
 
   public MatchResult getMatchResult()
@@ -118,6 +113,16 @@ public class MatchHasTeam implements Serializable
   public void setMatchResult(MatchResult matchResult)
   {
     this.matchResult = matchResult;
+  }
+
+  public Team getTeam()
+  {
+    return team;
+  }
+
+  public void setTeam(Team team)
+  {
+    this.team = team;
   }
 
   @Override
@@ -138,7 +143,8 @@ public class MatchHasTeam implements Serializable
     }
     MatchHasTeam other = (MatchHasTeam) object;
     return !((this.matchHasTeamPK == null && other.matchHasTeamPK != null)
-            || (this.matchHasTeamPK != null && !this.matchHasTeamPK.equals(other.matchHasTeamPK)));
+            || (this.matchHasTeamPK != null
+            && !this.matchHasTeamPK.equals(other.matchHasTeamPK)));
   }
 
   @Override

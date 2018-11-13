@@ -2,17 +2,17 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="TMPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Round</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Player</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Record</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Match</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Team</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Tournament</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Format</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.MatchEntry</class>
     <class>net.sourceforge.javydreamercsw.database.storage.db.MatchHasTeam</class>
     <class>net.sourceforge.javydreamercsw.database.storage.db.MatchResult</class>
     <class>net.sourceforge.javydreamercsw.database.storage.db.MatchResultType</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.TmId</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Player</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Record</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Round</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Team</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Tournament</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:~/TournamentManager/data/tournament-manager;AUTO_SERVER=TRUE"/>
       <property name="javax.persistence.jdbc.password" value=""/>
@@ -27,17 +27,17 @@
   </persistence-unit>
   <persistence-unit name="TestTMPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Round</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Player</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Record</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Match</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Team</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.Tournament</class>
+   <class>net.sourceforge.javydreamercsw.database.storage.db.Format</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.MatchEntry</class>
     <class>net.sourceforge.javydreamercsw.database.storage.db.MatchHasTeam</class>
     <class>net.sourceforge.javydreamercsw.database.storage.db.MatchResult</class>
     <class>net.sourceforge.javydreamercsw.database.storage.db.MatchResultType</class>
-    <class>net.sourceforge.javydreamercsw.database.storage.db.TmId</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Player</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Record</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Round</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Team</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.Tournament</class>
+    <class>net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:./target/data/test/tournament-manager;AUTO_SERVER=TRUE"/>
       <property name="javax.persistence.jdbc.password" value=""/>

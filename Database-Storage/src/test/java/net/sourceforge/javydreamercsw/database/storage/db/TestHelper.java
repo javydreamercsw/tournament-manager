@@ -2,6 +2,7 @@ package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.util.List;
 
+import net.sourceforge.javydreamercsw.database.storage.db.server.FormatServer;
 import net.sourceforge.javydreamercsw.database.storage.db.server.PlayerServer;
 import net.sourceforge.javydreamercsw.database.storage.db.server.RoundServer;
 import net.sourceforge.javydreamercsw.database.storage.db.server.TeamServer;
@@ -28,4 +29,9 @@ public class TestHelper {
     public static TeamServer createTeam(String name, List<Player> players) {
         return new TeamServer(name, players);
     }
+
+  public static FormatServer createFormat(String name)
+  {
+    return new FormatServer(name);
+  }
 }

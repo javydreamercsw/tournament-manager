@@ -1,24 +1,26 @@
 package net.sourceforge.javydreamercsw.database.storage.db.server;
 
 import java.util.ArrayList;
-import net.sourceforge.javydreamercsw.database.storage.db.Match;
+
+import org.openide.util.Exceptions;
+
 import net.sourceforge.javydreamercsw.database.storage.db.Round;
 import net.sourceforge.javydreamercsw.database.storage.db.RoundPK;
 import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.RoundJpaController;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
-import org.openide.util.Exceptions;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
 public final class RoundServer extends Round implements DatabaseEntity<Round> {
+  private static final long serialVersionUID = -4051744388749043991L;
 
     public RoundServer(Tournament t) {
         super(t.getId());
         setRoundPK(new RoundPK(t.getId()));
-        setMatchList(new ArrayList<Match>());
+        setMatchEntryList(new ArrayList<>());
         setTournament(t);
     }
 
@@ -56,14 +58,14 @@ public final class RoundServer extends Round implements DatabaseEntity<Round> {
 
     @Override
     public void update(Round target, Round source) {
-        target.setMatchList(source.getMatchList());
+        target.setMatchEntryList(source.getMatchEntryList());
         target.setRoundPK(source.getRoundPK());
         target.setTournament(source.getTournament());
     }
 
     @Override
     public Round getEntity() {
-        return new RoundJpaController(DataBaseManager.getEntityManagerFactory()).findRound(getRoundPK());
+        return new RoundJpaController(DataBaseManager.getEntityManagerFactory())
+                .findRound(getRoundPK());
     }
-
 }

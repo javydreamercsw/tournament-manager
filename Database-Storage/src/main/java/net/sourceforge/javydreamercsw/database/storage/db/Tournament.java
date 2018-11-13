@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
@@ -12,6 +7,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,22 +21,42 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Entity
 @Table(name = "tournament")
 @XmlRootElement
 @NamedQueries(
-        {
-          @NamedQuery(name = "Tournament.findAll", query = "SELECT t FROM Tournament t"),
-  @NamedQuery(name = "Tournament.findById",
+{
+  @NamedQuery(name = "Tournament.findAll", query = "SELECT t FROM Tournament t"),
+  @NamedQuery(name = "Tournament.findById", 
           query = "SELECT t FROM Tournament t WHERE t.id = :id"),
-  @NamedQuery(name = "Tournament.findByName",
-          query = "SELECT t FROM Tournament t WHERE t.name = :name")
+  @NamedQuery(name = "Tournament.findByName", 
+          query = "SELECT t FROM Tournament t WHERE t.name = :name"),
+  @NamedQuery(name = "Tournament.findByWinPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.winPoints = :winPoints"),
+  @NamedQuery(name = "Tournament.findByDrawPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.drawPoints = :drawPoints"),
+  @NamedQuery(name = "Tournament.findByLossPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.lossPoints = :lossPoints")
 })
 public class Tournament implements Serializable
 {
-
+  private static final long serialVersionUID = 1L;
+  @Id
+  @GeneratedValue(strategy = GenerationType.TABLE, generator = "TournamentGen")
+  @TableGenerator(name = "TournamentGen", table = "tm_id",
+          pkColumnName = "table_name",
+          valueColumnName = "last_id",
+          pkColumnValue = "tournament",
+          allocationSize = 1,
+          initialValue = 1)
+  @Basic(optional = false)
+  @Column(name = "id")
+  private Integer id;
+  @Basic(optional = false)
+  @Column(name = "name")
+  private String name;
   @Basic(optional = false)
   @Column(name = "winPoints")
   private int winPoints;
@@ -50,25 +66,9 @@ public class Tournament implements Serializable
   @Basic(optional = false)
   @Column(name = "lossPoints")
   private int lossPoints;
-
-  private static final long serialVersionUID = 1L;
-  @Id
-  @Basic(optional = false)
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "TournamentGen")
-  @TableGenerator(name = "TournamentGen", table = "tm_id",
-          pkColumnName = "table_name",
-          valueColumnName = "last_id",
-          pkColumnValue = "tournament",
-          allocationSize = 1,
-          initialValue = 1)
-  @Column(name = "id")
-  private Integer id;
-  @Basic(optional = false)
-  @Column(name = "name")
-  private String name;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament", fetch = FetchType.LAZY)
   private List<Round> roundList;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament", fetch = FetchType.LAZY)
   private List<TournamentHasTeam> tournamentHasTeamList;
 
   public Tournament()
@@ -98,6 +98,36 @@ public class Tournament implements Serializable
   public void setName(String name)
   {
     this.name = name;
+  }
+
+  public int getWinPoints()
+  {
+    return winPoints;
+  }
+
+  public void setWinPoints(int winPoints)
+  {
+    this.winPoints = winPoints;
+  }
+
+  public int getDrawPoints()
+  {
+    return drawPoints;
+  }
+
+  public void setDrawPoints(int drawPoints)
+  {
+    this.drawPoints = drawPoints;
+  }
+
+  public int getLossPoints()
+  {
+    return lossPoints;
+  }
+
+  public void setLossPoints(int lossPoints)
+  {
+    this.lossPoints = lossPoints;
   }
 
   @XmlTransient
@@ -139,44 +169,17 @@ public class Tournament implements Serializable
       return false;
     }
     Tournament other = (Tournament) object;
-    return !((this.id == null && other.id != null)
-            || (this.id != null && !this.id.equals(other.id)));
+    if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)))
+    {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.Tournament[ id="
-            + id + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.Tournament[ id=" + id + " ]";
   }
-
-  public int getWinPoints()
-  {
-    return winPoints;
-  }
-
-  public void setWinPoints(int winPoints)
-  {
-    this.winPoints = winPoints;
-  }
-
-  public int getDrawPoints()
-  {
-    return drawPoints;
-  }
-
-  public void setDrawPoints(int drawPoints)
-  {
-    this.drawPoints = drawPoints;
-  }
-
-  public int getLossPoints()
-  {
-    return lossPoints;
-  }
-
-  public void setLossPoints(int lossPoints)
-  {
-    this.lossPoints = lossPoints;
-  }
+  
 }

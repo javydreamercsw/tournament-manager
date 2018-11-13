@@ -1,23 +1,23 @@
 package net.sourceforge.javydreamercsw.database.storage.db.server;
 
 import java.util.ArrayList;
-import net.sourceforge.javydreamercsw.database.storage.db.Round;
-import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
-import net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.TournamentJpaController;
+
 import org.openide.util.Exceptions;
+
+import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.TournamentJpaController;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
 public final class TournamentServer extends Tournament implements DatabaseEntity<Tournament> {
+  private static final long serialVersionUID = -5110745821215071346L;
 
     public TournamentServer(String name) {
         super(name);
-        setId(0);
-        setRoundList(new ArrayList<Round>());
-        setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
+        setRoundList(new ArrayList<>());
+        setTournamentHasTeamList(new ArrayList<>());
         setWinPoints(0);
         setDrawPoints(0);
         setLossPoints(0);
@@ -25,9 +25,8 @@ public final class TournamentServer extends Tournament implements DatabaseEntity
 
     public TournamentServer(String name, int winPoints, int drawPoints, int lossPoints) {
         super(name);
-        setId(0);
-        setRoundList(new ArrayList<Round>());
-        setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
+        setRoundList(new ArrayList<>());
+        setTournamentHasTeamList(new ArrayList<>());
         setWinPoints(winPoints);
         setDrawPoints(drawPoints);
         setLossPoints(lossPoints);
@@ -41,7 +40,7 @@ public final class TournamentServer extends Tournament implements DatabaseEntity
     public int write2DB() {
         TournamentJpaController controller
                 = new TournamentJpaController(DataBaseManager.getEntityManagerFactory());
-        if (getId() > 0) {
+        if (getId() != null) {
             Tournament tm = controller.findTournament(getId());
             update(tm, this);
             try {
@@ -65,7 +64,6 @@ public final class TournamentServer extends Tournament implements DatabaseEntity
 
     @Override
     public void update(Tournament target, Tournament source) {
-        target.setId(source.getId());
         target.setName(source.getName());
         target.setRoundList(source.getRoundList());
         target.setTournamentHasTeamList(source.getTournamentHasTeamList());

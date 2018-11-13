@@ -6,12 +6,12 @@
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,22 +27,20 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Entity
 @Table(name = "player")
 @XmlRootElement
 @NamedQueries(
-        {
-          @NamedQuery(name = "Player.findAll", query = "SELECT p FROM Player p"),
-          @NamedQuery(name = "Player.findById",
-                  query = "SELECT p FROM Player p WHERE p.id = :id"),
-          @NamedQuery(name = "Player.findByName",
-                  query = "SELECT p FROM Player p WHERE p.name = :name")
+{
+  @NamedQuery(name = "Player.findAll", query = "SELECT p FROM Player p"),
+  @NamedQuery(name = "Player.findById", query = "SELECT p FROM Player p WHERE p.id = :id"),
+  @NamedQuery(name = "Player.findByName", query = "SELECT p FROM Player p WHERE p.name = :name")
 })
 public class Player implements Serializable
 {
-  private static final long serialVersionUID = -6835135177610693037L;
+  private static final long serialVersionUID = 1L;
   @Id
   @Basic(optional = false)
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "PlayerGen")
@@ -57,7 +55,14 @@ public class Player implements Serializable
   @Basic(optional = false)
   @Column(name = "name")
   private String name;
-  @ManyToMany(mappedBy = "playerList")
+  @JoinTable(name = "team_has_player", joinColumns =
+  {
+    @JoinColumn(name = "player_id", referencedColumnName = "id")
+  }, inverseJoinColumns =
+  {
+    @JoinColumn(name = "team_id", referencedColumnName = "id")
+  })
+  @ManyToMany(fetch = FetchType.LAZY)
   private List<Team> teamList;
   @JoinTable(name = "player_has_record", joinColumns =
   {
@@ -66,7 +71,7 @@ public class Player implements Serializable
   {
     @JoinColumn(name = "record_id", referencedColumnName = "id")
   })
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.LAZY)
   private List<Record> recordList;
 
   public Player()
@@ -76,8 +81,6 @@ public class Player implements Serializable
   public Player(String name)
   {
     this.name = name;
-    this.recordList = new ArrayList<>();
-    this.teamList = new ArrayList<>();
   }
 
   public Integer getId()
@@ -133,19 +136,23 @@ public class Player implements Serializable
   @Override
   public boolean equals(Object object)
   {
+    // TODO: Warning - this method won't work in the case the id fields are not set
     if (!(object instanceof Player))
     {
       return false;
     }
     Player other = (Player) object;
-    return !((this.id == null && other.id != null)
-            || (this.id != null && !this.id.equals(other.id)));
+    if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)))
+    {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.Player[ id="
-            + id + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.Player[ id=" + id + " ]";
   }
+  
 }

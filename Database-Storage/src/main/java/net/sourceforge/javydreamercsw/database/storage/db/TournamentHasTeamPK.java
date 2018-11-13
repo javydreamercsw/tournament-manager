@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
@@ -13,11 +8,12 @@ import javax.persistence.Embeddable;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Embeddable
 public class TournamentHasTeamPK implements Serializable
 {
+  private static final long serialVersionUID = -5811393046410368312L;
   @Basic(optional = false)
   @Column(name = "tournament_id")
   private int tournamentId;

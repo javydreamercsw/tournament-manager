@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
@@ -11,6 +6,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -22,31 +18,30 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
-@Entity
+ @Entity
 @Table(name = "round")
 @XmlRootElement
 @NamedQueries(
-        {
-          @NamedQuery(name = "Round.findAll", query = "SELECT r FROM Round r"),
-  @NamedQuery(name = "Round.findById",
+{
+  @NamedQuery(name = "Round.findAll", query = "SELECT r FROM Round r"),
+  @NamedQuery(name = "Round.findById", 
           query = "SELECT r FROM Round r WHERE r.roundPK.id = :id"),
   @NamedQuery(name = "Round.findByTournamentId",
           query = "SELECT r FROM Round r WHERE r.roundPK.tournamentId = :tournamentId")
 })
 public class Round implements Serializable
 {
-
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected RoundPK roundPK;
-  @JoinColumn(name = "tournament_id", referencedColumnName = "id",
+  @JoinColumn(name = "tournament_id", referencedColumnName = "id", 
           insertable = false, updatable = false)
-  @ManyToOne(optional = false)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
   private Tournament tournament;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "round")
-  private List<Match> matchList;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "round", fetch = FetchType.LAZY)
+  private List<MatchEntry> matchEntryList;
 
   public Round()
   {
@@ -83,14 +78,14 @@ public class Round implements Serializable
   }
 
   @XmlTransient
-  public List<Match> getMatchList()
+  public List<MatchEntry> getMatchEntryList()
   {
-    return matchList;
+    return matchEntryList;
   }
 
-  public void setMatchList(List<Match> matchList)
+  public void setMatchEntryList(List<MatchEntry> matchEntryList)
   {
-    this.matchList = matchList;
+    this.matchEntryList = matchEntryList;
   }
 
   @Override
@@ -110,7 +105,7 @@ public class Round implements Serializable
       return false;
     }
     Round other = (Round) object;
-    return !((this.roundPK == null && other.roundPK != null)
+    return !((this.roundPK == null && other.roundPK != null) 
             || (this.roundPK != null && !this.roundPK.equals(other.roundPK)));
   }
 

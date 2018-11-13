@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
@@ -16,12 +11,12 @@ import javax.persistence.TableGenerator;
 
 /**
  *
- * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Embeddable
 public class RoundPK implements Serializable
 {
-
+  private static final long serialVersionUID = 5947445359540449916L;
   @Basic(optional = false)
   @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "RoundGen")
@@ -93,7 +88,7 @@ public class RoundPK implements Serializable
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.RoundPK[ id="
+    return "net.sourceforge.javydreamercsw.database.storage.db.RoundPK[ id=" 
             + id + ", tournamentId=" + tournamentId + " ]";
   }
 }
