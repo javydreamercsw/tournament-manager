@@ -5,7 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.openide.util.Exceptions;
@@ -13,10 +15,12 @@ import org.openide.util.lookup.ServiceProvider;
 
 import net.sourceforge.javydreamercsw.database.storage.db.AbstractServerTest;
 import net.sourceforge.javydreamercsw.tournament.manager.AbstractTournament;
-import net.sourceforge.javydreamercsw.tournament.manager.Player;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
+import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
+import net.sourceforge.javydreamercsw.tournament.manager.api.Variables;
+import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RecordInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.storage.StorageException;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
@@ -111,5 +115,63 @@ public class DatabaseStorageTest extends AbstractServerTest
       t.teams.addAll(teams);
       return t;
     }
+  }
+  
+  private class Player implements TournamentPlayerInterface{
+    private Map<String, Object> properties = new HashMap<>();
+
+    public Player(String name)
+    {
+      properties.put(Variables.PLAYER_NAME.getDisplayName(), name);
+    }
+    
+    @Override
+    public Object get(String key)
+    {
+      return properties.get(key);
+    }
+
+    @Override
+    public String getName()
+    {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setName(String name)
+    {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getID()
+    {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public RecordInterface getRecord()
+    {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public TournamentPlayerInterface createInstance(String name, int wins, int loses, int draws)
+    {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public TournamentPlayerInterface createInstance(String name, int id, int wins, int loses, int draws)
+    {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public TournamentPlayerInterface createInstance(String name, int id)
+    {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
   }
 }
