@@ -343,7 +343,6 @@ public abstract class AbstractTournament implements TournamentInterface
             if (pending != null)
             {
               //We got someone pending from previous level, pair with him
-              //Pair them
               TeamInterface opp = null;
               int lucky;
               while (opp == null && exclude.length < players.size())
@@ -354,7 +353,7 @@ public abstract class AbstractTournament implements TournamentInterface
                 exclude = ArrayUtils.add(exclude, lucky);
                 if (isTeamActive(opp))
                 {
-                  addPairing(pairings, pending, opp);
+                  addPairing(pairings, 1, pending, opp);
                   LOG.log(Level.INFO, "Pairing {0} from higher level with {1}",
                           new Object[]
                           {
@@ -399,7 +398,7 @@ public abstract class AbstractTournament implements TournamentInterface
               //Pair them
               if (isTeamActive(team1) && isTeamActive(team2))
               {
-                addPairing(pairings, team1, team2);
+                addPairing(pairings, 1, team1, team2);
               }
             }
           }
@@ -412,7 +411,7 @@ public abstract class AbstractTournament implements TournamentInterface
             else
             {
               //We got someone pending. Pair with him BYE
-              addPairing(pairings, pending, BYE);
+              addPairing(pairings, 1, pending, BYE);
               LOG.log(Level.INFO, "Pairing {0} with BYE", pending);
             }
           }
@@ -437,14 +436,14 @@ public abstract class AbstractTournament implements TournamentInterface
               //Only one player left, pair with Bye
               LOG.log(Level.FINE, "Pairing {0} vs. BYE",
                       getActiveTeams().get(player1).getName());
-              addPairing(pairings,
+              addPairing(pairings, 1,
                       getActiveTeams().get(player1), BYE);
             }
             else
             {
               int player2 = getRandomWithExclusion(rnd, 0,
                       getActiveTeams().size() - 1, exclude);
-              addPairing(pairings,
+              addPairing(pairings, 1,
                       getActiveTeams().get(player1),
                       getActiveTeams().get(player2));
               exclude = ArrayUtils.add(exclude, player2);
@@ -632,11 +631,12 @@ public abstract class AbstractTournament implements TournamentInterface
     return (int) (Math.log(x) / Math.log(base));
   }
 
-  protected void addPairing(Map<Integer, Encounter> pairings,
+  protected void addPairing(Map<Integer, Encounter> pairings, int format,
           TeamInterface player1, TeamInterface player2)
   {
     pairings.put(encounterCount,
             new Encounter(encounterCount,
+                    format,
                     player1,
                     player2));
     if (player1 == BYE)

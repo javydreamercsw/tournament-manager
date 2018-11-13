@@ -51,11 +51,11 @@ public class TeamTest
   public void testGetTeamMembers()
   {
     System.out.println("getTeamMembers");
-    Team instance = new Team(new Player("Test", 1));
+    Team instance = new Team(new UIPlayer("Test", 1));
     List<TournamentPlayerInterface> result = instance.getTeamMembers();
     assertEquals(1, result.size());
-    instance = new Team(Arrays.asList(new Player("Test", 1),
-            new Player("Player 2", 2)));
+    instance = new Team(Arrays.asList(new UIPlayer("Test", 1),
+            new UIPlayer("Player 2", 2)));
     result = instance.getTeamMembers();
     assertEquals(2, result.size());
   }

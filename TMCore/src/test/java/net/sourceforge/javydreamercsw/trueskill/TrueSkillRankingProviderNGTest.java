@@ -15,7 +15,7 @@ import de.gesundkrank.jskills.IPlayer;
 import de.gesundkrank.jskills.ITeam;
 import de.gesundkrank.jskills.Rating;
 import de.gesundkrank.jskills.trueskill.TwoPlayerTrueSkillCalculator;
-import net.sourceforge.javydreamercsw.tournament.manager.Player;
+import net.sourceforge.javydreamercsw.tournament.manager.UIPlayer;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RankingProvider;
@@ -45,8 +45,8 @@ public class TrueSkillRankingProviderNGTest
   {
     System.out.println("addMatch");
     int playerCount = 0;
-    Player p1 = new Player("Player 1", ++playerCount);
-    Player p2 = new Player("Player 2", ++playerCount);
+    UIPlayer p1 = new UIPlayer("Player 1", ++playerCount);
+    UIPlayer p2 = new UIPlayer("Player 2", ++playerCount);
     TeamInterface[] teams = new TeamInterface[]
     {
       new Team(p1), new Team(p2)
@@ -74,8 +74,8 @@ public class TrueSkillRankingProviderNGTest
                     });
     assertEquals(newRatings.size(), playerCount);
 
-    Player p3 = new Player("Player 3", ++playerCount);
-    Player p4 = new Player("Player 4", ++playerCount);
+    UIPlayer p3 = new UIPlayer("Player 3", ++playerCount);
+    UIPlayer p4 = new UIPlayer("Player 4", ++playerCount);
     teams = new TeamInterface[]
     {
       new Team(p3), new Team(p4)

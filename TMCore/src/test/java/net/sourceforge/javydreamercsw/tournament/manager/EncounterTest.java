@@ -29,9 +29,9 @@ public class EncounterTest
     try
     {
       System.out.println("updateResult");
-      TeamInterface team1 = new Team(new Player("Player 1", 1));
-      TeamInterface team2 = new Team(new Player("Player 2", 2));
-      Encounter instance = new Encounter(1, team1, team2);
+      TeamInterface team1 = new Team(new UIPlayer("Player 1", 1));
+      TeamInterface team2 = new Team(new UIPlayer("Player 2", 2));
+      Encounter instance = new Encounter(1, 1, team1, team2);
       instance.updateResult(team1, EncounterResult.WIN);
       instance.updateResult(team2, EncounterResult.LOSS);
       assertEquals(1, team1.getTeamMembers().get(0).getRecord().getWins());

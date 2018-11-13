@@ -26,6 +26,13 @@ public interface TournamentPlayerInterface extends IPlayer
   String getName();
 
   /**
+   * Set the player name.
+   *
+   * @param name New name to set.
+   */
+  void setName(String name);
+
+  /**
    * Get the player ID.
    *
    * @return player ID

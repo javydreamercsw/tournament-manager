@@ -22,16 +22,18 @@ public class Encounter
   private final int id;
   private static final Logger LOG
           = Logger.getLogger(Encounter.class.getName());
+  private int format;
 
   /**
    * Create an encounter between multiple teams.
    *
    * @param id encounter id
-   * @param team1
-   * @param team2
+   * @param format encounter format
+   * @param team1 team 1
+   * @param team2 team 2
    * @param t additional teams (optional)
    */
-  public Encounter(int id, TeamInterface team1, TeamInterface team2,
+  public Encounter(int id, int format, TeamInterface team1, TeamInterface team2,
           TeamInterface... t)
   {
     results.put(team1, EncounterResult.UNDECIDED);
@@ -41,21 +43,24 @@ public class Encounter
       results.put(team, EncounterResult.UNDECIDED);
     }
     this.id = id;
+    this.format = format;
   }
 
   /**
    * Create an encounter between two players.
    *
    * @param id encounter id
+   * @param format encounter format
    * @param team1 team 1
    * @param team2 team 2
    */
-  public Encounter(int id, TournamentPlayerInterface team1,
+  public Encounter(int id, int format, TournamentPlayerInterface team1,
           TournamentPlayerInterface team2)
   {
     results.put(new Team(team1), EncounterResult.UNDECIDED);
     results.put(new Team(team2), EncounterResult.UNDECIDED);
     this.id = id;
+    this.format = format;
   }
 
   public void updateResult(TeamInterface team,
@@ -158,5 +163,10 @@ public class Encounter
       sb.append(t.toString());
     });
     return MessageFormat.format("Encounter {0} ({1})", id, sb.toString());
+  }
+
+  public int getFormat()
+  {
+    return format;
   }
 }

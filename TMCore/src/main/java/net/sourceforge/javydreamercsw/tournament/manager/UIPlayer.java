@@ -14,19 +14,19 @@ import net.sourceforge.javydreamercsw.tournament.manager.api.standing.RecordInte
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class Player implements TournamentPlayerInterface
+public class UIPlayer implements TournamentPlayerInterface
 {
 
   private RecordInterface record = null;
   private final Map<String, Object> variables = new HashMap<>();
   private final int id;
 
-  public Player(String name)
+  public UIPlayer(String name)
   {
     this(name, -1);
   }
 
-  public Player(String name, int id)
+  public UIPlayer(String name, int id)
   {
     variables.put(Variables.PLAYER_NAME.getDisplayName(), name);
     record = Lookup.getDefault().lookup(RecordInterface.class).getNewInstance();
@@ -85,7 +85,7 @@ public class Player implements TournamentPlayerInterface
   public TournamentPlayerInterface createInstance(String name, int id, int wins,
           int losses, int draws)
   {
-    Player player = new Player(name, id);
+    UIPlayer player = new UIPlayer(name, id);
     player.getRecord().setWins(wins);
     player.getRecord().setLosses(losses);
     player.getRecord().setDraws(draws);
@@ -104,5 +104,11 @@ public class Player implements TournamentPlayerInterface
   public int getId()
   {
     return id;
+  }
+
+  @Override
+  public void setName(String name)
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

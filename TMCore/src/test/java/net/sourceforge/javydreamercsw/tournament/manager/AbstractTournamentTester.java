@@ -1,8 +1,8 @@
 package net.sourceforge.javydreamercsw.tournament.manager;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 import java.text.MessageFormat;
@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.junit.Test;
 import org.openide.util.Exceptions;
 
+import junit.framework.TestCase;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
@@ -27,7 +28,7 @@ import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignup
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public abstract class AbstractTournamentTester
+public abstract class AbstractTournamentTester extends TestCase
 {
 
   private final TournamentInterface tournament;
@@ -39,10 +40,15 @@ public abstract class AbstractTournamentTester
     this.tournament = tournament;
   }
 
-  public void testTournament()
+  public AbstractTournamentTester()
   {
-
+    this.tournament = generateRandomTournament();
   }
+
+  /**
+   * Test the peculiarities of this tournament.
+   */
+  public abstract void testTournament();
 
   /**
    * Test of getName method, of class Elimination.
@@ -50,17 +56,8 @@ public abstract class AbstractTournamentTester
   @Test
   public void testGetName()
   {
-    try
-    {
-      LOG.info("getName");
-      TournamentInterface instance = tournament.getClass().newInstance();
-      assertFalse(instance.getName().trim().isEmpty());
-    }
-    catch (InstantiationException | IllegalAccessException ex)
-    {
-      Exceptions.printStackTrace(ex);
-      fail();
-    }
+    LOG.info("getName");
+    assertFalse(tournament.getName().trim().isEmpty());
   }
 
   /**
@@ -72,7 +69,7 @@ public abstract class AbstractTournamentTester
     LOG.info("getPairings");
     //Even entries
     LOG.info("Even amount of entries -----------------------");
-    TournamentInterface instance = null;
+    TournamentInterface instance;
     int limit = new Random().nextInt(1000) + 100;
     if (limit % 2 != 0)
     {
@@ -86,13 +83,9 @@ public abstract class AbstractTournamentTester
       printPairings(result);
       LOG.log(Level.INFO, "Amount of pairings: {0}", result.size());
       assertEquals(instance.getAmountOfTeams() / 2, result.size());
-      Encounter e = result.values().toArray(new Encounter[]
-      {
-      })[instance.getAmountOfTeams() / 2 - 1];
+      Encounter e = result.values().toArray(new Encounter[0])[(instance.getAmountOfTeams() / 2) - 1];
       TeamInterface t
-              = e.getEncounterSummary().keySet().toArray(new TeamInterface[]
-              {
-      })[0];
+              = e.getEncounterSummary().keySet().toArray(new TeamInterface[0])[0];
       try
       {
         LOG.log(Level.INFO, "Updating result for: {0} encounter id: {1}",
@@ -147,7 +140,7 @@ public abstract class AbstractTournamentTester
       {
         try
         {
-          instance.addTeam(new Team(new Player(MessageFormat.format("Player #{0}", i), i)));
+          instance.addTeam(new Team(new UIPlayer(MessageFormat.format("Player #{0}", i), i)));
         }
         catch (TournamentSignupException ex)
         {
@@ -237,7 +230,7 @@ public abstract class AbstractTournamentTester
         try
         {
           instance.addTeam(new Team(
-                  new Player(MessageFormat.format("Player #{0}", (y + 1)), y)));
+                  new UIPlayer(MessageFormat.format("Player #{0}", (y + 1)), y)));
         }
         catch (TournamentSignupException ex)
         {

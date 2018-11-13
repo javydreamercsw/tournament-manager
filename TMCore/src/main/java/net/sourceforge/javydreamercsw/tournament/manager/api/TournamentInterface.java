@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sourceforge.javydreamercsw.tournament.manager.Player;
+import net.sourceforge.javydreamercsw.tournament.manager.UIPlayer;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
@@ -18,7 +18,7 @@ public interface TournamentInterface {
     /**
      * Default BYE player.
      */
-  public final TeamInterface BYE = new Team(new Player("BYE", -1));
+  public final TeamInterface BYE = new Team(new UIPlayer("BYE", -1));
 
     /**
      * Get tournament name.

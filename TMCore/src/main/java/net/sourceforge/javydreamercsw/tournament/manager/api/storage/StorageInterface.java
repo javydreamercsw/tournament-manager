@@ -47,4 +47,12 @@ public interface StorageInterface {
    * @return id of the created player.
    */
   public int addPlayer(IPlayer player);
+
+  /**
+   * Retrieve a player by id.
+   *
+   * @param id ID to retrieve.
+   * @return Player or null if it doesn't exist.
+   */
+  public IPlayer getPlayer(int id);
 }

@@ -72,7 +72,7 @@ public class AbstractTournamentTest extends TestCase
   public void testAddPlayer()
   {
     System.out.println("addPlayer");
-    TeamInterface team = new Team(new Player("Test", 1));
+    TeamInterface team = new Team(new UIPlayer("Test", 1));
     AbstractTournament instance = new AbstractTournamentImpl();
     try
     {
@@ -102,7 +102,7 @@ public class AbstractTournamentTest extends TestCase
   public void testRemovePlayer()
   {
     System.out.println("removePlayer");
-    TeamInterface team = new Team(new Player("Test", 0));
+    TeamInterface team = new Team(new UIPlayer("Test", 0));
     AbstractTournament instance = new AbstractTournamentImpl();
     boolean failure = false;
     try
@@ -205,7 +205,7 @@ public class AbstractTournamentTest extends TestCase
     @Override
     public int getMinimumAmountOfRounds()
     {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+      return 1;
     }
 
     @Override
