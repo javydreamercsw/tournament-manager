@@ -7,7 +7,12 @@ import java.util.Optional;
 import org.openide.util.Exceptions;
 
 import net.sourceforge.javydreamercsw.database.storage.db.Player;
+import net.sourceforge.javydreamercsw.database.storage.db.Record;
+import net.sourceforge.javydreamercsw.database.storage.db.Team;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.PlayerJpaController;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.RecordJpaController;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.TeamJpaController;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
 import net.sourceforge.javydreamercsw.tournament.manager.UIPlayer;
@@ -152,9 +157,21 @@ public class PlayerService
     {
       PlayerJpaController c
               = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
+      TeamJpaController tc
+              = new TeamJpaController(DataBaseManager.getEntityManagerFactory());
+      RecordJpaController rc
+              = new RecordJpaController(DataBaseManager.getEntityManagerFactory());
+      for (Team team : player.getTeamList())
+      {
+        tc.destroy(team.getId());
+      }
+      for (Record r : player.getRecordList())
+      {
+        rc.destroy(r.getId());
+      }
       c.destroy(player.getId());
     }
-    catch (NonexistentEntityException ex)
+    catch (NonexistentEntityException | IllegalOrphanException ex)
     {
       Exceptions.printStackTrace(ex);
     }
@@ -173,10 +190,16 @@ public class PlayerService
   {
     if (player != null)
     {
-      // Make a copy to keep entities and DTOs separated
       PlayerJpaController c
               = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
       c.create(player);
+
+      //Create the single player's team
+      TeamJpaController tc
+              = new TeamJpaController(DataBaseManager.getEntityManagerFactory());
+      Team alone = new Team();
+      alone.getPlayerList().add(player);
+      tc.create(alone);
     }
   }
 }
