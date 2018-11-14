@@ -132,7 +132,7 @@ public class PlayerList extends VerticalLayout
     }
     return Integer.toString(wins);
   }
-  
+
   private String getLossCount(Player player)
   {
     int losses = 0;
@@ -142,7 +142,7 @@ public class PlayerList extends VerticalLayout
     }
     return Integer.toString(losses);
   }
-  
+
   private String getDrawCount(Player player)
   {
     int losses = 0;
@@ -185,7 +185,8 @@ public class PlayerList extends VerticalLayout
     List<Player> matchesInCategory = PlayerService.getInstance()
             .findPlayers(player.getName());
 
-    if (matchesInCategory.isEmpty())
+    if (matchesInCategory.isEmpty()
+            && player.getTeamList().size() <= 1)
     {
       PlayerService.getInstance().deletePlayer(player);
 
@@ -197,6 +198,21 @@ public class PlayerList extends VerticalLayout
     {
       Notification.show("Unable to delete player!", 3000,
               Position.BOTTOM_START);
+      if (player.getTeamList().size() > 1)
+      {
+        StringBuilder sb = new StringBuilder();
+        player.getTeamList().forEach(team ->
+        {
+          if (team.getPlayerList().size() > 1)
+          {
+            sb.append(team.getName()).append("\n");
+          }
+        });
+        Notification.show("This payer is member of multi-person teams that need "
+                + "to be deleted before deleting this user!\n"
+                + "Delete the following teams:\n" + sb.toString(), 3000,
+                Position.BOTTOM_START);
+      }
     }
   }
 }
