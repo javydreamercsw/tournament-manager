@@ -115,7 +115,7 @@ public class FormatList extends VerticalLayout
     Button edit = new Button("Edit", event -> form.open(category,
             AbstractEditorDialog.Operation.EDIT));
     edit.setIcon(new Icon("lumo", "edit"));
-    edit.addClassName("review__edit");
+    edit.addClassName("format__edit");
     edit.getElement().setAttribute("theme", "tertiary");
     return edit;
   }

@@ -67,7 +67,7 @@ public class PlayerList extends VerticalLayout
 
   private void initView()
   {
-    addClassName("formats-list");
+    addClassName("players-list");
     setDefaultHorizontalComponentAlignment(Alignment.STRETCH);
   }
 
@@ -84,7 +84,7 @@ public class PlayerList extends VerticalLayout
     Button newButton = new Button("New player", new Icon("lumo", "plus"));
     newButton.getElement().setAttribute("theme", "primary");
     newButton.addClassName("view-toolbar__button");
-    newButton.addClickListener(e -> form.open(new Player(),
+    newButton.addClickListener(e -> form.open(new Player(""),
             AbstractEditorDialog.Operation.ADD));
 
     viewToolbar.add(searchField, newButton);
@@ -118,7 +118,7 @@ public class PlayerList extends VerticalLayout
     Button edit = new Button("Edit", event -> form.open(player,
             AbstractEditorDialog.Operation.EDIT));
     edit.setIcon(new Icon("lumo", "edit"));
-    edit.addClassName("review__edit");
+    edit.addClassName("player__edit");
     edit.getElement().setAttribute("theme", "tertiary");
     return edit;
   }

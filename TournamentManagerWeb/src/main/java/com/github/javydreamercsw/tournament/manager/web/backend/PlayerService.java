@@ -62,19 +62,24 @@ public class PlayerService
    */
   public List<Player> findPlayers(String filter)
   {
-    String normalizedFilter = filter.toLowerCase();
-
-    // Make a copy of each matching item to keep entities and DTOs separatedPlayerJpaController c =
+    List<Player> results = new ArrayList<>();
     PlayerJpaController c
             = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
-    List<Player> results = new ArrayList<>();
-    c.findPlayerEntities().forEach(player ->
+    if (filter == null || filter.trim().isEmpty())
     {
-      if (player.getName().contains(normalizedFilter))
+      results.addAll(c.findPlayerEntities());
+    }
+    else
+    {
+      String normalizedFilter = filter.toLowerCase();
+      c.findPlayerEntities().forEach(player ->
       {
-        results.add(player);
-      }
-    });
+        if (player.getName().toLowerCase().contains(normalizedFilter))
+        {
+          results.add(player);
+        }
+      });
+    }
     return results;
   }
 

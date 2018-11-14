@@ -26,7 +26,6 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.shared.Registration;
 
 /**
@@ -47,6 +46,7 @@ import com.vaadin.flow.shared.Registration;
 public abstract class AbstractEditorDialog<T extends Serializable>
         extends Dialog
 {
+  private static final long serialVersionUID = -6916639397630884016L;
 
   /**
    * The operations supported by this dialog. Delete is enabled when editing an
@@ -164,8 +164,7 @@ public abstract class AbstractEditorDialog<T extends Serializable>
     return formLayout;
   }
 
-  /**
-   * Gets the binder.
+  /**a
    *
    * @return the binder
    */
@@ -218,7 +217,7 @@ public abstract class AbstractEditorDialog<T extends Serializable>
     }
     else
     {
-      BinderValidationStatus<T> status = binder.validate();
+      binder.validate();
     }
   }
 

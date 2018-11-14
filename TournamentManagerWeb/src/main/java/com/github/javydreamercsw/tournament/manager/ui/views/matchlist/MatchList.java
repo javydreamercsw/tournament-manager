@@ -21,7 +21,6 @@ import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.Format;
 import com.github.javydreamercsw.tournament.manager.web.backend.MatchService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -114,16 +113,9 @@ public class MatchList extends VerticalLayout
     Button edit = new Button("Edit", event -> form.open(category,
             AbstractEditorDialog.Operation.EDIT));
     edit.setIcon(new Icon("lumo", "edit"));
-    edit.addClassName("review__edit");
+    edit.addClassName("match__edit");
     edit.getElement().setAttribute("theme", "tertiary");
     return edit;
-  }
-
-  private String getMatchCount(Format format)
-  {
-    List<MatchEntry> matchesInCategory = MatchService.getInstance()
-            .findMatchesWithFormat(format.getName());
-    return Integer.toString(matchesInCategory.size());
   }
 
   private void updateView()

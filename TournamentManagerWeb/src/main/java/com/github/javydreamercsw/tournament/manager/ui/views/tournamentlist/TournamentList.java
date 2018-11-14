@@ -68,7 +68,7 @@ public class TournamentList extends VerticalLayout
 
   private void initView()
   {
-    addClassName("matches-list");
+    addClassName("tournamentss-list");
     setDefaultHorizontalComponentAlignment(Alignment.STRETCH);
   }
 
@@ -127,7 +127,7 @@ public class TournamentList extends VerticalLayout
     Button edit = new Button("Edit", event -> form.open(category,
             AbstractEditorDialog.Operation.EDIT));
     edit.setIcon(new Icon("lumo", "edit"));
-    edit.addClassName("review__edit");
+    edit.addClassName("tournament__edit");
     edit.getElement().setAttribute("theme", "tertiary");
     return edit;
   }
