@@ -1,6 +1,7 @@
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -27,19 +28,19 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "tournament")
 @XmlRootElement
 @NamedQueries(
-{
-  @NamedQuery(name = "Tournament.findAll", query = "SELECT t FROM Tournament t"),
-  @NamedQuery(name = "Tournament.findById", 
-          query = "SELECT t FROM Tournament t WHERE t.id = :id"),
-  @NamedQuery(name = "Tournament.findByName", 
-          query = "SELECT t FROM Tournament t WHERE t.name = :name"),
-  @NamedQuery(name = "Tournament.findByWinPoints", 
-          query = "SELECT t FROM Tournament t WHERE t.winPoints = :winPoints"),
-  @NamedQuery(name = "Tournament.findByDrawPoints", 
-          query = "SELECT t FROM Tournament t WHERE t.drawPoints = :drawPoints"),
-  @NamedQuery(name = "Tournament.findByLossPoints", 
-          query = "SELECT t FROM Tournament t WHERE t.lossPoints = :lossPoints")
-})
+        {
+          @NamedQuery(name = "Tournament.findAll", query = "SELECT t FROM Tournament t"),
+          @NamedQuery(name = "Tournament.findById",
+                  query = "SELECT t FROM Tournament t WHERE t.id = :id"),
+          @NamedQuery(name = "Tournament.findByName",
+                  query = "SELECT t FROM Tournament t WHERE t.name = :name"),
+          @NamedQuery(name = "Tournament.findByWinPoints",
+                  query = "SELECT t FROM Tournament t WHERE t.winPoints = :winPoints"),
+          @NamedQuery(name = "Tournament.findByDrawPoints",
+                  query = "SELECT t FROM Tournament t WHERE t.drawPoints = :drawPoints"),
+          @NamedQuery(name = "Tournament.findByLossPoints",
+                  query = "SELECT t FROM Tournament t WHERE t.lossPoints = :lossPoints")
+        })
 public class Tournament implements Serializable
 {
   private static final long serialVersionUID = 1L;
@@ -66,17 +67,22 @@ public class Tournament implements Serializable
   @Basic(optional = false)
   @Column(name = "lossPoints")
   private int lossPoints;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament", fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament",
+          fetch = FetchType.LAZY)
   private List<Round> roundList;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament", fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament",
+          fetch = FetchType.LAZY)
   private List<TournamentHasTeam> tournamentHasTeamList;
 
   public Tournament()
   {
+    setRoundList(new ArrayList<>());
+    setTournamentHasTeamList(new ArrayList<>());
   }
 
   public Tournament(String name)
   {
+    this();
     this.name = name;
   }
 
@@ -136,7 +142,7 @@ public class Tournament implements Serializable
     return roundList;
   }
 
-  public void setRoundList(List<Round> roundList)
+  public final void setRoundList(List<Round> roundList)
   {
     this.roundList = roundList;
   }
@@ -147,7 +153,7 @@ public class Tournament implements Serializable
     return tournamentHasTeamList;
   }
 
-  public void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
+  public final void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
   {
     this.tournamentHasTeamList = tournamentHasTeamList;
   }
@@ -169,17 +175,14 @@ public class Tournament implements Serializable
       return false;
     }
     Tournament other = (Tournament) object;
-    if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)))
-    {
-      return false;
-    }
-    return true;
+    return !((this.id == null && other.id != null)
+            || (this.id != null && !this.id.equals(other.id)));
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.Tournament[ id=" + id + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.Tournament[ id="
+            + id + " ]";
   }
-  
 }

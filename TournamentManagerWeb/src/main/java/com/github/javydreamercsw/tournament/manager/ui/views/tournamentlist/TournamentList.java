@@ -85,7 +85,7 @@ public class TournamentList extends VerticalLayout
     Button newButton = new Button("New tournament", new Icon("lumo", "plus"));
     newButton.getElement().setAttribute("theme", "primary");
     newButton.addClassName("view-toolbar__button");
-    newButton.addClickListener(e -> form.open(new Tournament(),
+    newButton.addClickListener(e -> form.open(new Tournament(""),
             AbstractEditorDialog.Operation.ADD));
 
     viewToolbar.add(searchField, newButton);

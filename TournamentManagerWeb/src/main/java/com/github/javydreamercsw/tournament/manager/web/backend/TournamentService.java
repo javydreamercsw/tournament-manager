@@ -1,9 +1,15 @@
 package com.github.javydreamercsw.tournament.manager.web.backend;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.openide.util.Exceptions;
+
 import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.TournamentJpaController;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 /**
  *
@@ -11,6 +17,9 @@ import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
  */
 public class TournamentService
 {
+  private TournamentJpaController controller
+          = new TournamentJpaController(DataBaseManager.getEntityManagerFactory());
+
   /**
    * Helper class to initialize the singleton Service in a thread-safe way and
    * to keep the initialization ordering clear between the two services. See
@@ -47,23 +56,34 @@ public class TournamentService
 
   public List<Tournament> findTournaments(String value)
   {
-    //TODO
-    return Collections.EMPTY_LIST;
+    return controller.findTournamentEntities();
   }
 
   public void saveTournament(Tournament t)
   {
-    //TODO
+    controller.create(t);
   }
 
   public void deleteTournament(Tournament t)
   {
-    //TODO
+    try
+    {
+      controller.destroy(t.getId());
+    }
+    catch (IllegalOrphanException | NonexistentEntityException ex)
+    {
+      Exceptions.printStackTrace(ex);
+    }
   }
 
   public List<Tournament> findTournament(Integer id)
   {
-    //TODO
-    return Collections.EMPTY_LIST;
+    List<Tournament> results = new ArrayList<>();
+    Tournament t = controller.findTournament(id);
+    if (t != null)
+    {
+      results.add(t);
+    }
+    return results;
   }
 }

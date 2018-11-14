@@ -15,12 +15,15 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist;
 
-
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.github.javydreamercsw.tournament.manager.web.backend.Format;
+import com.github.javydreamercsw.tournament.manager.web.backend.TournamentService;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.converter.StringToIntegerConverter;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 
 import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
 
@@ -30,18 +33,70 @@ import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
 public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
 {
   private static final long serialVersionUID = 1075907611022458493L;
+  private final TextField tournamentNameField = new TextField("Name");
+  private final TextField winPoints = new TextField("Points per win");
+  private final TextField lossPoints = new TextField("Points per loss");
+  private final TextField drawPoints = new TextField("Points per draw");
 
   public TournamentEditorDialog(BiConsumer<Tournament, Operation> itemSaver,
           Consumer<Tournament> itemDeleter)
   {
     super("tournament", itemSaver, itemDeleter);
 
-    //TODO: add fields
+    addNameField();
+    addNameWinPoints();
+    addNameLossPoints();
+    addNameDrawPoints();
   }
 
   @Override
   protected void confirmDelete()
   {
     doDelete(getCurrentItem());
+  }
+
+  private void addNameField()
+  {
+    getFormLayout().add(tournamentNameField);
+
+    getBinder().forField(tournamentNameField)
+            .withConverter(String::trim, String::trim)
+            .withValidator(new StringLengthValidator(
+                    "Tournament name must contain at least 3 printable characters",
+                    3, null))
+            .withValidator(name -> TournamentService.getInstance()
+            .findTournaments(name).isEmpty(),
+                    "Tournament name must be unique")
+            .bind(Tournament::getName, Tournament::setName);
+  }
+
+  private void addNameWinPoints()
+  {
+    getFormLayout().add(winPoints);
+
+    getBinder().forField(winPoints)
+            .withConverter(
+                    new StringToIntegerConverter("Must enter a number"))
+            .bind(Tournament::getWinPoints, Tournament::setWinPoints);
+  }
+
+  private void addNameLossPoints()
+  {
+   getFormLayout().add(lossPoints);
+
+    getBinder().forField(lossPoints)
+            .withConverter(
+                    new StringToIntegerConverter("Must enter a number"))
+            .bind(Tournament::getLossPoints, Tournament::setLossPoints);
+  }
+
+  private void addNameDrawPoints()
+  {
+    getFormLayout().add(drawPoints);
+
+    getBinder().forField(drawPoints)
+            .withConverter(
+                    new StringToIntegerConverter("Must enter a number"))
+            .bind(Tournament::getDrawPoints, Tournament::setDrawPoints);
   }
 }
