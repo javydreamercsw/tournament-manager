@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import org.openide.util.Exceptions;
 
-import net.sourceforge.javydreamercsw.database.storage.db.controller.PlayerJpaController;
 import net.sourceforge.javydreamercsw.database.storage.db.Player;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.PlayerJpaController;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 
 /**
@@ -21,7 +21,6 @@ public final class PlayerServer extends Player implements DatabaseEntity<Player>
     setName(p.getName());
     setRecordList(new ArrayList<>());
     setTeamList(new ArrayList<>());
-    setId(0);
   }
 
   public PlayerServer(Player p)
@@ -52,7 +51,7 @@ public final class PlayerServer extends Player implements DatabaseEntity<Player>
   {
     PlayerJpaController controller
             = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
-    if (getId() > 0)
+    if (getId() != null)
     {
       //Update
       Player player = controller.findPlayer(getId());

@@ -6,6 +6,7 @@
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -35,8 +36,10 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries(
 {
   @NamedQuery(name = "Player.findAll", query = "SELECT p FROM Player p"),
-  @NamedQuery(name = "Player.findById", query = "SELECT p FROM Player p WHERE p.id = :id"),
-  @NamedQuery(name = "Player.findByName", query = "SELECT p FROM Player p WHERE p.name = :name")
+  @NamedQuery(name = "Player.findById", 
+          query = "SELECT p FROM Player p WHERE p.id = :id"),
+  @NamedQuery(name = "Player.findByName", 
+          query = "SELECT p FROM Player p WHERE p.name = :name")
 })
 public class Player implements Serializable
 {
@@ -76,10 +79,13 @@ public class Player implements Serializable
 
   public Player()
   {
+    setRecordList(new ArrayList<>());
+    setTeamList(new ArrayList<>());
   }
 
   public Player(String name)
   {
+    this();
     this.name = name;
   }
 
@@ -109,7 +115,7 @@ public class Player implements Serializable
     return teamList;
   }
 
-  public void setTeamList(List<Team> teamList)
+  public final void setTeamList(List<Team> teamList)
   {
     this.teamList = teamList;
   }
@@ -120,7 +126,7 @@ public class Player implements Serializable
     return recordList;
   }
 
-  public void setRecordList(List<Record> recordList)
+  public final void setRecordList(List<Record> recordList)
   {
     this.recordList = recordList;
   }
@@ -142,17 +148,14 @@ public class Player implements Serializable
       return false;
     }
     Player other = (Player) object;
-    if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)))
-    {
-      return false;
-    }
-    return true;
+    return !((this.id == null && other.id != null) 
+            || (this.id != null && !this.id.equals(other.id)));
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.Player[ id=" + id + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.Player[ id=" + 
+            id + " ]";
   }
-  
 }
