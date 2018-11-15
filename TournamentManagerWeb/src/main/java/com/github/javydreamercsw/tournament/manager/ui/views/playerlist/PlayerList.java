@@ -159,7 +159,7 @@ public class PlayerList extends VerticalLayout
             .findPlayers(searchField.getValue());
     grid.setItems(players);
 
-    if (searchField.getValue().length() > 0)
+    if (searchField.getValue().trim().length() > 0)
     {
       header.setText("Search for “" + searchField.getValue() + "”");
     }
@@ -185,7 +185,7 @@ public class PlayerList extends VerticalLayout
     List<Player> matchesInCategory = PlayerService.getInstance()
             .findPlayers(player.getName());
 
-    if (matchesInCategory.isEmpty()
+    if (!matchesInCategory.isEmpty()
             && player.getTeamList().size() <= 1)
     {
       PlayerService.getInstance().deletePlayer(player);
