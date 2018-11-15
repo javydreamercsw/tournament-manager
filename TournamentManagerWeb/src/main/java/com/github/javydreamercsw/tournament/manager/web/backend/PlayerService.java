@@ -11,8 +11,6 @@ import net.sourceforge.javydreamercsw.database.storage.db.Record;
 import net.sourceforge.javydreamercsw.database.storage.db.Team;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.PlayerJpaController;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.RecordJpaController;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.TeamJpaController;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
 import net.sourceforge.javydreamercsw.tournament.manager.UIPlayer;
@@ -22,6 +20,9 @@ import net.sourceforge.javydreamercsw.tournament.manager.UIPlayer;
  */
 public class PlayerService
 {
+  private final PlayerJpaController pc
+          = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
+
   /**
    * Helper class to initialize the singleton Service in a thread-safe way and
    * to keep the initialization ordering clear between the two services. See
@@ -68,16 +69,14 @@ public class PlayerService
   public List<Player> findPlayers(String filter)
   {
     List<Player> results = new ArrayList<>();
-    PlayerJpaController c
-            = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
     if (filter == null || filter.trim().isEmpty())
     {
-      results.addAll(c.findPlayerEntities());
+      results.addAll(pc.findPlayerEntities());
     }
     else
     {
       String normalizedFilter = filter.toLowerCase();
-      c.findPlayerEntities().forEach(player ->
+      pc.findPlayerEntities().forEach(player ->
       {
         if (player.getName().toLowerCase().contains(normalizedFilter))
         {
@@ -98,7 +97,7 @@ public class PlayerService
    * {@link Optional#empty()}
    * @throws IllegalStateException if the result is ambiguous
    */
-  public Optional<Player> findPlayersByName(String name)
+  public Optional<Player> findPlayerByName(String name)
   {
     List<Player> playersMatching = findPlayers(name);
 
@@ -108,7 +107,7 @@ public class PlayerService
     }
     if (playersMatching.size() > 1)
     {
-      throw new IllegalStateException("Player " + name + " is ambiguous");
+      return Optional.empty();
     }
     return Optional.of(playersMatching.get(0));
   }
@@ -116,7 +115,7 @@ public class PlayerService
   /**
    * Fetches the exact place whose name matches the given filter text.
    *
-   * Behaves like {@link #findPlayersByName(String)}, except that returns a
+   * Behaves like {@link #findPlayerByName(String)}, except that returns a
    * {@link UIPlayer} instead of an {@link Optional}. If the category can't be
    * identified, an exception is thrown.
    *
@@ -125,9 +124,9 @@ public class PlayerService
    * @throws IllegalStateException if not exactly one category matches the given
    * name
    */
-  public Player findNameOrThrow(String name)
+  public Player findNameOrThrow(String name) throws IllegalStateException
   {
-    return findPlayersByName(name)
+    return findPlayerByName(name)
             .orElseThrow(() -> new IllegalStateException("Player " + name
             + " does not exist"));
   }
@@ -141,9 +140,7 @@ public class PlayerService
    */
   public Optional<Player> findPlayerById(Integer id)
   {
-    PlayerJpaController c
-            = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
-    return Optional.ofNullable(c.findPlayer(id));
+    return Optional.ofNullable(pc.findPlayer(id));
   }
 
   /**
@@ -155,23 +152,19 @@ public class PlayerService
   {
     try
     {
-      PlayerJpaController c
-              = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
-      TeamJpaController tc
-              = new TeamJpaController(DataBaseManager.getEntityManagerFactory());
       RecordJpaController rc
               = new RecordJpaController(DataBaseManager.getEntityManagerFactory());
-      for (Team team : player.getTeamList())
+      player.getTeamList().forEach((team) ->
       {
-        tc.destroy(team.getId());
-      }
+        TeamService.getInstance().deleteTeam(team);
+      });
       for (Record r : player.getRecordList())
       {
         rc.destroy(r.getId());
       }
-      c.destroy(player.getId());
+      pc.destroy(player.getId());
     }
-    catch (NonexistentEntityException | IllegalOrphanException ex)
+    catch (NonexistentEntityException ex)
     {
       Exceptions.printStackTrace(ex);
     }
@@ -188,18 +181,25 @@ public class PlayerService
    */
   public void savePlayer(Player player)
   {
-    if (player != null)
+    if (player.getId() != null && pc.findPlayer(player.getId()) != null)
     {
-      PlayerJpaController c
-              = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
-      c.create(player);
-
+      try
+      {
+        pc.edit(player);
+      }
+      catch (Exception ex)
+      {
+        Exceptions.printStackTrace(ex);
+      }
+    }
+    else
+    {
+      pc.create(player);
       //Create the single player's team
-      TeamJpaController tc
-              = new TeamJpaController(DataBaseManager.getEntityManagerFactory());
       Team alone = new Team();
+      alone.setName(player.getName());
       alone.getPlayerList().add(player);
-      tc.create(alone);
+      TeamService.getInstance().saveTeam(alone);
     }
   }
 }

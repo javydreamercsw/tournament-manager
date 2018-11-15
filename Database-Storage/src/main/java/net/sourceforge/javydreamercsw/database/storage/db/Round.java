@@ -1,6 +1,7 @@
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -45,6 +46,7 @@ public class Round implements Serializable
 
   public Round()
   {
+    setMatchEntryList(new ArrayList<>());
   }
 
   public Round(RoundPK roundPK)
@@ -83,7 +85,7 @@ public class Round implements Serializable
     return matchEntryList;
   }
 
-  public void setMatchEntryList(List<MatchEntry> matchEntryList)
+  public final void setMatchEntryList(List<MatchEntry> matchEntryList)
   {
     this.matchEntryList = matchEntryList;
   }

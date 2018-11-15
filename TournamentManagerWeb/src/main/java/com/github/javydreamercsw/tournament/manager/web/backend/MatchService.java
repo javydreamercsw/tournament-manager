@@ -1,13 +1,15 @@
 package com.github.javydreamercsw.tournament.manager.web.backend;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.openide.util.Exceptions;
 
 import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
 import net.sourceforge.javydreamercsw.database.storage.db.MatchEntryPK;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.MatchEntryJpaController;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 /**
@@ -16,7 +18,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager
  */
 public class MatchService
 {
-  private MatchEntryJpaController matchController
+  private MatchEntryJpaController mc
           = new MatchEntryJpaController(DataBaseManager.getEntityManagerFactory());
 
   /**
@@ -27,7 +29,6 @@ public class MatchService
   private static class SingletonHolder
   {
     static final MatchService INSTANCE = createMatchService();
-    private static Map<Integer, MatchEntry> matches = new HashMap<>();
 
     /**
      * This class is not meant to be instantiated.
@@ -39,12 +40,6 @@ public class MatchService
     private static MatchService createMatchService()
     {
       final MatchService reviewService = new MatchService();
-      MatchEntryJpaController c = new MatchEntryJpaController(DataBaseManager
-              .getEntityManagerFactory());
-      c.findMatchEntryEntities().forEach(match ->
-      {
-        matches.put(match.getMatchEntryPK().getId(), match);
-      });
       return reviewService;
     }
   }
@@ -68,40 +63,55 @@ public class MatchService
 
   public void saveMatch(MatchEntry match) throws Exception
   {
-    matchController.create(match);
+    if (match.getMatchEntryPK() != null
+            && mc.findMatchEntry(match.getMatchEntryPK()) != null)
+    {
+      mc.edit(match);
+    }
+    else
+    {
+      mc.create(match);
+    }
   }
-  
-  public void deleteMatch(MatchEntry match) throws Exception
+
+  public void deleteMatch(MatchEntry match)
   {
-    matchController.destroy(match.getMatchEntryPK());
+    try
+    {
+      mc.destroy(match.getMatchEntryPK());
+    }
+    catch (IllegalOrphanException | NonexistentEntityException ex)
+    {
+      Exceptions.printStackTrace(ex);
+    }
   }
 
   public List<MatchEntry> findMatchesWithFormat(String format)
   {
     List<MatchEntry> results = new ArrayList<>();
-    HashMap<String, Object> parameters = new HashMap<>();
-    parameters.put("name", format);
-    List<Object> result
-            = DataBaseManager.namedQuery("Format.findByName", parameters);
-    result.forEach(r -> results.add((MatchEntry) r));
+    mc.findMatchEntryEntities().forEach(match ->
+    {
+      if (match.getFormat().getName().equals(format))
+      {
+        results.add(match);
+      }
+    });
     return results;
   }
 
   public List<MatchEntry> findMatch(MatchEntryPK key)
   {
     List<MatchEntry> results = new ArrayList<>();
-    MatchEntryJpaController c = new MatchEntryJpaController(DataBaseManager
-            .getEntityManagerFactory());
-    MatchEntry match = c.findMatchEntry(key);
+    MatchEntry match = mc.findMatchEntry(key);
     if (match != null)
     {
       results.add(match);
     }
     return results;
   }
-  
-  public List<MatchEntry> findMatches(String value)
+
+  public List<MatchEntry> findMatches()
   {
-    return matchController.findMatchEntryEntities();
+    return mc.findMatchEntryEntities();
   }
 }

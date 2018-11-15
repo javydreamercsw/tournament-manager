@@ -46,25 +46,25 @@ public class TournamentJpaController implements Serializable
   {
     if (tournament.getRoundList() == null)
     {
-      tournament.setRoundList(new ArrayList<Round>());
+      tournament.setRoundList(new ArrayList<>());
     }
     if (tournament.getTournamentHasTeamList() == null)
     {
-      tournament.setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
+      tournament.setTournamentHasTeamList(new ArrayList<>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<Round> attachedRoundList = new ArrayList<Round>();
+      List<Round> attachedRoundList = new ArrayList<>();
       for (Round roundListRoundToAttach : tournament.getRoundList())
       {
         roundListRoundToAttach = em.getReference(roundListRoundToAttach.getClass(), roundListRoundToAttach.getRoundPK());
         attachedRoundList.add(roundListRoundToAttach);
       }
       tournament.setRoundList(attachedRoundList);
-      List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<TournamentHasTeam>();
+      List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<>();
       for (TournamentHasTeam tournamentHasTeamListTournamentHasTeamToAttach : tournament.getTournamentHasTeamList())
       {
         tournamentHasTeamListTournamentHasTeamToAttach = em.getReference(tournamentHasTeamListTournamentHasTeamToAttach.getClass(), tournamentHasTeamListTournamentHasTeamToAttach.getTournamentHasTeamPK());
@@ -124,7 +124,7 @@ public class TournamentJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<String>();
+            illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain Round " + roundListOldRound + " since its tournament field is not nullable.");
         }
@@ -135,7 +135,7 @@ public class TournamentJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<String>();
+            illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain TournamentHasTeam " + tournamentHasTeamListOldTournamentHasTeam + " since its tournament field is not nullable.");
         }
@@ -144,7 +144,7 @@ public class TournamentJpaController implements Serializable
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
-      List<Round> attachedRoundListNew = new ArrayList<Round>();
+      List<Round> attachedRoundListNew = new ArrayList<>();
       for (Round roundListNewRoundToAttach : roundListNew)
       {
         roundListNewRoundToAttach = em.getReference(roundListNewRoundToAttach.getClass(), roundListNewRoundToAttach.getRoundPK());
@@ -152,7 +152,7 @@ public class TournamentJpaController implements Serializable
       }
       roundListNew = attachedRoundListNew;
       tournament.setRoundList(roundListNew);
-      List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<TournamentHasTeam>();
+      List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<>();
       for (TournamentHasTeam tournamentHasTeamListNewTournamentHasTeamToAttach : tournamentHasTeamListNew)
       {
         tournamentHasTeamListNewTournamentHasTeamToAttach = em.getReference(tournamentHasTeamListNewTournamentHasTeamToAttach.getClass(), tournamentHasTeamListNewTournamentHasTeamToAttach.getTournamentHasTeamPK());
@@ -236,7 +236,7 @@ public class TournamentJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<String>();
+          illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This Tournament (" + tournament + ") cannot be destroyed since the Round " + roundListOrphanCheckRound + " in its roundList field has a non-nullable tournament field.");
       }
@@ -245,7 +245,7 @@ public class TournamentJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<String>();
+          illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This Tournament (" + tournament + ") cannot be destroyed since the TournamentHasTeam " + tournamentHasTeamListOrphanCheckTournamentHasTeam + " in its tournamentHasTeamList field has a non-nullable tournament field.");
       }

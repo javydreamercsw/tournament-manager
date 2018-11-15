@@ -52,7 +52,7 @@ public class MatchResultJpaController implements Serializable
     }
     if (matchResult.getMatchHasTeamList() == null)
     {
-      matchResult.setMatchHasTeamList(new ArrayList<MatchHasTeam>());
+      matchResult.setMatchHasTeamList(new ArrayList<>());
     }
     matchResult.getMatchResultPK().setMatchResultTypeId(matchResult.getMatchResultType().getId());
     EntityManager em = null;
@@ -66,7 +66,7 @@ public class MatchResultJpaController implements Serializable
         matchResultType = em.getReference(matchResultType.getClass(), matchResultType.getId());
         matchResult.setMatchResultType(matchResultType);
       }
-      List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<MatchHasTeam>();
+      List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<>();
       for (MatchHasTeam matchHasTeamListMatchHasTeamToAttach : matchResult.getMatchHasTeamList())
       {
         matchHasTeamListMatchHasTeamToAttach = em.getReference(matchHasTeamListMatchHasTeamToAttach.getClass(), matchHasTeamListMatchHasTeamToAttach.getMatchHasTeamPK());
@@ -129,7 +129,7 @@ public class MatchResultJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<String>();
+            illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain MatchHasTeam " + matchHasTeamListOldMatchHasTeam + " since its matchResult field is not nullable.");
         }
@@ -143,7 +143,7 @@ public class MatchResultJpaController implements Serializable
         matchResultTypeNew = em.getReference(matchResultTypeNew.getClass(), matchResultTypeNew.getId());
         matchResult.setMatchResultType(matchResultTypeNew);
       }
-      List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<MatchHasTeam>();
+      List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<>();
       for (MatchHasTeam matchHasTeamListNewMatchHasTeamToAttach : matchHasTeamListNew)
       {
         matchHasTeamListNewMatchHasTeamToAttach = em.getReference(matchHasTeamListNewMatchHasTeamToAttach.getClass(), matchHasTeamListNewMatchHasTeamToAttach.getMatchHasTeamPK());
@@ -223,7 +223,7 @@ public class MatchResultJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<String>();
+          illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This MatchResult (" + matchResult + ") cannot be destroyed since the MatchHasTeam " + matchHasTeamListOrphanCheckMatchHasTeam + " in its matchHasTeamList field has a non-nullable matchResult field.");
       }

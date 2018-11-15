@@ -30,8 +30,10 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries(
 {
   @NamedQuery(name = "TournamentHasTeam.findAll", query = "SELECT t FROM TournamentHasTeam t"),
-  @NamedQuery(name = "TournamentHasTeam.findByTournamentId", query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.tournamentId = :tournamentId"),
-  @NamedQuery(name = "TournamentHasTeam.findByTeamId", query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.teamId = :teamId")
+  @NamedQuery(name = "TournamentHasTeam.findByTournamentId", 
+          query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.tournamentId = :tournamentId"),
+  @NamedQuery(name = "TournamentHasTeam.findByTeamId", 
+          query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.teamId = :teamId")
 })
 public class TournamentHasTeam implements Serializable
 {
@@ -40,10 +42,12 @@ public class TournamentHasTeam implements Serializable
   protected TournamentHasTeamPK tournamentHasTeamPK;
   @ManyToMany(mappedBy = "tournamentHasTeamList", fetch = FetchType.LAZY)
   private List<Record> recordList;
-  @JoinColumn(name = "team_id", referencedColumnName = "id", insertable = false, updatable = false)
+  @JoinColumn(name = "team_id", referencedColumnName = "id", insertable = false, 
+          updatable = false)
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   private Team team;
-  @JoinColumn(name = "tournament_id", referencedColumnName = "id", insertable = false, updatable = false)
+  @JoinColumn(name = "tournament_id", referencedColumnName = "id", 
+          insertable = false, updatable = false)
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   private Tournament tournament;
 
@@ -119,17 +123,16 @@ public class TournamentHasTeam implements Serializable
       return false;
     }
     TournamentHasTeam other = (TournamentHasTeam) object;
-    if ((this.tournamentHasTeamPK == null && other.tournamentHasTeamPK != null) || (this.tournamentHasTeamPK != null && !this.tournamentHasTeamPK.equals(other.tournamentHasTeamPK)))
-    {
-      return false;
-    }
-    return true;
+    return !((this.tournamentHasTeamPK == null 
+            && other.tournamentHasTeamPK != null) 
+            || (this.tournamentHasTeamPK != null 
+            && !this.tournamentHasTeamPK.equals(other.tournamentHasTeamPK)));
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam[ tournamentHasTeamPK=" + tournamentHasTeamPK + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam[ tournamentHasTeamPK=" 
+            + tournamentHasTeamPK + " ]";
   }
-  
 }

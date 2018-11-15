@@ -52,7 +52,7 @@ public class RoundJpaController implements Serializable
     }
     if (round.getMatchEntryList() == null)
     {
-      round.setMatchEntryList(new ArrayList<MatchEntry>());
+      round.setMatchEntryList(new ArrayList<>());
     }
     round.getRoundPK().setTournamentId(round.getTournament().getId());
     EntityManager em = null;
@@ -66,7 +66,7 @@ public class RoundJpaController implements Serializable
         tournament = em.getReference(tournament.getClass(), tournament.getId());
         round.setTournament(tournament);
       }
-      List<MatchEntry> attachedMatchEntryList = new ArrayList<MatchEntry>();
+      List<MatchEntry> attachedMatchEntryList = new ArrayList<>();
       for (MatchEntry matchEntryListMatchEntryToAttach : round.getMatchEntryList())
       {
         matchEntryListMatchEntryToAttach = em.getReference(matchEntryListMatchEntryToAttach.getClass(), matchEntryListMatchEntryToAttach.getMatchEntryPK());
@@ -129,7 +129,7 @@ public class RoundJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<String>();
+            illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain MatchEntry " + matchEntryListOldMatchEntry + " since its round field is not nullable.");
         }
@@ -143,7 +143,7 @@ public class RoundJpaController implements Serializable
         tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getId());
         round.setTournament(tournamentNew);
       }
-      List<MatchEntry> attachedMatchEntryListNew = new ArrayList<MatchEntry>();
+      List<MatchEntry> attachedMatchEntryListNew = new ArrayList<>();
       for (MatchEntry matchEntryListNewMatchEntryToAttach : matchEntryListNew)
       {
         matchEntryListNewMatchEntryToAttach = em.getReference(matchEntryListNewMatchEntryToAttach.getClass(), matchEntryListNewMatchEntryToAttach.getMatchEntryPK());
@@ -223,7 +223,7 @@ public class RoundJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<String>();
+          illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This Round (" + round + ") cannot be destroyed since the MatchEntry " + matchEntryListOrphanCheckMatchEntry + " in its matchEntryList field has a non-nullable round field.");
       }

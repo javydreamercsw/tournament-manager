@@ -19,7 +19,6 @@ import java.util.List;
 
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.Format;
 import com.github.javydreamercsw.tournament.manager.web.backend.FormatService;
 import com.github.javydreamercsw.tournament.manager.web.backend.MatchService;
 import com.vaadin.flow.component.button.Button;
@@ -37,6 +36,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import net.sourceforge.javydreamercsw.database.storage.db.Format;
 import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
 
 /**
@@ -123,7 +123,7 @@ public class FormatList extends VerticalLayout
   private String getMatchCount(Format category)
   {
     List<MatchEntry> matchesInCategory = MatchService.getInstance()
-            .findMatches(category.getName());
+            .findMatchesWithFormat(category.getName());
     return Integer.toString(matchesInCategory.size());
   }
 
@@ -157,7 +157,7 @@ public class FormatList extends VerticalLayout
   private void deleteFormat(Format category)
   {
     List<MatchEntry> matchesInCategory = MatchService.getInstance()
-            .findMatches(category.getName());
+            .findMatchesWithFormat(category.getName());
 
     if (matchesInCategory.isEmpty())
     {

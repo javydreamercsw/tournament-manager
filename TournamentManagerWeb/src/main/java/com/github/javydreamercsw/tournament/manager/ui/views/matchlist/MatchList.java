@@ -121,7 +121,7 @@ public class MatchList extends VerticalLayout
   private void updateView()
   {
     List<MatchEntry> matches = MatchService.getInstance()
-            .findMatches(searchField.getValue());
+            .findMatchesWithFormat(searchField.getValue());
     grid.setItems(matches);
 
     if (searchField.getValue().length() > 0)

@@ -1,6 +1,5 @@
 package net.sourceforge.javydreamercsw.tournament.manager.elimination.tournament;
 
-import net.sourceforge.javydreamercsw.tournament.manager.AbstractTournament;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +8,16 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.openide.util.lookup.ServiceProvider;
+
+import net.sourceforge.javydreamercsw.tournament.manager.AbstractTournament;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
-import org.apache.commons.lang3.ArrayUtils;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -179,7 +181,7 @@ public class Elimination extends AbstractTournament
                             //Got our winner
                         } else {
                             //We got someone pending. Pair with him BYE
-                            addPairing(pairings, pending, bye);
+                            addPairing(pairings, pending, null);
                             LOG.log(Level.INFO, "Pairing {0} with BYE", pending);
                         }
                     }

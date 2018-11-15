@@ -1,0 +1,67 @@
+package com.github.javydreamercsw.tournament.manager.web.backend;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
+import java.util.List;
+
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
+import net.sourceforge.javydreamercsw.database.storage.db.Player;
+import net.sourceforge.javydreamercsw.database.storage.db.Team;
+import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
+
+public class MatchServiceNGTest extends BaseTestCase
+{
+  @BeforeClass
+  @Override
+  public void setup()
+  {
+    super.setup();
+    System.out.println("Creating players...");
+    Player p1 = new Player("Player 1");
+    PlayerService.getInstance().savePlayer(p1);
+    Player p2 = new Player("Player 2");
+    PlayerService.getInstance().savePlayer(p2);
+  }
+
+  /**
+   * Test of saveMatch method, of class MatchService.
+   *
+   * @throws java.lang.Exception
+   */
+  @Test
+  public void testSaveMatch() throws Exception
+  {
+    System.out.println("saveMatch");
+    List<Team> teams = TeamService.getInstance().findTeams("");
+    assertEquals(teams.size(), 2);
+
+    Tournament t = new Tournament("Test");
+    TournamentService.getInstance().saveTournament(t);
+
+    // Add the teams
+    TournamentService.getInstance().addTeams(t, teams);
+
+    // Add round
+    TournamentService.getInstance().addRound(t);
+
+    // Update
+    TournamentService.getInstance().saveTournament(t);
+
+    MatchEntry match = new MatchEntry();
+    match.setFormat(FormatService.getInstance().findFormats("").get(0));
+    match.setRound(t.getRoundList().get(0));
+    MatchService.getInstance().saveMatch(match);
+
+    System.out.println("findMatchesWithFormat");
+    assertEquals(MatchService.getInstance().findMatchesWithFormat(FormatService
+            .getInstance().findFormats("").get(0).getName()).size(), 1);
+    assertEquals(MatchService.getInstance().findMatchesWithFormat(FormatService
+            .getInstance().findFormats("").get(1).getName()).size(), 0);
+    
+    assertFalse(MatchService.getInstance().findMatch(match.getMatchEntryPK()).isEmpty());
+  }
+}

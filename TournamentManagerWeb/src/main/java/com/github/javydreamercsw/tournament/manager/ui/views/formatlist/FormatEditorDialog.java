@@ -19,12 +19,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.Format;
 import com.github.javydreamercsw.tournament.manager.web.backend.FormatService;
 import com.github.javydreamercsw.tournament.manager.web.backend.MatchService;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.validator.StringLengthValidator;
+
+import net.sourceforge.javydreamercsw.database.storage.db.Format;
 
 /**
  * A dialog for editing {@link Format} objects.

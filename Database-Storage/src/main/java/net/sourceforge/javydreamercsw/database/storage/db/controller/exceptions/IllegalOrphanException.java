@@ -8,7 +8,7 @@ public class IllegalOrphanException extends Exception {
     public IllegalOrphanException(List<String> messages) {
         super((messages != null && messages.size() > 0 ? messages.get(0) : null));
         if (messages == null) {
-            this.messages = new ArrayList<String>();
+            this.messages = new ArrayList<>();
         }
         else {
             this.messages = messages;

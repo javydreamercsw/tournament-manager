@@ -6,21 +6,18 @@
 package net.sourceforge.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
-
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import net.sourceforge.javydreamercsw.database.storage.db.Format;
+import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
@@ -30,6 +27,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.
  */
 public class FormatJpaController implements Serializable
 {
+  private static final long serialVersionUID = 2970390892130758461L;
   public FormatJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -45,14 +43,14 @@ public class FormatJpaController implements Serializable
   {
     if (format.getMatchEntryList() == null)
     {
-      format.setMatchEntryList(new ArrayList<MatchEntry>());
+      format.setMatchEntryList(new ArrayList<>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<MatchEntry> attachedMatchEntryList = new ArrayList<MatchEntry>();
+      List<MatchEntry> attachedMatchEntryList = new ArrayList<>();
       for (MatchEntry matchEntryListMatchEntryToAttach : format.getMatchEntryList())
       {
         matchEntryListMatchEntryToAttach = em.getReference(matchEntryListMatchEntryToAttach.getClass(), matchEntryListMatchEntryToAttach.getMatchEntryPK());
@@ -99,7 +97,7 @@ public class FormatJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<String>();
+            illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain MatchEntry " + matchEntryListOldMatchEntry + " since its format field is not nullable.");
         }
@@ -108,7 +106,7 @@ public class FormatJpaController implements Serializable
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
-      List<MatchEntry> attachedMatchEntryListNew = new ArrayList<MatchEntry>();
+      List<MatchEntry> attachedMatchEntryListNew = new ArrayList<>();
       for (MatchEntry matchEntryListNewMatchEntryToAttach : matchEntryListNew)
       {
         matchEntryListNewMatchEntryToAttach = em.getReference(matchEntryListNewMatchEntryToAttach.getClass(), matchEntryListNewMatchEntryToAttach.getMatchEntryPK());
@@ -178,7 +176,7 @@ public class FormatJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<String>();
+          illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This Format (" + format + ") cannot be destroyed since the MatchEntry " + matchEntryListOrphanCheckMatchEntry + " in its matchEntryList field has a non-nullable format field.");
       }

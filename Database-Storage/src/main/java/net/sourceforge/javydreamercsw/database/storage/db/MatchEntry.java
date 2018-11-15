@@ -6,6 +6,7 @@
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -58,11 +59,12 @@ public class MatchEntry implements Serializable
     @JoinColumn(name = "tournament_id", referencedColumnName = "id", insertable = false,
             updatable = false)
   })
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @ManyToOne(optional = true, fetch = FetchType.LAZY)
   private Round round;
 
   public MatchEntry()
   {
+     setMatchHasTeamList(new ArrayList<>());
   }
 
   public MatchEntry(MatchEntryPK matchEntryPK)
@@ -91,7 +93,7 @@ public class MatchEntry implements Serializable
     return matchHasTeamList;
   }
 
-  public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
+  public final void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
   {
     this.matchHasTeamList = matchHasTeamList;
   }

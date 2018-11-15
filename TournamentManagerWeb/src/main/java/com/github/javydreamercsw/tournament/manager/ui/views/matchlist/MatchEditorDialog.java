@@ -15,13 +15,20 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.Format;
+import com.github.javydreamercsw.tournament.manager.web.backend.TeamService;
+import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
+import com.vaadin.flow.component.HasValue.ValueChangeListener;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.grid.Grid;
 
+import net.sourceforge.javydreamercsw.database.storage.db.Format;
 import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
+import net.sourceforge.javydreamercsw.database.storage.db.Team;
 
 /**
  * A dialog for editing {@link Format} objects.
@@ -29,13 +36,13 @@ import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
 public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
 {
   private static final long serialVersionUID = 2349638969280300323L;
+  private final Grid<Team> grid = new Grid<>();
 
   public MatchEditorDialog(BiConsumer<MatchEntry, Operation> itemSaver,
           Consumer<MatchEntry> itemDeleter)
   {
     super("match", itemSaver, itemDeleter);
-
-    //TODO: add fields
+    addTeams();
   }
 
   @Override
@@ -43,4 +50,44 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
   {
     doDelete(getCurrentItem());
   }
+
+  private void addTeams()
+  { 
+    getFormLayout().add(grid);
+
+    grid.addColumn(Team::getName).setHeader("Name").setWidth("8em")
+            .setResizable(true);
+
+    grid.addColumn(team ->
+    {
+      return new Checkbox("", new TeamSelectionListener(team));
+    });
+  }
+
+  private class TeamSelectionListener implements 
+          ValueChangeListener<ComponentValueChangeEvent<Checkbox, Boolean>>
+  {
+    private static final long serialVersionUID = 1991737314876349305L;
+    private final Team team;
+
+    public TeamSelectionListener(Team team)
+    {
+      this.team = team;
+    }
+
+    @Override
+    public void valueChanged(ComponentValueChangeEvent<Checkbox, Boolean> e)
+    {
+      System.out.println(team.getName() + "Selected? " + e.getSource().getValue());
+    }
+  }
+
+  @Override
+  public void open()
+  {
+    List<Team> teams = TeamService.getInstance().findTeams("");
+    grid.setItems(teams);
+    System.out.println("Amount of Teams: "+teams.size());
+    super.open();
+  }  
 }

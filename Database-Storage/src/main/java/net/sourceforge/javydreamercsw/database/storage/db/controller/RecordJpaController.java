@@ -45,25 +45,25 @@ public class RecordJpaController implements Serializable
   {
     if (record.getPlayerList() == null)
     {
-      record.setPlayerList(new ArrayList<Player>());
+      record.setPlayerList(new ArrayList<>());
     }
     if (record.getTournamentHasTeamList() == null)
     {
-      record.setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
+      record.setTournamentHasTeamList(new ArrayList<>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<Player> attachedPlayerList = new ArrayList<Player>();
+      List<Player> attachedPlayerList = new ArrayList<>();
       for (Player playerListPlayerToAttach : record.getPlayerList())
       {
         playerListPlayerToAttach = em.getReference(playerListPlayerToAttach.getClass(), playerListPlayerToAttach.getId());
         attachedPlayerList.add(playerListPlayerToAttach);
       }
       record.setPlayerList(attachedPlayerList);
-      List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<TournamentHasTeam>();
+      List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<>();
       for (TournamentHasTeam tournamentHasTeamListTournamentHasTeamToAttach : record.getTournamentHasTeamList())
       {
         tournamentHasTeamListTournamentHasTeamToAttach = em.getReference(tournamentHasTeamListTournamentHasTeamToAttach.getClass(), tournamentHasTeamListTournamentHasTeamToAttach.getTournamentHasTeamPK());
@@ -104,7 +104,7 @@ public class RecordJpaController implements Serializable
       List<Player> playerListNew = record.getPlayerList();
       List<TournamentHasTeam> tournamentHasTeamListOld = persistentRecord.getTournamentHasTeamList();
       List<TournamentHasTeam> tournamentHasTeamListNew = record.getTournamentHasTeamList();
-      List<Player> attachedPlayerListNew = new ArrayList<Player>();
+      List<Player> attachedPlayerListNew = new ArrayList<>();
       for (Player playerListNewPlayerToAttach : playerListNew)
       {
         playerListNewPlayerToAttach = em.getReference(playerListNewPlayerToAttach.getClass(), playerListNewPlayerToAttach.getId());
@@ -112,7 +112,7 @@ public class RecordJpaController implements Serializable
       }
       playerListNew = attachedPlayerListNew;
       record.setPlayerList(playerListNew);
-      List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<TournamentHasTeam>();
+      List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<>();
       for (TournamentHasTeam tournamentHasTeamListNewTournamentHasTeamToAttach : tournamentHasTeamListNew)
       {
         tournamentHasTeamListNewTournamentHasTeamToAttach = em.getReference(tournamentHasTeamListNewTournamentHasTeamToAttach.getClass(), tournamentHasTeamListNewTournamentHasTeamToAttach.getTournamentHasTeamPK());

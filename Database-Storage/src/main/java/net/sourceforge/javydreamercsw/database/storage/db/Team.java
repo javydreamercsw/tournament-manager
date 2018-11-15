@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -33,11 +29,13 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "team")
 @XmlRootElement
 @NamedQueries(
-{
-  @NamedQuery(name = "Team.findAll", query = "SELECT t FROM Team t"),
-  @NamedQuery(name = "Team.findById", query = "SELECT t FROM Team t WHERE t.id = :id"),
-  @NamedQuery(name = "Team.findByName", query = "SELECT t FROM Team t WHERE t.name = :name")
-})
+        {
+          @NamedQuery(name = "Team.findAll", query = "SELECT t FROM Team t"),
+          @NamedQuery(name = "Team.findById",
+                  query = "SELECT t FROM Team t WHERE t.id = :id"),
+          @NamedQuery(name = "Team.findByName",
+                  query = "SELECT t FROM Team t WHERE t.name = :name")
+        })
 public class Team implements Serializable
 {
   private static final long serialVersionUID = 1L;
@@ -63,11 +61,15 @@ public class Team implements Serializable
 
   public Team()
   {
+    setMatchHasTeamList(new ArrayList<>());
+    setPlayerList(new ArrayList<>());
+    setTournamentHasTeamList(new ArrayList<>());
   }
 
-  public Team(Integer id)
+  public Team(String name)
   {
-    this.id = id;
+    this();
+    this.name = name;
   }
 
   public Integer getId()
@@ -96,7 +98,7 @@ public class Team implements Serializable
     return playerList;
   }
 
-  public void setPlayerList(List<Player> playerList)
+  public final void setPlayerList(List<Player> playerList)
   {
     this.playerList = playerList;
   }
@@ -107,7 +109,7 @@ public class Team implements Serializable
     return matchHasTeamList;
   }
 
-  public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
+  public final void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
   {
     this.matchHasTeamList = matchHasTeamList;
   }
@@ -118,7 +120,7 @@ public class Team implements Serializable
     return tournamentHasTeamList;
   }
 
-  public void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
+  public final void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
   {
     this.tournamentHasTeamList = tournamentHasTeamList;
   }
@@ -140,17 +142,14 @@ public class Team implements Serializable
       return false;
     }
     Team other = (Team) object;
-    if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)))
-    {
-      return false;
-    }
-    return true;
+    return !((this.id == null && other.id != null) 
+            || (this.id != null && !this.id.equals(other.id)));
   }
 
   @Override
   public String toString()
   {
-    return "net.sourceforge.javydreamercsw.database.storage.db.Team[ id=" + id + " ]";
+    return "net.sourceforge.javydreamercsw.database.storage.db.Team[ id="
+            + id + " ]";
   }
-  
 }

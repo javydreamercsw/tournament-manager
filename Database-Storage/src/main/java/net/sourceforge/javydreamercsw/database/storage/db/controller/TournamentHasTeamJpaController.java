@@ -52,7 +52,7 @@ public class TournamentHasTeamJpaController implements Serializable
     }
     if (tournamentHasTeam.getRecordList() == null)
     {
-      tournamentHasTeam.setRecordList(new ArrayList<Record>());
+      tournamentHasTeam.setRecordList(new ArrayList<>());
     }
     tournamentHasTeam.getTournamentHasTeamPK().setTournamentId(tournamentHasTeam.getTournament().getId());
     tournamentHasTeam.getTournamentHasTeamPK().setTeamId(tournamentHasTeam.getTeam().getId());
@@ -73,7 +73,7 @@ public class TournamentHasTeamJpaController implements Serializable
         tournament = em.getReference(tournament.getClass(), tournament.getId());
         tournamentHasTeam.setTournament(tournament);
       }
-      List<Record> attachedRecordList = new ArrayList<Record>();
+      List<Record> attachedRecordList = new ArrayList<>();
       for (Record recordListRecordToAttach : tournamentHasTeam.getRecordList())
       {
         recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getId());
@@ -141,7 +141,7 @@ public class TournamentHasTeamJpaController implements Serializable
         tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getId());
         tournamentHasTeam.setTournament(tournamentNew);
       }
-      List<Record> attachedRecordListNew = new ArrayList<Record>();
+      List<Record> attachedRecordListNew = new ArrayList<>();
       for (Record recordListNewRecordToAttach : recordListNew)
       {
         recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getId());

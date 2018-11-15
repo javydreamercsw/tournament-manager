@@ -49,6 +49,11 @@ public abstract class AbstractTournamentTester extends TestCase
    * Test the peculiarities of this tournament.
    */
   public abstract void testTournament();
+  
+  @Test
+  public void TestTournament(){
+    TestTournament();
+  }
 
   /**
    * Test of getName method, of class Elimination.

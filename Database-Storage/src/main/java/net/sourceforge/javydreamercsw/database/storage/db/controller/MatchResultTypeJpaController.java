@@ -45,14 +45,14 @@ public class MatchResultTypeJpaController implements Serializable
   {
     if (matchResultType.getMatchResultList() == null)
     {
-      matchResultType.setMatchResultList(new ArrayList<MatchResult>());
+      matchResultType.setMatchResultList(new ArrayList<>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<MatchResult> attachedMatchResultList = new ArrayList<MatchResult>();
+      List<MatchResult> attachedMatchResultList = new ArrayList<>();
       for (MatchResult matchResultListMatchResultToAttach : matchResultType.getMatchResultList())
       {
         matchResultListMatchResultToAttach = em.getReference(matchResultListMatchResultToAttach.getClass(), matchResultListMatchResultToAttach.getMatchResultPK());
@@ -99,7 +99,7 @@ public class MatchResultTypeJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<String>();
+            illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain MatchResult " + matchResultListOldMatchResult + " since its matchResultType field is not nullable.");
         }
@@ -108,7 +108,7 @@ public class MatchResultTypeJpaController implements Serializable
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
-      List<MatchResult> attachedMatchResultListNew = new ArrayList<MatchResult>();
+      List<MatchResult> attachedMatchResultListNew = new ArrayList<>();
       for (MatchResult matchResultListNewMatchResultToAttach : matchResultListNew)
       {
         matchResultListNewMatchResultToAttach = em.getReference(matchResultListNewMatchResultToAttach.getClass(), matchResultListNewMatchResultToAttach.getMatchResultPK());
@@ -178,7 +178,7 @@ public class MatchResultTypeJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<String>();
+          illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This MatchResultType (" + matchResultType + ") cannot be destroyed since the MatchResult " + matchResultListOrphanCheckMatchResult + " in its matchResultList field has a non-nullable matchResultType field.");
       }
