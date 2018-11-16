@@ -156,11 +156,11 @@ public class Encounter
     StringBuilder sb = new StringBuilder();
     results.keySet().forEach((t) ->
     {
-      if (!sb.toString().isEmpty())
-      {
-        sb.append(" vs. ");
-      }
-      sb.append(t.toString());
+        if (!sb.toString().isEmpty())
+        {
+          sb.append(" vs. ");
+        }
+        sb.append(t.toString());
     });
     return MessageFormat.format("Encounter {0} ({1})", id, sb.toString());
   }

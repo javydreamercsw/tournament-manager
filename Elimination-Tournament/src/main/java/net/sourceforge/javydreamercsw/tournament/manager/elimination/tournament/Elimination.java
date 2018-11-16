@@ -181,7 +181,7 @@ public class Elimination extends AbstractTournament
                             //Got our winner
                         } else {
                             //We got someone pending. Pair with him BYE
-                            addPairing(pairings, pending, null);
+                            addPairing(pairings, pending, BYE);
                             LOG.log(Level.INFO, "Pairing {0} with BYE", pending);
                         }
                     }

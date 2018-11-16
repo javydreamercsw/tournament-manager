@@ -17,11 +17,6 @@ public class EliminationTest extends AbstractTournamentTester
   private static final Logger LOG
           = Logger.getLogger(EliminationTest.class.getName());
 
-  public EliminationTest()
-  {
-    super(new Elimination());
-  }
-
   @Override
   public TournamentInterface generateRandomTournament()
   {
