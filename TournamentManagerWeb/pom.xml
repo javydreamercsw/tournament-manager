@@ -108,17 +108,17 @@
             <version>1.4.197</version>
             <type>jar</type>
         </dependency>
-        <!--Vaadin plugins
-        <dependency>
-            <groupId>org.vaadin.addons</groupId>
-            <artifactId>stepper</artifactId>
-            <version>2.4.0</version>
-        </dependency>-->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.8.1</version>
             <scope>test</scope>
+        </dependency>
+        <!--Vaadin plugins-->
+        <dependency>
+            <groupId>org.vaadin.maxime</groupId>
+            <artifactId>markdown-area</artifactId>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 

@@ -42,7 +42,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.Record;
  * Displays the list of available formats, with a search filter as well as
  * buttons to add a new format or edit existing ones.
  */
-@Route(value = "", layout = MainLayout.class)
+@Route(value = "players", layout = MainLayout.class)
 @PageTitle("Player List")
 public class PlayerList extends VerticalLayout
 {

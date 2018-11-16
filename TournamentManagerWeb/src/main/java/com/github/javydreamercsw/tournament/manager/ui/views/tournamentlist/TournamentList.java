@@ -43,7 +43,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
  * Displays the list of available categories, with a search filter as well as
  * buttons to add a new category or edit existing ones.
  */
-@Route(value = "tournamentss", layout = MainLayout.class)
+@Route(value = "tournaments", layout = MainLayout.class)
 @PageTitle("Tournament List")
 public class TournamentList extends VerticalLayout
 {
@@ -68,7 +68,7 @@ public class TournamentList extends VerticalLayout
 
   private void initView()
   {
-    addClassName("tournamentss-list");
+    addClassName("tournaments-list");
     setDefaultHorizontalComponentAlignment(Alignment.STRETCH);
   }
 

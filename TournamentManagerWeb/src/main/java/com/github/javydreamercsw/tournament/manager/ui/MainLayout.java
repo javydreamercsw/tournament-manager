@@ -24,6 +24,7 @@ import com.github.javydreamercsw.tournament.manager.ui.views.formatlist.FormatLi
 import com.github.javydreamercsw.tournament.manager.ui.views.matchlist.MatchList;
 import com.github.javydreamercsw.tournament.manager.ui.views.playerlist.PlayerList;
 import com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist.TournamentList;
+import com.github.javydreamercsw.tournament.manager.ui.views.welcome.Welcome;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
@@ -69,6 +70,10 @@ public class MainLayout extends Div
     H2 title = new H2("MTG Buddy");
     title.addClassName("main-layout__title");
 
+    RouterLink welcome = new RouterLink(null, Welcome.class);
+    welcome.add(new Icon(VaadinIcon.HOME), new Text("Welcome"));
+    welcome.addClassName("main-layout__nav-item");
+
     RouterLink tournaments = new RouterLink(null, TournamentList.class);
     tournaments.add(new Icon(VaadinIcon.TROPHY), new Text("Tournaments"));
     tournaments.addClassName("main-layout__nav-item");
@@ -82,12 +87,12 @@ public class MainLayout extends Div
     RouterLink formats = new RouterLink(null, FormatList.class);
     formats.add(new Icon(VaadinIcon.ARCHIVES), new Text("Formats"));
     formats.addClassName("main-layout__nav-item");
-    
+
     RouterLink players = new RouterLink(null, PlayerList.class);
     players.add(new Icon(VaadinIcon.USERS), new Text("Players"));
     players.addClassName("main-layout__nav-item");
 
-    Div navigation = new Div(players, tournaments, matches, formats);
+    Div navigation = new Div(welcome, players, tournaments, matches, formats);
     navigation.addClassName("main-layout__nav");
 
     Div header = new Div(title, navigation);

@@ -43,7 +43,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
  * Displays the list of available formats, with a search filter as well as
  * buttons to add a new format or edit existing ones.
  */
-@Route(value = "formatss", layout = MainLayout.class)
+@Route(value = "formats", layout = MainLayout.class)
 @PageTitle("Format List")
 public class FormatList extends VerticalLayout
 {

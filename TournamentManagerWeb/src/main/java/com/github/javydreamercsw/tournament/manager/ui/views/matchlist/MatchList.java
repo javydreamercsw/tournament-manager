@@ -43,7 +43,7 @@ import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
  * Displays the list of available categories, with a search filter as well as
  * buttons to add a new category or edit existing ones.
  */
-@Route(value = "matchess", layout = MainLayout.class)
+@Route(value = "matches", layout = MainLayout.class)
 @PageTitle("Match List")
 public class MatchList extends VerticalLayout
 {
