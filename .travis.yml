@@ -1,0 +1,20 @@
+language: java
+
+# Use https (public access) instead of git for git-submodules. This modifies only Travis-CI behavior!
+
+# disable the default submodule logic
+git:
+  submodules: false
+
+# use sed to replace the SSH URL with the public URL, then init and update submodules
+before_install:
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule sync
+  - git submodule update --init --recursive
+
+jdk:
+  - oraclejdk8
+  - openjdk8
+  - openjdk11
+
+script: mvn sonar:sonar -Dsonar.organization=javydreamercsw-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=6e3a9d4d7b11e581b919b9ba1498f02ac35a3fa8
