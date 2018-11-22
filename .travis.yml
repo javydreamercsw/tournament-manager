@@ -1,0 +1,8 @@
+language: java
+
+jdk:
+  - oraclejdk8
+  - openjdk8
+#  - openjdk11
+
+script: mvn sonar:sonar -Dsonar.organization=javydreamercsw-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=6e3a9d4d7b11e581b919b9ba1498f02ac35a3fa8
