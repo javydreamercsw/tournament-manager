@@ -1,15 +1,18 @@
 package net.sourceforge.javydreamercsw.swiss.tournament;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.openide.util.lookup.ServiceProvider;
+
 import net.sourceforge.javydreamercsw.tournament.manager.AbstractTournament;
 import net.sourceforge.javydreamercsw.tournament.manager.api.Encounter;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TeamInterface;
 import net.sourceforge.javydreamercsw.tournament.manager.api.TournamentInterface;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  * Swiss tournament is an elimination tournament without eliminations. Just
@@ -56,9 +59,11 @@ public class Swiss extends AbstractTournament implements TournamentInterface {
                     }
                 }
                 if (leader - second >= getWinPoints()) {
-                    LOG.log(Level.INFO, "We got a winner: {0}", potentialWinner.toString());
+                    LOG.log(Level.INFO, "We got a winner: {0}", 
+                            potentialWinner.toString());
                     getActiveTeams().clear();
                     getActiveTeams().add(potentialWinner);
+                    return new HashMap<>();
                 }
             } else {
                 LOG.log(Level.INFO, "Multiple teams tied at ranking 1: {0}",

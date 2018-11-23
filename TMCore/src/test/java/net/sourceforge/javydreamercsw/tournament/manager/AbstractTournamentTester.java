@@ -245,7 +245,6 @@ public abstract class AbstractTournamentTester extends TestCase
           {
             LOG.log(Level.INFO, "Round {0}", tournament.getRound());
             LOG.info("Pairings...");
-            assertFalse(tournament.roundComplete());
             LOG.info("Simulating results...");
             for (Map.Entry<Integer, Encounter> entry
                     : tournament.getPairings().entrySet())
@@ -272,7 +271,8 @@ public abstract class AbstractTournamentTester extends TestCase
                         EncounterResult.values()[result]);
               }
               if (player1.equals(TournamentInterface.BYE)
-                      || player2.equals(TournamentInterface.BYE) && tournament.getActiveTeams().size() == 1)
+                      || player2.equals(TournamentInterface.BYE) 
+                      && tournament.getActiveTeams().size() == 1)
               {
                 //Only one player left, we got a winner!
                 ignore = true;
@@ -286,26 +286,33 @@ public abstract class AbstractTournamentTester extends TestCase
           LOG.log(Level.SEVERE, null, ex);
           fail();
         }
+        //Random player drop
+        if (tournament.getActiveTeams().size() > 1 && random.nextBoolean())
+        {
+          TeamInterface toDrop
+                  = tournament.getActiveTeams().get(random
+                          .nextInt(tournament.getAmountOfTeams()));
+          LOG.log(Level.INFO, "Player: {0} dropped!", toDrop.toString());
+          try
+          {
+            tournament.removeTeam(toDrop);
+          }
+          catch (TournamentSignupException ex)
+          {
+            LOG.log(Level.SEVERE, null, ex);
+            fail();
+          }
+          catch (TournamentException ex)
+          {
+            LOG.log(Level.SEVERE, null, ex);
+            fail();
+          }
+        }
       }
       if (!ignore)
       {
+        tournament.showPairings();
         assertTrue(tournament.roundComplete());
-      }
-      //Random player drop
-      if (tournament.getActiveTeams().size() > 1 && random.nextBoolean())
-      {
-        TeamInterface toDrop
-                = tournament.getActiveTeams().get(random.nextInt(tournament.getAmountOfTeams()));
-        LOG.log(Level.INFO, "Player: {0} dropped!", toDrop.getName());
-        try
-        {
-          tournament.removeTeam(toDrop);
-        }
-        catch (TournamentSignupException ex)
-        {
-          LOG.log(Level.SEVERE, null, ex);
-          fail();
-        }
       }
       if (tournament.getActiveTeams().size() == 1)
       {

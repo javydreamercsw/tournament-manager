@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.openide.util.Exceptions;
 
 import junit.framework.TestCase;
 import net.sourceforge.javydreamercsw.tournament.manager.api.EncounterResult;
@@ -114,6 +115,11 @@ public class AbstractTournamentTest extends TestCase
       //As expected
       failure = true;
     }
+    catch (TournamentException ex)
+    {
+      Exceptions.printStackTrace(ex);
+      fail();
+    }
     assertTrue(failure);
     try
     {
@@ -131,6 +137,11 @@ public class AbstractTournamentTest extends TestCase
     catch (TournamentSignupException ex)
     {
       LOG.log(Level.SEVERE, null, ex);
+      fail();
+    }
+    catch (TournamentException ex)
+    {
+      Exceptions.printStackTrace(ex);
       fail();
     }
   }

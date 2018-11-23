@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sourceforge.javydreamercsw.tournament.manager.UIPlayer;
 import net.sourceforge.javydreamercsw.tournament.manager.Team;
+import net.sourceforge.javydreamercsw.tournament.manager.UIPlayer;
 import net.sourceforge.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 /**
@@ -72,9 +72,10 @@ public interface TournamentInterface {
      *
      * @param team TournamentPlayerInterface to remove.
      * @throws TournamentSignupException
+     * @throws TournamentException
      */
     public void removeTeam(TeamInterface team)
-            throws TournamentSignupException;
+            throws TournamentSignupException, TournamentException;
 
     /**
      * Advance the tournament to next round.

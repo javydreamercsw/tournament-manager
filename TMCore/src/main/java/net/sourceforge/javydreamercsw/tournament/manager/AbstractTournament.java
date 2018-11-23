@@ -143,7 +143,8 @@ public abstract class AbstractTournament implements TournamentInterface
   }
 
   @Override
-  public void removeTeam(TeamInterface team) throws TournamentSignupException
+  public void removeTeam(TeamInterface team) throws TournamentSignupException,
+          TournamentException
   {
     //Loop thru teamsCopy to check for name
     boolean found = false;
@@ -163,15 +164,46 @@ public abstract class AbstractTournament implements TournamentInterface
         }
       }
     }
-    toRemove.stream().map((remove) ->
+    for (TeamInterface remove : toRemove)
     {
       getActiveTeams().remove(remove);
-      //If we haven't started remove it from the overall list as well.
-      return remove;
-    }).filter((remove) -> (round == 0)).forEachOrdered((remove) ->
-    {
+
+      // If we haven't started remove it from the overall list as well.
       teams.remove(remove);
-    });
+
+      // Resolve any pending Encounters by forfeiting
+      for (Encounter encounter : getPairings().values())
+      {
+        if (encounter.getEncounterSummary().containsKey(remove))
+        {
+          if (encounter.getEncounterSummary().size() == 2)
+          {
+            // Simple case where leaving forfeits to the other team.
+            encounter.getEncounterSummary().entrySet().forEach(entry ->
+            {
+              if (entry.getKey().getName().equals(remove.getName()))
+              {
+                encounter.getEncounterSummary().put(entry.getKey(),
+                        EncounterResult.NO_SHOW);
+              }
+              else
+              {
+                encounter.getEncounterSummary().put(entry.getKey(),
+                        EncounterResult.WIN);
+              }
+            });
+          }
+          else
+          {
+            LOG.info(encounter.toString());
+            throw new TournamentException(
+                    MessageFormat.format(
+                            "Team: {0} dropped and there are encounters that need "
+                            + "to be manually resolved.", team));
+          }
+        }
+      }
+    }
     if (!found)
     {
       throw new TournamentSignupException(
@@ -436,14 +468,14 @@ public abstract class AbstractTournament implements TournamentInterface
               //Only one player left, pair with Bye
               LOG.log(Level.FINE, "Pairing {0} vs. BYE",
                       getActiveTeams().get(player1).getName());
-              addPairing(pairings, 
+              addPairing(pairings,
                       getActiveTeams().get(player1), BYE);
             }
             else
             {
               int player2 = getRandomWithExclusion(rnd, 0,
                       getActiveTeams().size() - 1, exclude);
-              addPairing(pairings, 
+              addPairing(pairings,
                       getActiveTeams().get(player1),
                       getActiveTeams().get(player2));
               exclude = ArrayUtils.add(exclude, player2);
