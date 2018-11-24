@@ -3,11 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.sourceforge.javydreamercsw</groupId>
+        <groupId>com.github.javydreamercsw</groupId>
         <artifactId>Tournament-Manager</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>net.sourceforge.javydreamercsw</groupId>
+    <groupId>com.github.javydreamercsw</groupId>
     <artifactId>Elimination-Tournament</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>Elimination Tournament</name>
@@ -32,12 +32,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.javydreamercsw</groupId>
+            <groupId>com.github.javydreamercsw</groupId>
             <artifactId>TMCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.javydreamercsw</groupId>
+            <groupId>com.github.javydreamercsw</groupId>
             <artifactId>TMCore</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>

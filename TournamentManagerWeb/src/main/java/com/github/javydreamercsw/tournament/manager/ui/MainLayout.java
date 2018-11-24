@@ -20,6 +20,7 @@ import javax.naming.NamingException;
 
 import org.openide.util.Exceptions;
 
+import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 import com.github.javydreamercsw.tournament.manager.ui.views.formatlist.FormatList;
 import com.github.javydreamercsw.tournament.manager.ui.views.matchlist.MatchList;
 import com.github.javydreamercsw.tournament.manager.ui.views.playerlist.PlayerList;
@@ -37,8 +38,6 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
-
-import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 /**
  * The main layout contains the header with the navigation buttons, and the
@@ -67,7 +66,7 @@ public class MainLayout extends Div
 
   public MainLayout() throws NamingException
   {
-    H2 title = new H2("MTG Buddy");
+    H2 title = new H2("Tournament Buddy");
     title.addClassName("main-layout__title");
 
     RouterLink welcome = new RouterLink(null, Welcome.class);

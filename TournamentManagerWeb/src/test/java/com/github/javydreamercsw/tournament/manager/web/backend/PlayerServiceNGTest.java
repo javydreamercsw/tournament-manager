@@ -8,7 +8,7 @@ import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Player;
 
 public class PlayerServiceNGTest extends BaseTestCase
 {

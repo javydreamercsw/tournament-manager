@@ -5,16 +5,19 @@ import java.util.List;
 
 import org.openide.util.Exceptions;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Round;
-import net.sourceforge.javydreamercsw.database.storage.db.Team;
-import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
-import net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.RoundJpaController;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.TournamentHasTeamJpaController;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.TournamentJpaController;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
-import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
+import com.github.javydreamercsw.database.storage.db.Round;
+import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
+
+import com.github.javydreamercsw.database.storage.db.controller.RoundJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.TournamentHasTeamJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.TournamentJpaController;
+
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+
+import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 /**
  *

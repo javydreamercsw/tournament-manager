@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>Tournament-Manager</artifactId>
-        <groupId>net.sourceforge.javydreamercsw</groupId>
+        <groupId>com.github.javydreamercsw</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>net.sourceforge.javydreamercsw</groupId>
+    <groupId>com.github.javydreamercsw</groupId>
     <artifactId>TournamentManagerWeb</artifactId>
     <packaging>war</packaging>
     <name>Tournament Manager Web</name>

@@ -24,8 +24,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Format;
-import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.Tournament;
 
 /**
  * A dialog for editing {@link Format} objects.

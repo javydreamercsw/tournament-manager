@@ -5,15 +5,18 @@ import java.util.List;
 
 import org.openide.util.Exceptions;
 
-import net.sourceforge.javydreamercsw.database.storage.db.MatchHasTeam;
-import net.sourceforge.javydreamercsw.database.storage.db.Player;
-import net.sourceforge.javydreamercsw.database.storage.db.Team;
-import net.sourceforge.javydreamercsw.database.storage.db.TournamentHasTeam;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.MatchHasTeamJpaController;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.TeamJpaController;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
-import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
+import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
+
+import com.github.javydreamercsw.database.storage.db.controller.MatchHasTeamJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.TeamJpaController;
+
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+
+import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 public class TeamService
 {

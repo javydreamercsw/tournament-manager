@@ -8,10 +8,10 @@ import java.util.List;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
-import net.sourceforge.javydreamercsw.database.storage.db.Player;
-import net.sourceforge.javydreamercsw.database.storage.db.Team;
-import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.Tournament;
 
 public class MatchServiceNGTest extends BaseTestCase
 {

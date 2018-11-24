@@ -37,7 +37,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.Tournament;
 
 /**
  * Displays the list of available categories, with a search filter as well as
