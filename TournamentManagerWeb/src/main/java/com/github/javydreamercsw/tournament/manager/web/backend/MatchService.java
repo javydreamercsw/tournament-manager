@@ -5,12 +5,15 @@ import java.util.List;
 
 import org.openide.util.Exceptions;
 
-import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
-import net.sourceforge.javydreamercsw.database.storage.db.MatchEntryPK;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.MatchEntryJpaController;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
-import net.sourceforge.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
-import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
+import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
+
+import com.github.javydreamercsw.database.storage.db.controller.MatchEntryJpaController;
+
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+
+import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 /**
  *

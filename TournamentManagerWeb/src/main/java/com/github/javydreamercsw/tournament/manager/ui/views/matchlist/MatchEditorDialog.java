@@ -26,9 +26,9 @@ import com.vaadin.flow.component.HasValue.ValueChangeListener;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Format;
-import net.sourceforge.javydreamercsw.database.storage.db.MatchEntry;
-import net.sourceforge.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.Team;
 
 /**
  * A dialog for editing {@link Format} objects.

@@ -35,8 +35,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Player;
-import net.sourceforge.javydreamercsw.database.storage.db.Record;
+import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Record;
 
 /**
  * Displays the list of available formats, with a search filter as well as

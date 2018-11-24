@@ -6,8 +6,8 @@ import static org.testng.Assert.assertNotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Player;
-import net.sourceforge.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Team;
 
 public class TeamServiceNGTest extends BaseTestCase
 {

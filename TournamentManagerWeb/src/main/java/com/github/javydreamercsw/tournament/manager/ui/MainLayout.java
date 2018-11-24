@@ -38,7 +38,7 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
 
-import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
+import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 /**
  * The main layout contains the header with the navigation buttons, and the

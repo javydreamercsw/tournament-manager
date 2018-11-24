@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.Format;
 
 public class FormatServiceNGTest extends BaseTestCase
 {

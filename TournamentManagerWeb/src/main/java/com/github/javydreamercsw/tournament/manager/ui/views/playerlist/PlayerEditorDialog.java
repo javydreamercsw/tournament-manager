@@ -23,7 +23,7 @@ import com.github.javydreamercsw.tournament.manager.web.backend.PlayerService;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
-import net.sourceforge.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Player;
 
 /**
  * A dialog for editing {@link Format} objects.

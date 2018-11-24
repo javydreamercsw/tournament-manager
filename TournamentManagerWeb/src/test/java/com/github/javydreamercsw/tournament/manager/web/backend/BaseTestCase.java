@@ -3,7 +3,7 @@ package com.github.javydreamercsw.tournament.manager.web.backend;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
-import net.sourceforge.javydreamercsw.database.storage.db.server.DataBaseManager;
+import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 public class BaseTestCase
 {
