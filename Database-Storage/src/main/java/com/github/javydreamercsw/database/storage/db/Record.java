@@ -6,6 +6,7 @@
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -33,17 +34,17 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "record")
 @XmlRootElement
 @NamedQueries(
-{
-  @NamedQuery(name = "Record.findAll", query = "SELECT r FROM Record r"),
-  @NamedQuery(name = "Record.findById", 
-          query = "SELECT r FROM Record r WHERE r.id = :id"),
-  @NamedQuery(name = "Record.findByWins", 
-          query = "SELECT r FROM Record r WHERE r.wins = :wins"),
-  @NamedQuery(name = "Record.findByLoses", 
-          query = "SELECT r FROM Record r WHERE r.loses = :loses"),
-  @NamedQuery(name = "Record.findByDraws", 
-          query = "SELECT r FROM Record r WHERE r.draws = :draws")
-})
+        {
+          @NamedQuery(name = "Record.findAll", query = "SELECT r FROM Record r"),
+          @NamedQuery(name = "Record.findById",
+                  query = "SELECT r FROM Record r WHERE r.id = :id"),
+          @NamedQuery(name = "Record.findByWins",
+                  query = "SELECT r FROM Record r WHERE r.wins = :wins"),
+          @NamedQuery(name = "Record.findByLoses",
+                  query = "SELECT r FROM Record r WHERE r.loses = :loses"),
+          @NamedQuery(name = "Record.findByDraws",
+                  query = "SELECT r FROM Record r WHERE r.draws = :draws")
+        })
 public class Record implements Serializable
 {
   private static final long serialVersionUID = 1L;
@@ -74,14 +75,17 @@ public class Record implements Serializable
     @JoinColumn(name = "record_id", referencedColumnName = "id")
   }, inverseJoinColumns =
   {
-    @JoinColumn(name = "tournament_has_team_tournament_id", referencedColumnName = "tournament_id"),
-    @JoinColumn(name = "tournament_has_team_team_id", referencedColumnName = "team_id")
+    @JoinColumn(name = "tournament_has_team_tournament_id",
+            referencedColumnName = "tournament_id"),
+    @JoinColumn(name = "tournament_has_team_team_id",
+            referencedColumnName = "team_id")
   })
   @ManyToMany(fetch = FetchType.LAZY)
   private List<TournamentHasTeam> tournamentHasTeamList;
 
   public Record()
   {
+    this(0, 0, 0);
   }
 
   public Record(int wins, int loses, int draws)
@@ -89,6 +93,8 @@ public class Record implements Serializable
     this.wins = wins;
     this.loses = loses;
     this.draws = draws;
+    tournamentHasTeamList = new ArrayList<>();
+    playerList = new ArrayList<>();
   }
 
   public Integer getId()
@@ -170,14 +176,14 @@ public class Record implements Serializable
       return false;
     }
     Record other = (Record) object;
-    return !((this.id == null && other.id != null) 
+    return !((this.id == null && other.id != null)
             || (this.id != null && !this.id.equals(other.id)));
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.Record[ id=" 
+    return "com.github.javydreamercsw.database.storage.db.Record[ id="
             + id + " ]";
   }
 }

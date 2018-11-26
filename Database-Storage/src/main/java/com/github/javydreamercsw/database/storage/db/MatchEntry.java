@@ -21,10 +21,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
  * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
 @Entity
@@ -43,28 +41,37 @@ import javax.xml.bind.annotation.XmlTransient;
 public class MatchEntry implements Serializable
 {
   private static final long serialVersionUID = 1L;
+
   @EmbeddedId
   protected MatchEntryPK matchEntryPK;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "matchEntry",
-          fetch = FetchType.LAZY)
-  private List<MatchHasTeam> matchHasTeamList;
-  @JoinColumn(name = "format_id", referencedColumnName = "id", insertable = false,
-          updatable = false)
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  private Format format;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumns(
-  {
-    @JoinColumn(name = "round_id", referencedColumnName = "id", insertable = false,
-            updatable = false),
-    @JoinColumn(name = "tournament_id", referencedColumnName = "id", insertable = false,
-            updatable = false)
-  })
+          {
+            @JoinColumn(name = "FORMAT_ID", referencedColumnName = "ID",
+                    insertable = false, updatable = false),
+            @JoinColumn(name = "GAME_ID", referencedColumnName = "ID",
+                    insertable = false, updatable = false)
+          })
+  private Format format;
+
   @ManyToOne(optional = true, fetch = FetchType.LAZY)
+  @JoinColumns(
+          {
+            @JoinColumn(name = "ROUND_ID", referencedColumnName = "ID",
+                    insertable = false, updatable = false),
+            @JoinColumn(name = "TOURNAMENT_ID", referencedColumnName = "ID",
+                    insertable = false, updatable = false)
+          })
   private Round round;
+
+  @OneToMany(mappedBy = "matchEntry", fetch = FetchType.LAZY,
+          cascade = CascadeType.ALL)
+  private List<MatchHasTeam> matchHasTeamList;
 
   public MatchEntry()
   {
-     setMatchHasTeamList(new ArrayList<>());
+    setMatchHasTeamList(new ArrayList<>());
   }
 
   public MatchEntry(MatchEntryPK matchEntryPK)
@@ -87,17 +94,6 @@ public class MatchEntry implements Serializable
     this.matchEntryPK = matchEntryPK;
   }
 
-  @XmlTransient
-  public List<MatchHasTeam> getMatchHasTeamList()
-  {
-    return matchHasTeamList;
-  }
-
-  public final void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
-  {
-    this.matchHasTeamList = matchHasTeamList;
-  }
-
   public Format getFormat()
   {
     return format;
@@ -118,6 +114,16 @@ public class MatchEntry implements Serializable
     this.round = round;
   }
 
+  public List<MatchHasTeam> getMatchHasTeamList()
+  {
+    return matchHasTeamList;
+  }
+
+  public final void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
+  {
+    this.matchHasTeamList = matchHasTeamList;
+  }
+
   @Override
   public int hashCode()
   {
@@ -135,15 +141,15 @@ public class MatchEntry implements Serializable
       return false;
     }
     MatchEntry other = (MatchEntry) object;
-    return !((this.matchEntryPK == null && other.matchEntryPK != null)
-            || (this.matchEntryPK != null
+    return !((this.matchEntryPK == null && other.matchEntryPK != null) 
+            || (this.matchEntryPK != null 
             && !this.matchEntryPK.equals(other.matchEntryPK)));
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.MatchEntry[ matchEntryPK="
+    return "com.github.javydreamercsw.database.storage.db.MatchEntry[ matchEntryPK=" 
             + matchEntryPK + " ]";
   }
 }

@@ -23,7 +23,6 @@ import javax.persistence.EntityManagerFactory;
 
 import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultPK;
-
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;

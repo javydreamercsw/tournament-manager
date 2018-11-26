@@ -20,7 +20,6 @@ import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeamPK;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.Team;
-
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 

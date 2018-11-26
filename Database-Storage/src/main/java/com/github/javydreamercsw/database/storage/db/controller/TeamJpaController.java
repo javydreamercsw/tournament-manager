@@ -23,7 +23,6 @@ import javax.persistence.EntityManagerFactory;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
-
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 

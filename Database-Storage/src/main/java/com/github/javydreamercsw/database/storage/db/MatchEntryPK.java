@@ -1,6 +1,7 @@
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -9,10 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.TableGenerator;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 @Embeddable
 public class MatchEntryPK implements Serializable
 {
@@ -75,43 +72,42 @@ public class MatchEntryPK implements Serializable
   }
 
   @Override
-  public int hashCode()
+  public boolean equals(Object obj)
   {
-    int hash = 0;
-    hash += (int) id;
-    hash += (int) roundId;
-    hash += (int) formatId;
-    return hash;
+    if (obj == null)
+    {
+      return false;
+    }
+    if (!Objects.equals(getClass(), obj.getClass()))
+    {
+      return false;
+    }
+    final MatchEntryPK other = (MatchEntryPK) obj;
+    if (this.getId() != other.getId())
+    {
+      return false;
+    }
+    if (this.getRoundId() != other.getRoundId())
+    {
+      return false;
+    }
+    return this.getFormatId() == other.getFormatId();
   }
 
   @Override
-  public boolean equals(Object object)
+  public int hashCode()
   {
-    // TODO: Warning - this method won't work in the case the id fields are not set
-    if (!(object instanceof MatchEntryPK))
-    {
-      return false;
-    }
-    MatchEntryPK other = (MatchEntryPK) object;
-    if (this.id != other.id)
-    {
-      return false;
-    }
-    if (this.roundId != other.roundId)
-    {
-      return false;
-    }
-    if (this.formatId != other.formatId)
-    {
-      return false;
-    }
-    return true;
+    int hash = 7;
+    hash = 31 * hash + this.getId();
+    hash = 31 * hash + this.getRoundId();
+    hash = 31 * hash + this.getFormatId();
+    return hash;
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.MatchEntryPK[ id=" + id + ", roundId=" + roundId + ", formatId=" + formatId + " ]";
+    return "com.github.javydreamercsw.database.storage.db.MatchEntryPK[ id=" + id 
+            + ", roundId=" + roundId + ", formatId=" + formatId + " ]";
   }
-
 }

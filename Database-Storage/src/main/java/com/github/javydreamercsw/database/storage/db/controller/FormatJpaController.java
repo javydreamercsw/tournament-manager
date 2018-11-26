@@ -6,21 +6,20 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import com.github.javydreamercsw.database.storage.db.Format;
-import com.github.javydreamercsw.database.storage.db.MatchEntry;
-
-import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.FormatPK;
+import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
 /**
  *
@@ -28,7 +27,6 @@ import com.github.javydreamercsw.database.storage.db.controller.exceptions.Nonex
  */
 public class FormatJpaController implements Serializable
 {
-  private static final long serialVersionUID = 2970390892130758461L;
   public FormatJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -40,37 +38,39 @@ public class FormatJpaController implements Serializable
     return emf.createEntityManager();
   }
 
-  public void create(Format format)
+  public void create(Format format) throws PreexistingEntityException, Exception
   {
-    if (format.getMatchEntryList() == null)
+    if (format.getFormatPK() == null)
     {
-      format.setMatchEntryList(new ArrayList<>());
+      format.setFormatPK(new FormatPK());
     }
+    format.getFormatPK().setGameId(format.getGame().getId());
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<MatchEntry> attachedMatchEntryList = new ArrayList<>();
-      for (MatchEntry matchEntryListMatchEntryToAttach : format.getMatchEntryList())
+      Game game = format.getGame();
+      if (game != null)
       {
-        matchEntryListMatchEntryToAttach = em.getReference(matchEntryListMatchEntryToAttach.getClass(), matchEntryListMatchEntryToAttach.getMatchEntryPK());
-        attachedMatchEntryList.add(matchEntryListMatchEntryToAttach);
+        game = em.getReference(game.getClass(), game.getId());
+        format.setGame(game);
       }
-      format.setMatchEntryList(attachedMatchEntryList);
       em.persist(format);
-      for (MatchEntry matchEntryListMatchEntry : format.getMatchEntryList())
+      if (game != null)
       {
-        Format oldFormatOfMatchEntryListMatchEntry = matchEntryListMatchEntry.getFormat();
-        matchEntryListMatchEntry.setFormat(format);
-        matchEntryListMatchEntry = em.merge(matchEntryListMatchEntry);
-        if (oldFormatOfMatchEntryListMatchEntry != null)
-        {
-          oldFormatOfMatchEntryListMatchEntry.getMatchEntryList().remove(matchEntryListMatchEntry);
-          oldFormatOfMatchEntryListMatchEntry = em.merge(oldFormatOfMatchEntryListMatchEntry);
-        }
+        game.getFormatList().add(format);
+        game = em.merge(game);
       }
       em.getTransaction().commit();
+    }
+    catch (Exception ex)
+    {
+      if (findFormat(format.getFormatPK()) != null)
+      {
+        throw new PreexistingEntityException("Format " + format + " already exists.", ex);
+      }
+      throw ex;
     }
     finally
     {
@@ -81,54 +81,32 @@ public class FormatJpaController implements Serializable
     }
   }
 
-  public void edit(Format format) throws IllegalOrphanException, NonexistentEntityException, Exception
+  public void edit(Format format) throws NonexistentEntityException, Exception
   {
+    format.getFormatPK().setGameId(format.getGame().getId());
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      Format persistentFormat = em.find(Format.class, format.getId());
-      List<MatchEntry> matchEntryListOld = persistentFormat.getMatchEntryList();
-      List<MatchEntry> matchEntryListNew = format.getMatchEntryList();
-      List<String> illegalOrphanMessages = null;
-      for (MatchEntry matchEntryListOldMatchEntry : matchEntryListOld)
+      Format persistentFormat = em.find(Format.class, format.getFormatPK());
+      Game gameOld = persistentFormat.getGame();
+      Game gameNew = format.getGame();
+      if (gameNew != null)
       {
-        if (!matchEntryListNew.contains(matchEntryListOldMatchEntry))
-        {
-          if (illegalOrphanMessages == null)
-          {
-            illegalOrphanMessages = new ArrayList<>();
-          }
-          illegalOrphanMessages.add("You must retain MatchEntry " + matchEntryListOldMatchEntry + " since its format field is not nullable.");
-        }
+        gameNew = em.getReference(gameNew.getClass(), gameNew.getId());
+        format.setGame(gameNew);
       }
-      if (illegalOrphanMessages != null)
-      {
-        throw new IllegalOrphanException(illegalOrphanMessages);
-      }
-      List<MatchEntry> attachedMatchEntryListNew = new ArrayList<>();
-      for (MatchEntry matchEntryListNewMatchEntryToAttach : matchEntryListNew)
-      {
-        matchEntryListNewMatchEntryToAttach = em.getReference(matchEntryListNewMatchEntryToAttach.getClass(), matchEntryListNewMatchEntryToAttach.getMatchEntryPK());
-        attachedMatchEntryListNew.add(matchEntryListNewMatchEntryToAttach);
-      }
-      matchEntryListNew = attachedMatchEntryListNew;
-      format.setMatchEntryList(matchEntryListNew);
       format = em.merge(format);
-      for (MatchEntry matchEntryListNewMatchEntry : matchEntryListNew)
+      if (gameOld != null && !gameOld.equals(gameNew))
       {
-        if (!matchEntryListOld.contains(matchEntryListNewMatchEntry))
-        {
-          Format oldFormatOfMatchEntryListNewMatchEntry = matchEntryListNewMatchEntry.getFormat();
-          matchEntryListNewMatchEntry.setFormat(format);
-          matchEntryListNewMatchEntry = em.merge(matchEntryListNewMatchEntry);
-          if (oldFormatOfMatchEntryListNewMatchEntry != null && !oldFormatOfMatchEntryListNewMatchEntry.equals(format))
-          {
-            oldFormatOfMatchEntryListNewMatchEntry.getMatchEntryList().remove(matchEntryListNewMatchEntry);
-            oldFormatOfMatchEntryListNewMatchEntry = em.merge(oldFormatOfMatchEntryListNewMatchEntry);
-          }
-        }
+        gameOld.getFormatList().remove(format);
+        gameOld = em.merge(gameOld);
+      }
+      if (gameNew != null && !gameNew.equals(gameOld))
+      {
+        gameNew.getFormatList().add(format);
+        gameNew = em.merge(gameNew);
       }
       em.getTransaction().commit();
     }
@@ -137,7 +115,7 @@ public class FormatJpaController implements Serializable
       String msg = ex.getLocalizedMessage();
       if (msg == null || msg.length() == 0)
       {
-        Integer id = format.getId();
+        FormatPK id = format.getFormatPK();
         if (findFormat(id) == null)
         {
           throw new NonexistentEntityException("The format with id " + id + " no longer exists.");
@@ -154,7 +132,7 @@ public class FormatJpaController implements Serializable
     }
   }
 
-  public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException
+  public void destroy(FormatPK id) throws NonexistentEntityException
   {
     EntityManager em = null;
     try
@@ -165,25 +143,17 @@ public class FormatJpaController implements Serializable
       try
       {
         format = em.getReference(Format.class, id);
-        format.getId();
+        format.getFormatPK();
       }
       catch (EntityNotFoundException enfe)
       {
         throw new NonexistentEntityException("The format with id " + id + " no longer exists.", enfe);
       }
-      List<String> illegalOrphanMessages = null;
-      List<MatchEntry> matchEntryListOrphanCheck = format.getMatchEntryList();
-      for (MatchEntry matchEntryListOrphanCheckMatchEntry : matchEntryListOrphanCheck)
+      Game game = format.getGame();
+      if (game != null)
       {
-        if (illegalOrphanMessages == null)
-        {
-          illegalOrphanMessages = new ArrayList<>();
-        }
-        illegalOrphanMessages.add("This Format (" + format + ") cannot be destroyed since the MatchEntry " + matchEntryListOrphanCheckMatchEntry + " in its matchEntryList field has a non-nullable format field.");
-      }
-      if (illegalOrphanMessages != null)
-      {
-        throw new IllegalOrphanException(illegalOrphanMessages);
+        game.getFormatList().remove(format);
+        game = em.merge(game);
       }
       em.remove(format);
       em.getTransaction().commit();
@@ -228,7 +198,7 @@ public class FormatJpaController implements Serializable
     }
   }
 
-  public Format findFormat(Integer id)
+  public Format findFormat(FormatPK id)
   {
     EntityManager em = getEntityManager();
     try

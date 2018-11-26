@@ -1,67 +1,55 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 @Entity
 @Table(name = "format")
 @XmlRootElement
 @NamedQueries(
-{
-  @NamedQuery(name = "Format.findAll", query = "SELECT f FROM Format f"),
-  @NamedQuery(name = "Format.findById", query = "SELECT f FROM Format f WHERE f.id = :id"),
-  @NamedQuery(name = "Format.findByName", query = "SELECT f FROM Format f WHERE f.name = :name"),
-  @NamedQuery(name = "Format.findByDescription", query = "SELECT f FROM Format f WHERE f.description = :description")
-})
+        {
+          @NamedQuery(name = "Format.findAll", query = "SELECT f FROM Format f"),
+          @NamedQuery(name = "Format.findById",
+                  query = "SELECT f FROM Format f WHERE f.formatPK.id = :id"),
+          @NamedQuery(name = "Format.findByName",
+                  query = "SELECT f FROM Format f WHERE f.name = :name"),
+          @NamedQuery(name = "Format.findByDescription",
+                  query = "SELECT f FROM Format f WHERE f.description = :description"),
+          @NamedQuery(name = "Format.findByGameId",
+                  query = "SELECT f FROM Format f WHERE f.formatPK.gameId = :gameId")
+        })
 public class Format implements Serializable
 {
   private static final long serialVersionUID = 1L;
-  @Id
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "FormatGen")
-  @TableGenerator(name = "FormatGen", table = "tm_id",
-          pkColumnName = "table_name",
-          valueColumnName = "last_id",
-          pkColumnValue = "format",
-          allocationSize = 1,
-          initialValue = 1)
-  @Basic(optional = false)
-  @Column(name = "id")
-  private Integer id;
+  @EmbeddedId
+  protected FormatPK formatPK;
   @Basic(optional = false)
   @Column(name = "name")
   private String name;
   @Column(name = "description")
   private String description;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "format", fetch = FetchType.LAZY)
-  private List<MatchEntry> matchEntryList;
+  @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false,
+          updatable = false)
+  @ManyToOne(optional = false)
+  private Game game;
 
   public Format()
   {
+  }
+
+  public Format(FormatPK formatPK)
+  {
+    this.formatPK = formatPK;
   }
 
   public Format(String name)
@@ -69,14 +57,19 @@ public class Format implements Serializable
     this.name = name;
   }
 
-  public Integer getId()
+  public Format(int id, int gameId)
   {
-    return id;
+    this.formatPK = new FormatPK(id, gameId);
   }
 
-  public void setId(Integer id)
+  public FormatPK getFormatPK()
   {
-    this.id = id;
+    return formatPK;
+  }
+
+  public void setFormatPK(FormatPK formatPK)
+  {
+    this.formatPK = formatPK;
   }
 
   public String getName()
@@ -99,22 +92,21 @@ public class Format implements Serializable
     this.description = description;
   }
 
-  @XmlTransient
-  public List<MatchEntry> getMatchEntryList()
+  public Game getGame()
   {
-    return matchEntryList;
+    return game;
   }
 
-  public void setMatchEntryList(List<MatchEntry> matchEntryList)
+  public void setGame(Game game)
   {
-    this.matchEntryList = matchEntryList;
+    this.game = game;
   }
 
   @Override
   public int hashCode()
   {
     int hash = 0;
-    hash += (id != null ? id.hashCode() : 0);
+    hash += (formatPK != null ? formatPK.hashCode() : 0);
     return hash;
   }
 
@@ -127,14 +119,14 @@ public class Format implements Serializable
       return false;
     }
     Format other = (Format) object;
-    return !((this.id == null && other.id != null) 
-            || (this.id != null && !this.id.equals(other.id)));
+    return !((this.formatPK == null && other.formatPK != null)
+            || (this.formatPK != null && !this.formatPK.equals(other.formatPK)));
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.Format[ id=" 
-            + id + " ]";
+    return "com.github.javydreamercsw.database.storage.db.Format[ formatPK="
+            + formatPK + " ]";
   }
 }

@@ -1,22 +1,28 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
+
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import com.github.javydreamercsw.database.storage.db.Round;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
-import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
-import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
-import com.github.javydreamercsw.database.storage.db.Round;
-
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
@@ -27,7 +33,6 @@ import com.github.javydreamercsw.database.storage.db.controller.exceptions.Preex
  */
 public class MatchEntryJpaController implements Serializable
 {
-  private static final long serialVersionUID = 1393239675880347875L;
   public MatchEntryJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -49,19 +54,11 @@ public class MatchEntryJpaController implements Serializable
     {
       matchEntry.setMatchHasTeamList(new ArrayList<>());
     }
-    matchEntry.getMatchEntryPK().setFormatId(matchEntry.getFormat().getId());
-    matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      Format format = matchEntry.getFormat();
-      if (format != null)
-      {
-        format = em.getReference(format.getClass(), format.getId());
-        matchEntry.setFormat(format);
-      }
       Round round = matchEntry.getRound();
       if (round != null)
       {
@@ -76,11 +73,6 @@ public class MatchEntryJpaController implements Serializable
       }
       matchEntry.setMatchHasTeamList(attachedMatchHasTeamList);
       em.persist(matchEntry);
-      if (format != null)
-      {
-        format.getMatchEntryList().add(matchEntry);
-        format = em.merge(format);
-      }
       if (round != null)
       {
         round.getMatchEntryList().add(matchEntry);
@@ -118,16 +110,12 @@ public class MatchEntryJpaController implements Serializable
 
   public void edit(MatchEntry matchEntry) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
-    matchEntry.getMatchEntryPK().setFormatId(matchEntry.getFormat().getId());
-    matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
       MatchEntry persistentMatchEntry = em.find(MatchEntry.class, matchEntry.getMatchEntryPK());
-      Format formatOld = persistentMatchEntry.getFormat();
-      Format formatNew = matchEntry.getFormat();
       Round roundOld = persistentMatchEntry.getRound();
       Round roundNew = matchEntry.getRound();
       List<MatchHasTeam> matchHasTeamListOld = persistentMatchEntry.getMatchHasTeamList();
@@ -148,11 +136,6 @@ public class MatchEntryJpaController implements Serializable
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
-      if (formatNew != null)
-      {
-        formatNew = em.getReference(formatNew.getClass(), formatNew.getId());
-        matchEntry.setFormat(formatNew);
-      }
       if (roundNew != null)
       {
         roundNew = em.getReference(roundNew.getClass(), roundNew.getRoundPK());
@@ -167,16 +150,6 @@ public class MatchEntryJpaController implements Serializable
       matchHasTeamListNew = attachedMatchHasTeamListNew;
       matchEntry.setMatchHasTeamList(matchHasTeamListNew);
       matchEntry = em.merge(matchEntry);
-      if (formatOld != null && !formatOld.equals(formatNew))
-      {
-        formatOld.getMatchEntryList().remove(matchEntry);
-        formatOld = em.merge(formatOld);
-      }
-      if (formatNew != null && !formatNew.equals(formatOld))
-      {
-        formatNew.getMatchEntryList().add(matchEntry);
-        formatNew = em.merge(formatNew);
-      }
       if (roundOld != null && !roundOld.equals(roundNew))
       {
         roundOld.getMatchEntryList().remove(matchEntry);
@@ -255,12 +228,6 @@ public class MatchEntryJpaController implements Serializable
       if (illegalOrphanMessages != null)
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
-      }
-      Format format = matchEntry.getFormat();
-      if (format != null)
-      {
-        format.getMatchEntryList().remove(matchEntry);
-        format = em.merge(format);
       }
       Round round = matchEntry.getRound();
       if (round != null)

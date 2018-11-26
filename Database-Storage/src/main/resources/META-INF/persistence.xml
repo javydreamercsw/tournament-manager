@@ -2,17 +2,18 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="TMPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.github.javydreamercsw.database.storage.db.MatchResult</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchEntry</class>
     <class>com.github.javydreamercsw.database.storage.db.Format</class>
-    <class>com.github.javydreamercsw.database.storage.db.Team</class>
+    <class>com.github.javydreamercsw.database.storage.db.Game</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchEntry</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchResult</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchResultType</class>
+    <class>com.github.javydreamercsw.database.storage.db.Player</class>
     <class>com.github.javydreamercsw.database.storage.db.Record</class>
     <class>com.github.javydreamercsw.database.storage.db.Round</class>
-    <class>com.github.javydreamercsw.database.storage.db.Player</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchResultType</class>
-    <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.Team</class>
     <class>com.github.javydreamercsw.database.storage.db.Tournament</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:~/TournamentManager/data/tournament-manager;AUTO_SERVER=TRUE"/>
       <property name="javax.persistence.jdbc.password" value=""/>
@@ -27,17 +28,18 @@
   </persistence-unit>
   <persistence-unit name="TestTMPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.github.javydreamercsw.database.storage.db.MatchResult</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchEntry</class>
     <class>com.github.javydreamercsw.database.storage.db.Format</class>
-    <class>com.github.javydreamercsw.database.storage.db.Team</class>
+    <class>com.github.javydreamercsw.database.storage.db.Game</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchEntry</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchResult</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchResultType</class>
+    <class>com.github.javydreamercsw.database.storage.db.Player</class>
     <class>com.github.javydreamercsw.database.storage.db.Record</class>
     <class>com.github.javydreamercsw.database.storage.db.Round</class>
-    <class>com.github.javydreamercsw.database.storage.db.Player</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchResultType</class>
-    <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.Team</class>
     <class>com.github.javydreamercsw.database.storage.db.Tournament</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:./target/data/test/tournament-manager;AUTO_SERVER=TRUE"/>
       <property name="javax.persistence.jdbc.password" value=""/>
@@ -53,17 +55,18 @@
   <persistence-unit name="TMPUJNDI" transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <jta-data-source>java:comp/env/jdbc/TMDB</jta-data-source>
-    <class>com.github.javydreamercsw.database.storage.db.MatchResult</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchEntry</class>
     <class>com.github.javydreamercsw.database.storage.db.Format</class>
-    <class>com.github.javydreamercsw.database.storage.db.Team</class>
+    <class>com.github.javydreamercsw.database.storage.db.Game</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchEntry</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchResult</class>
+    <class>com.github.javydreamercsw.database.storage.db.MatchResultType</class>
+    <class>com.github.javydreamercsw.database.storage.db.Player</class>
     <class>com.github.javydreamercsw.database.storage.db.Record</class>
     <class>com.github.javydreamercsw.database.storage.db.Round</class>
-    <class>com.github.javydreamercsw.database.storage.db.Player</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchResultType</class>
-    <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.Team</class>
     <class>com.github.javydreamercsw.database.storage.db.Tournament</class>
-    <class>com.github.javydreamercsw.database.storage.db.MatchHasTeam</class>
+    <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
       <property name="eclipselink.logging.logger" value="org.eclipse.persistence.logging.DefaultSessionLog"/>

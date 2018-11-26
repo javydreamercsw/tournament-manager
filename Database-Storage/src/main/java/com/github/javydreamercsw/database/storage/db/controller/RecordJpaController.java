@@ -22,7 +22,6 @@ import javax.persistence.EntityManagerFactory;
 
 import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
-
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
 /**
