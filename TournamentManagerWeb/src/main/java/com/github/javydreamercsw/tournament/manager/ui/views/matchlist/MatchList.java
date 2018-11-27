@@ -96,7 +96,7 @@ public class MatchList extends TMView
     container.setClassName("view-container");
     container.setAlignItems(Alignment.STRETCH);
 
-    grid.addColumn(MatchEntry::getFormat).setHeader("Format").setWidth("8em")
+    grid.addColumn(MatchEntry::getFormat).setHeader("Matches").setWidth("8em")
             .setResizable(true);
     grid.addColumn(new ComponentRenderer<>(this::createEditButton))
             .setFlexGrow(0);
