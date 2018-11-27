@@ -18,7 +18,6 @@ public abstract class TMView extends VerticalLayout
   @Override
   public void afterNavigation(AfterNavigationEvent ane)
   {
-    System.out.println("After Navigation: " + getClassName());
     updateView();
   }
 
