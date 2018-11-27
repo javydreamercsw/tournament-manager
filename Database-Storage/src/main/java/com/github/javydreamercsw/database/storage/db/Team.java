@@ -21,10 +21,6 @@ import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 @Entity
 @Table(name = "team")
 @XmlRootElement

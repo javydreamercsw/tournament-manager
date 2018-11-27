@@ -17,27 +17,23 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
- @Entity
+@Entity
 @Table(name = "round")
 @XmlRootElement
 @NamedQueries(
-{
-  @NamedQuery(name = "Round.findAll", query = "SELECT r FROM Round r"),
-  @NamedQuery(name = "Round.findById", 
-          query = "SELECT r FROM Round r WHERE r.roundPK.id = :id"),
-  @NamedQuery(name = "Round.findByTournamentId",
-          query = "SELECT r FROM Round r WHERE r.roundPK.tournamentId = :tournamentId")
-})
+        {
+          @NamedQuery(name = "Round.findAll", query = "SELECT r FROM Round r"),
+          @NamedQuery(name = "Round.findById",
+                  query = "SELECT r FROM Round r WHERE r.roundPK.id = :id"),
+          @NamedQuery(name = "Round.findByTournamentId",
+                  query = "SELECT r FROM Round r WHERE r.roundPK.tournamentId = :tournamentId")
+        })
 public class Round implements Serializable
 {
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected RoundPK roundPK;
-  @JoinColumn(name = "tournament_id", referencedColumnName = "id", 
+  @JoinColumn(name = "tournament_id", referencedColumnName = "id",
           insertable = false, updatable = false)
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   private Tournament tournament;
@@ -107,7 +103,7 @@ public class Round implements Serializable
       return false;
     }
     Round other = (Round) object;
-    return !((this.roundPK == null && other.roundPK != null) 
+    return !((this.roundPK == null && other.roundPK != null)
             || (this.roundPK != null && !this.roundPK.equals(other.roundPK)));
   }
 

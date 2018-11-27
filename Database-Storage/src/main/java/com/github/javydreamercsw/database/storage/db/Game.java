@@ -59,7 +59,7 @@ public class Game implements Serializable
   private String name;
   @Column(name = "description")
   private String description;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
+  @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "game")
   private List<Format> formatList;
 
   public Game()

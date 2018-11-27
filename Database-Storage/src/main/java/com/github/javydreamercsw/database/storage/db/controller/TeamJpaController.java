@@ -1,37 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
-
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import com.github.javydreamercsw.database.storage.db.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
+import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 public class TeamJpaController implements Serializable
 {
+  private static final long serialVersionUID = -948309699404935164L;
   public TeamJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;

@@ -1,15 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,9 +20,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 @Entity
 @Table(name = "match_entry")
 @XmlRootElement
@@ -45,7 +40,8 @@ public class MatchEntry implements Serializable
   @EmbeddedId
   protected MatchEntryPK matchEntryPK;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false,
+          cascade = CascadeType.PERSIST)
   @JoinColumns(
           {
             @JoinColumn(name = "FORMAT_ID", referencedColumnName = "ID",
@@ -55,7 +51,8 @@ public class MatchEntry implements Serializable
           })
   private Format format;
 
-  @ManyToOne(optional = true, fetch = FetchType.LAZY)
+  @ManyToOne(optional = true, fetch = FetchType.LAZY,
+          cascade = CascadeType.PERSIST)
   @JoinColumns(
           {
             @JoinColumn(name = "ROUND_ID", referencedColumnName = "ID",
@@ -66,8 +63,12 @@ public class MatchEntry implements Serializable
   private Round round;
 
   @OneToMany(mappedBy = "matchEntry", fetch = FetchType.LAZY,
-          cascade = CascadeType.ALL)
+          cascade = CascadeType.PERSIST)
   private List<MatchHasTeam> matchHasTeamList;
+
+  @Basic(optional = false)
+  @Column(name = "match_date")
+  private LocalDate matchDate;
 
   public MatchEntry()
   {
@@ -141,15 +142,25 @@ public class MatchEntry implements Serializable
       return false;
     }
     MatchEntry other = (MatchEntry) object;
-    return !((this.matchEntryPK == null && other.matchEntryPK != null) 
-            || (this.matchEntryPK != null 
+    return !((this.matchEntryPK == null && other.matchEntryPK != null)
+            || (this.matchEntryPK != null
             && !this.matchEntryPK.equals(other.matchEntryPK)));
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.MatchEntry[ matchEntryPK=" 
+    return "com.github.javydreamercsw.database.storage.db.MatchEntry[ matchEntryPK="
             + matchEntryPK + " ]";
+  }
+
+  public LocalDate getMatchDate()
+  {
+    return matchDate;
+  }
+
+  public void setMatchDate(LocalDate matchDate)
+  {
+    this.matchDate = matchDate;
   }
 }

@@ -30,4 +30,6 @@
     <!-- ################# Optional Configuration #################-->
     <!-- Database JNDI Name -->
     <Environment name="tm/JNDIDB" override="false" type="java.lang.String" value="TMPUJNDI"/>
+    <!-- If set to true demo data will be loaded -->
+    <Environment name="tm/demo" override="false" type="java.lang.Boolean" value="true"/>
 </Context>

@@ -1,38 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
-
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import com.github.javydreamercsw.database.storage.db.MatchResultType;
-import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
+import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultPK;
-import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 public class MatchResultJpaController implements Serializable
 {
+  private static final long serialVersionUID = -4857066805022202452L;
   public MatchResultJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -109,7 +97,7 @@ public class MatchResultJpaController implements Serializable
     }
   }
 
-  public void edit(MatchResult matchResult) throws IllegalOrphanException, NonexistentEntityException, Exception
+  public void edit(MatchResult matchResult) throws NonexistentEntityException, Exception
   {
     matchResult.getMatchResultPK().setMatchResultTypeId(matchResult.getMatchResultType().getId());
     EntityManager em = null;
@@ -122,22 +110,6 @@ public class MatchResultJpaController implements Serializable
       MatchResultType matchResultTypeNew = matchResult.getMatchResultType();
       List<MatchHasTeam> matchHasTeamListOld = persistentMatchResult.getMatchHasTeamList();
       List<MatchHasTeam> matchHasTeamListNew = matchResult.getMatchHasTeamList();
-      List<String> illegalOrphanMessages = null;
-      for (MatchHasTeam matchHasTeamListOldMatchHasTeam : matchHasTeamListOld)
-      {
-        if (!matchHasTeamListNew.contains(matchHasTeamListOldMatchHasTeam))
-        {
-          if (illegalOrphanMessages == null)
-          {
-            illegalOrphanMessages = new ArrayList<>();
-          }
-          illegalOrphanMessages.add("You must retain MatchHasTeam " + matchHasTeamListOldMatchHasTeam + " since its matchResult field is not nullable.");
-        }
-      }
-      if (illegalOrphanMessages != null)
-      {
-        throw new IllegalOrphanException(illegalOrphanMessages);
-      }
       if (matchResultTypeNew != null)
       {
         matchResultTypeNew = em.getReference(matchResultTypeNew.getClass(), matchResultTypeNew.getId());
@@ -161,6 +133,14 @@ public class MatchResultJpaController implements Serializable
       {
         matchResultTypeNew.getMatchResultList().add(matchResult);
         matchResultTypeNew = em.merge(matchResultTypeNew);
+      }
+      for (MatchHasTeam matchHasTeamListOldMatchHasTeam : matchHasTeamListOld)
+      {
+        if (!matchHasTeamListNew.contains(matchHasTeamListOldMatchHasTeam))
+        {
+          matchHasTeamListOldMatchHasTeam.setMatchResult(null);
+          matchHasTeamListOldMatchHasTeam = em.merge(matchHasTeamListOldMatchHasTeam);
+        }
       }
       for (MatchHasTeam matchHasTeamListNewMatchHasTeam : matchHasTeamListNew)
       {
@@ -200,7 +180,7 @@ public class MatchResultJpaController implements Serializable
     }
   }
 
-  public void destroy(MatchResultPK id) throws IllegalOrphanException, NonexistentEntityException
+  public void destroy(MatchResultPK id) throws NonexistentEntityException
   {
     EntityManager em = null;
     try
@@ -217,25 +197,17 @@ public class MatchResultJpaController implements Serializable
       {
         throw new NonexistentEntityException("The matchResult with id " + id + " no longer exists.", enfe);
       }
-      List<String> illegalOrphanMessages = null;
-      List<MatchHasTeam> matchHasTeamListOrphanCheck = matchResult.getMatchHasTeamList();
-      for (MatchHasTeam matchHasTeamListOrphanCheckMatchHasTeam : matchHasTeamListOrphanCheck)
-      {
-        if (illegalOrphanMessages == null)
-        {
-          illegalOrphanMessages = new ArrayList<>();
-        }
-        illegalOrphanMessages.add("This MatchResult (" + matchResult + ") cannot be destroyed since the MatchHasTeam " + matchHasTeamListOrphanCheckMatchHasTeam + " in its matchHasTeamList field has a non-nullable matchResult field.");
-      }
-      if (illegalOrphanMessages != null)
-      {
-        throw new IllegalOrphanException(illegalOrphanMessages);
-      }
       MatchResultType matchResultType = matchResult.getMatchResultType();
       if (matchResultType != null)
       {
         matchResultType.getMatchResultList().remove(matchResult);
         matchResultType = em.merge(matchResultType);
+      }
+      List<MatchHasTeam> matchHasTeamList = matchResult.getMatchHasTeamList();
+      for (MatchHasTeam matchHasTeamListMatchHasTeam : matchHasTeamList)
+      {
+        matchHasTeamListMatchHasTeam.setMatchResult(null);
+        matchHasTeamListMatchHasTeam = em.merge(matchHasTeamListMatchHasTeam);
       }
       em.remove(matchResult);
       em.getTransaction().commit();

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
@@ -11,13 +6,10 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 @Embeddable
 public class MatchHasTeamPK implements Serializable
 {
+  private static final long serialVersionUID = 1692252424439773610L;
   @Basic(optional = false)
   @Column(name = "match_id")
   private int matchId;
@@ -115,17 +107,15 @@ public class MatchHasTeamPK implements Serializable
     {
       return false;
     }
-    if (this.matchResultMatchResultTypeId != other.matchResultMatchResultTypeId)
-    {
-      return false;
-    }
-    return true;
+    return this.matchResultMatchResultTypeId == other.matchResultMatchResultTypeId;
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.MatchHasTeamPK[ matchId=" + matchId + ", teamId=" + teamId + ", matchResultId=" + matchResultId + ", matchResultMatchResultTypeId=" + matchResultMatchResultTypeId + " ]";
+    return "com.github.javydreamercsw.database.storage.db.MatchHasTeamPK[ matchId="
+            + matchId + ", teamId=" + teamId + ", matchResultId=" + matchResultId
+            + ", matchResultMatchResultTypeId=" + matchResultMatchResultTypeId + " ]";
   }
-  
+
 }

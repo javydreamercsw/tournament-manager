@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
@@ -18,10 +13,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 @Entity
 @Table(name = "match_has_team")
 @XmlRootElement
@@ -64,7 +55,7 @@ public class MatchHasTeam implements Serializable
                     referencedColumnName = "match_result_type_id", insertable = false,
                     updatable = false)
           })
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @ManyToOne(optional = true, fetch = FetchType.LAZY)
   private MatchResult matchResult;
   @JoinColumn(name = "team_id", referencedColumnName = "id", insertable = false,
           updatable = false)

@@ -15,19 +15,35 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
+import static com.github.javydreamercsw.tournament.manager.ui.views.TMView.CURRENT_GAME;
+
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.openide.util.Exceptions;
+
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.database.storage.db.server.FormatService;
+import com.github.javydreamercsw.database.storage.db.server.MatchService;
 import com.github.javydreamercsw.database.storage.db.server.TeamService;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
+import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeListener;
+import com.vaadin.flow.component.ItemLabelGenerator;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.server.VaadinService;
 
 /**
  * A dialog for editing {@link Format} objects.
@@ -36,6 +52,8 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
 {
   private static final long serialVersionUID = 2349638969280300323L;
   private final Grid<Team> grid = new Grid<>();
+  private final ComboBox<Format> cb = new ComboBox<>();
+  private final DatePicker datePicker = new DatePicker();
 
   public MatchEditorDialog(BiConsumer<MatchEntry, Operation> itemSaver,
           Consumer<MatchEntry> itemDeleter)
@@ -47,23 +65,113 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
   @Override
   protected void confirmDelete()
   {
-    doDelete(getCurrentItem());
+    boolean canDelete = getCurrentItem().getRound() != null;
+
+    if (canDelete)
+    {
+      // Check if it has results already.
+      for (MatchHasTeam mht : getCurrentItem().getMatchHasTeamList())
+      {
+        if (mht.getMatchResult().getMatchResultPK().getId() == 1)
+        {
+          canDelete = false;
+          break;
+        }
+      }
+    }
+    if (!canDelete)
+    {
+      openConfirmationDialog("Delete match",
+              "Are you sure you want to delete this match?",
+              "You will lose all it's data.");
+    }
+    else
+    {
+      doDelete(getCurrentItem());
+    }
   }
 
   private void addTeams()
-  { 
+  {
     getFormLayout().add(grid);
 
     grid.addColumn(Team::getName).setHeader("Name").setWidth("8em")
             .setResizable(true);
 
-    grid.addColumn(team ->
+    grid.addColumn(new ComponentRenderer<>(team ->
     {
-      return new Checkbox("", new TeamSelectionListener(team));
+      Checkbox checkbox = new Checkbox("", new TeamSelectionListener(team));
+
+      // Preselect if the team is already in the match
+      for (MatchHasTeam mht : getCurrentItem().getMatchHasTeamList())
+      {
+        if (Objects.equals(mht.getTeam().getId(), team.getId()))
+        {
+          checkbox.setValue(true);
+          break;
+        }
+      }
+      return checkbox;
+    })).setHeader("Selected");
+
+    List<Format> formats = FormatService.getInstance().findFormatByGame(
+            (String) VaadinService.getCurrentRequest().getWrappedSession()
+                    .getAttribute(CURRENT_GAME));
+
+    cb.setLabel("Select a Format: ");
+    cb.setDataProvider(new ListDataProvider(formats));
+    cb.setItemLabelGenerator(new FormatLabelGenerator());
+    cb.setRequired(true);
+    cb.setPreventInvalidInput(true);
+    cb.setAllowCustomValue(false);
+    cb.addValueChangeListener(new ValueChangeListener()
+    {
+      private static final long serialVersionUID = 5377566605252849942L;
+
+      @Override
+      public void valueChanged(ValueChangeEvent e)
+      {
+        validate();
+      }
     });
+
+    getBinder().forField(cb).bind(MatchEntry::getFormat, MatchEntry::setFormat);
+
+    cb.setEnabled(formats.size() > 1);
+    if (formats.size() == 1)
+    {
+      // Select the only option
+      cb.setValue(formats.get(0));
+    }
+
+    getFormLayout().add(cb);
+
+    getBinder().forField(datePicker)
+            .bind(MatchEntry::getMatchDate, MatchEntry::setMatchDate);
+
+    datePicker.addValueChangeListener(new ValueChangeListener()
+    {
+      private static final long serialVersionUID = 5377566605252849942L;
+
+      @Override
+      public void valueChanged(ValueChangeEvent e)
+      {
+        validate();
+      }
+    });
+    getFormLayout().add(datePicker);
+    validate();
   }
 
-  private class TeamSelectionListener implements 
+  @Override
+  protected boolean isValid()
+  {
+    return cb.getValue() != null
+            && datePicker.getValue() != null
+            && getCurrentItem().getMatchHasTeamList().size() >= 2;
+  }
+
+  private class TeamSelectionListener implements
           ValueChangeListener<ComponentValueChangeEvent<Checkbox, Boolean>>
   {
     private static final long serialVersionUID = 1991737314876349305L;
@@ -77,7 +185,31 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
     @Override
     public void valueChanged(ComponentValueChangeEvent<Checkbox, Boolean> e)
     {
-      System.out.println(team.getName() + "Selected? " + e.getSource().getValue());
+      if (e.getSource().getValue())
+      {
+        try
+        {
+          // Add it
+          MatchService.getInstance().addTeam(getCurrentItem(), team);
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+      else
+      {
+        try
+        {
+          // Remove it
+          MatchService.getInstance().removeTeam(getCurrentItem(), team);
+        }
+        catch (NonexistentEntityException ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+      validate();
     }
   }
 
@@ -86,7 +218,17 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
   {
     List<Team> teams = TeamService.getInstance().findTeams("");
     grid.setItems(teams);
-    System.out.println("Amount of Teams: "+teams.size());
     super.open();
-  }  
+  }
+
+  private class FormatLabelGenerator implements ItemLabelGenerator<Format>
+  {
+    private static final long serialVersionUID = -738603579674658479L;
+
+    @Override
+    public String apply(Format f)
+    {
+      return f.getName();
+    }
+  }
 }

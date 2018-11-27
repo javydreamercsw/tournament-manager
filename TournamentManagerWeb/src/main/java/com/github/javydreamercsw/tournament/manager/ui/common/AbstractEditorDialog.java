@@ -47,6 +47,7 @@ public abstract class AbstractEditorDialog<T extends Serializable>
         extends Dialog
 {
   private static final long serialVersionUID = -6916639397630884016L;
+  private Operation currentOperation;
 
   /**
    * The operations supported by this dialog. Delete is enabled when editing an
@@ -164,7 +165,8 @@ public abstract class AbstractEditorDialog<T extends Serializable>
     return formLayout;
   }
 
-  /**a
+  /**
+   * Binder
    *
    * @return the binder
    */
@@ -192,6 +194,7 @@ public abstract class AbstractEditorDialog<T extends Serializable>
    */
   public final void open(T item, Operation operation)
   {
+    currentOperation = operation;
     currentItem = item;
     titleField.setText(operation.getNameInTitle() + " " + itemType);
     if (registrationForSave != null)
@@ -267,5 +270,57 @@ public abstract class AbstractEditorDialog<T extends Serializable>
   private void deleteConfirmed(T item)
   {
     doDelete(item);
+  }
+
+  /**
+   * @return the saveButton
+   */
+  protected Button getSaveButton()
+  {
+    return saveButton;
+  }
+
+  /**
+   * @return the cancelButton
+   */
+  protected Button getCancelButton()
+  {
+    return cancelButton;
+  }
+
+  /**
+   * @return the deleteButton
+   */
+  protected Button getDeleteButton()
+  {
+    return deleteButton;
+  }
+
+  /**
+   * Check that the form is valid to enable save/delete/
+   *
+   * @return true if dialog is valid and save and/or delete buttons should be
+   * enabled.
+   */
+  protected boolean isValid()
+  {
+    return true;
+  }
+
+  /**
+   * Validate the form. Update buttons accordingly.
+   */
+  protected void validate()
+  {
+    getSaveButton().setEnabled(isValid());
+    getDeleteButton().setEnabled(isValid() && currentOperation.isDeleteEnabled());
+  }
+
+  /**
+   * @return the currentOperation
+   */
+  protected Operation getCurrentOperation()
+  {
+    return currentOperation;
   }
 }

@@ -20,7 +20,9 @@ import javax.naming.NamingException;
 
 import org.openide.util.Exceptions;
 
+import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
+import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.tournament.manager.ui.views.formatlist.FormatList;
 import com.github.javydreamercsw.tournament.manager.ui.views.matchlist.MatchList;
 import com.github.javydreamercsw.tournament.manager.ui.views.playerlist.PlayerList;
@@ -32,6 +34,8 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLayout;
@@ -49,14 +53,19 @@ public class MainLayout extends Div
         implements RouterLayout, PageConfigurator
 {
   private static final long serialVersionUID = 1412472530637429687L;
+  private static boolean demo = false;
 
   static
   {
     try
     {
-      String JNDIDB = (String) (new InitialContext())
+      InitialContext context = new InitialContext();
+      String JNDIDB = (String) context
               .lookup("java:comp/env/tm/JNDIDB");
       DataBaseManager.setPersistenceUnitName(JNDIDB);
+
+      demo = (Boolean) context
+              .lookup("java:comp/env/tm/demo");
     }
     catch (NamingException ex)
     {
@@ -99,6 +108,29 @@ public class MainLayout extends Div
     add(header);
 
     addClassName("main-layout");
+
+    // Check if it's configured for demo
+    if (demo && PlayerService.getInstance().findPlayers("").isEmpty())
+    {
+      Notification.show(
+              "Loading demo data...",
+              3000, Position.MIDDLE);
+      // Add players
+      for (int i = 0; i < 10; i++)
+      {
+        try
+        {
+          PlayerService.getInstance().savePlayer(new Player("Player " + (i + 1)));
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+      Notification.show(
+              "Loading demo data done!",
+              3000, Position.MIDDLE);
+    }
   }
 
   @Override

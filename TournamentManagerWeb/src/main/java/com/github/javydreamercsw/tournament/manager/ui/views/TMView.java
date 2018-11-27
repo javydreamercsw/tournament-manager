@@ -30,13 +30,7 @@ public abstract class TMView extends VerticalLayout
   {
     VaadinService.getCurrentRequest().getWrappedSession()
             .setAttribute(key, value);
-  }
-
-  protected final void showValue(String key)
-  {
-    System.out.println(VaadinService.getCurrentRequest().getWrappedSession()
-            .getAttribute(key));
-  }
+}
 
   protected final Object getValue(String key)
   {

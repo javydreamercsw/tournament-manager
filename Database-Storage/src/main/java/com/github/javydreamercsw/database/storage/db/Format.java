@@ -3,6 +3,7 @@ package com.github.javydreamercsw.database.storage.db;
 import java.io.Serializable;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -40,7 +41,7 @@ public class Format implements Serializable
   private String description;
   @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false,
           updatable = false)
-  @ManyToOne(optional = false)
+  @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
   private Game game;
 
   public Format()

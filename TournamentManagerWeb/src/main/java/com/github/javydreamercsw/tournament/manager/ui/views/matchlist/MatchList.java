@@ -15,6 +15,7 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.openide.util.Exceptions;
@@ -96,7 +97,26 @@ public class MatchList extends TMView
     container.setClassName("view-container");
     container.setAlignItems(Alignment.STRETCH);
 
-    grid.addColumn(MatchEntry::getFormat).setHeader("Matches").setWidth("8em")
+    grid.addColumn(match ->
+    {
+      //Build a match name
+      StringBuilder sb = new StringBuilder();
+      match.getMatchHasTeamList().forEach(mht ->
+      {
+        if (!sb.toString().trim().isEmpty())
+        {
+          sb.append(" vs. ");
+        }
+        sb.append(mht.getTeam().getName());
+      });
+      return sb.toString();
+    }).setHeader("Matches").setWidth("8em")
+            .setResizable(true);
+    grid.addColumn(match -> match.getFormat() == null ? "Null"
+            : match.getFormat().getName())
+            .setHeader("Format").setWidth("8em")
+            .setResizable(true);
+    grid.addColumn(MatchEntry::getMatchDate).setHeader("Date").setWidth("8em")
             .setResizable(true);
     grid.addColumn(new ComponentRenderer<>(this::createEditButton))
             .setFlexGrow(0);
@@ -138,12 +158,32 @@ public class MatchList extends TMView
   {
     try
     {
-      MatchService.getInstance().saveMatch(match);
-      
-      Notification.show(
-              "Match successfully " + operation.getNameInText() + "ed.",
-              3000, Position.BOTTOM_START);
-      updateView();
+      if (match.getMatchHasTeamList().size() >= 2)
+      {
+        if (match.getFormat() == null)
+        {
+          Notification.show(
+                  "Match has no format!",
+                  3000, Position.BOTTOM_START);
+          return;
+        }
+        if (match.getMatchDate() == null)
+        {
+          match.setMatchDate(LocalDate.now());
+        }
+        MatchService.getInstance().saveMatch(match);
+
+        Notification.show(
+                "Match successfully " + operation.getNameInText() + "ed.",
+                3000, Position.BOTTOM_START);
+        updateView();
+      }
+      else
+      {
+        Notification.show(
+                "Not enough players to make a match!",
+                3000, Position.BOTTOM_START);
+      }
     }
     catch (Exception ex)
     {
@@ -153,28 +193,17 @@ public class MatchList extends TMView
 
   private void deleteMatch(MatchEntry match)
   {
-    List<MatchEntry> matchesInCategory = MatchService.getInstance()
-            .findMatch(match.getMatchEntryPK());
-
-    if (matchesInCategory.isEmpty())
+    try
     {
-      try
-      {
-        MatchService.getInstance().deleteMatch(match);
+      MatchService.getInstance().deleteMatch(match);
 
-        Notification.show("Format successfully deleted.", 3000,
-                Position.BOTTOM_START);
-        updateView();
-      }
-      catch (Exception ex)
-      {
-        Exceptions.printStackTrace(ex);
-      }
-    }
-    else
-    {
-      Notification.show("Unable to delete match!", 3000,
+      Notification.show("Format successfully deleted.", 3000,
               Position.BOTTOM_START);
+      updateView();
+    }
+    catch (Exception ex)
+    {
+      Exceptions.printStackTrace(ex);
     }
   }
 }
