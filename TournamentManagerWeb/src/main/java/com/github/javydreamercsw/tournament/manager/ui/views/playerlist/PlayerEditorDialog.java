@@ -18,12 +18,11 @@ package com.github.javydreamercsw.tournament.manager.ui.views.playerlist;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.PlayerService;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.validator.StringLengthValidator;
-
-import com.github.javydreamercsw.database.storage.db.Player;
 
 /**
  * A dialog for editing {@link Format} objects.

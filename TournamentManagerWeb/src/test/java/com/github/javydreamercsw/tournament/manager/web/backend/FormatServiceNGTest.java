@@ -7,30 +7,49 @@ import static org.testng.Assert.fail;
 
 import java.util.stream.Stream;
 
+import org.openide.util.Exceptions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.Game;
+import com.github.javydreamercsw.database.storage.db.server.FormatService;
+import com.github.javydreamercsw.database.storage.db.server.GameService;
 
 public class FormatServiceNGTest extends BaseTestCase
 {
+  private Game game = new Game("Test");
+
   @BeforeClass
   @Override
-  public void setup(){
+  public void setup()
+  {
     super.setup();
+    GameService.getInstance().saveGame(game);
     Stream.of("Commander",
-              "Beatdown",
-              "Legacy",
-              "Standard",
-              "Draft")
-              .forEach(name ->
+            "Beatdown",
+            "Legacy",
+            "Standard",
+            "Draft")
+            .forEach(name ->
+            {
+              if (!FormatService.getInstance().findFormatByName(name).isPresent())
               {
-                if (!FormatService.getInstance().findFormatByName(name).isPresent())
+                try
                 {
-                  FormatService.getInstance().saveFormat(new Format(name));
+                  Format format = new Format(name);
+                  format.setGame(game);
+                  FormatService.getInstance().saveFormat(format);
                 }
-              });
+                catch (Exception ex)
+                {
+                  Exceptions.printStackTrace(ex);
+                  fail();
+                }
+              }
+            });
   }
+
   /**
    * Test of findFormats method, of class FormatService.
    */
@@ -82,19 +101,20 @@ public class FormatServiceNGTest extends BaseTestCase
     System.out.println("findCategoryById");
     assertNotNull(FormatService.getInstance()
             .findFormatById(FormatService.getInstance()
-                    .findFormatByName("Commander").get().getId()));
-
-    assertFalse(FormatService.getInstance().findFormatById(1000).isPresent());
+                    .findFormatByName("Commander").get().getFormatPK()));
   }
 
   /**
    * Test of deleteFormat method, of class FormatService.
+   *
+   * @throws java.lang.Exception
    */
   @Test
-  public void testDeleteFormat()
+  public void testDeleteFormat() throws Exception
   {
     System.out.println("deleteFormat");
     Format format = new Format("test");
+    format.setGame(game);
     assertEquals(FormatService.getInstance().findFormats("test").size(), 0);
     FormatService.getInstance().saveFormat(format);
     assertEquals(FormatService.getInstance().findFormats("test").size(), 1);

@@ -1,7 +1,6 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import org.openide.util.Exceptions;
@@ -60,13 +59,14 @@ public class GameService
     parameters.put("name", name);
 
     Game game = null;
-    List<Object> result
-            = DataBaseManager.namedQuery("Game.findByName", parameters);
-    if (!result.isEmpty())
+    for (Game g : gc.findGameEntities())
     {
-      game = (Game) result.get(0);
+      if (g.getName().equals(name))
+      {
+        game = g;
+        break;
+      }
     }
-
     return Optional.ofNullable(game);
   }
 

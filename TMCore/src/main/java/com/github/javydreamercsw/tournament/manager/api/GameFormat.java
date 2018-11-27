@@ -10,5 +10,12 @@ public interface GameFormat
    *
    * @return Format's name
    */
-  String getName();
+  public String getName();
+
+  /**
+   * Get format's description.
+   *
+   * @return Format's description.
+   */
+  public String getDescription();
 }

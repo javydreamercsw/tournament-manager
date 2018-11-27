@@ -18,14 +18,13 @@ package com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.server.TournamentService;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.TournamentService;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
-
-import com.github.javydreamercsw.database.storage.db.Format;
-import com.github.javydreamercsw.database.storage.db.Tournament;
 
 /**
  * A dialog for editing {@link Format} objects.

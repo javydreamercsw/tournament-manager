@@ -120,6 +120,11 @@
             <artifactId>markdown-area</artifactId>
             <version>1.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>MTG</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -129,6 +134,37 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
             </plugin>
+            <!-- Run annotation processors on src/main/java sources -->
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>3.3.3</version>
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration> 
+                    <webResources> 
+                        <resource> 
+                            <directory>${project.build.directory}/generated-sources</directory> 
+                            <targetPath>META-INF</targetPath>
+                            <includes> 
+                                <include>*.class</include> 
+                            </includes> 
+                        </resource> 
+                    </webResources> 
+                </configuration> 
+            </plugin> 
         </plugins>
     </build>
 

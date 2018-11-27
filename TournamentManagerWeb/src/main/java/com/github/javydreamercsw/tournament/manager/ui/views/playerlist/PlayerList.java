@@ -17,9 +17,14 @@ package com.github.javydreamercsw.tournament.manager.ui.views.playerlist;
 
 import java.util.List;
 
+import org.openide.util.Exceptions;
+
+import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Record;
+import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.PlayerService;
+import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
@@ -35,16 +40,13 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import com.github.javydreamercsw.database.storage.db.Player;
-import com.github.javydreamercsw.database.storage.db.Record;
-
 /**
  * Displays the list of available formats, with a search filter as well as
  * buttons to add a new format or edit existing ones.
  */
 @Route(value = "players", layout = MainLayout.class)
 @PageTitle("Player List")
-public class PlayerList extends VerticalLayout
+public class PlayerList extends TMView
 {
   private static final long serialVersionUID = -2389907069192934700L;
 
@@ -153,7 +155,8 @@ public class PlayerList extends VerticalLayout
     return Integer.toString(losses);
   }
 
-  private void updateView()
+  @Override
+  public void updateView()
   {
     List<Player> players = PlayerService.getInstance()
             .findPlayers(searchField.getValue());
@@ -172,12 +175,21 @@ public class PlayerList extends VerticalLayout
   private void savePlayer(Player player,
           AbstractEditorDialog.Operation operation)
   {
-    PlayerService.getInstance().savePlayer(player);
-
-    Notification.show(
-            "Player successfully " + operation.getNameInText() + "ed.",
-            3000, Position.BOTTOM_START);
-    updateView();
+    try
+    {
+      PlayerService.getInstance().savePlayer(player);
+      
+      Notification.show(
+              "Player successfully " + operation.getNameInText() + "ed.",
+              3000, Position.BOTTOM_START);
+      updateView();
+    }
+    catch (Exception ex)
+    {
+      Exceptions.printStackTrace(ex);
+      Notification.show("Unable to save player!", 3000,
+              Position.BOTTOM_START);
+    }
   }
 
   private void deletePlayer(Player player)

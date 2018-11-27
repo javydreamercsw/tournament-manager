@@ -5,21 +5,19 @@ package com.github.javydreamercsw.tournament.manager.api;
 
 import java.util.List;
 
-public interface Game
+public interface IGame
 {
   /**
    * Get game's name.
    *
-   * @return Game's name
+   * @return IGame's name
    */
   String getName();
 
   /**
    * Get a list of formats for this game.
    *
-   * @return Game formats.
+   * @return IGame formats.
    */
   List<GameFormat> gameFormats();
-  
-  
 }

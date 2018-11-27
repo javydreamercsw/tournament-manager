@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
 
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.FormatPK;
@@ -75,29 +74,39 @@ public class FormatService
     final String normalizedFilter = filter.toLowerCase();
     List<Format> results = new ArrayList<>();
 
-    Game game = Lookup.getDefault().lookup(Game.class);
+    // Must be for tests or other low level checks.
+    fc.findFormatEntities().forEach(format ->
+    {
+      if (format.getName().toLowerCase().contains(normalizedFilter))
+      {
+        results.add(format);
+      }
+    });
+    return results;
+  }
+
+  /**
+   * Searches for the exact category whose name matches the given filter text.
+   * The matching is case insensitive.
+   *
+   * @param game Game to search for
+   * @return a list of formats for the specified game.
+   * @throws IllegalStateException if the result is ambiguous
+   */
+  public List<Format> findFormatByGame(String game)
+  {
+    ArrayList<Format> result = new ArrayList<>();
+
     if (game != null)
     {
-      findFormatByGame(game).forEach(format ->
+      Optional<Game> g = GameService.getInstance().findGameByName(game);
+      if (g.isPresent())
       {
-        if (format.getName().toLowerCase().contains(normalizedFilter))
-        {
-          results.add(format);
-        }
-      });
+        result.addAll(g.get().getFormatList());
+      }
     }
-    else
-    {
-      // Must be for tests or other low level checks.
-      fc.findFormatEntities().forEach(format ->
-      {
-        if (format.getName().toLowerCase().contains(normalizedFilter))
-        {
-          results.add(format);
-        }
-      });
-    }
-    return results;
+
+    return result;
   }
 
   /**
@@ -115,11 +124,7 @@ public class FormatService
 
     if (game != null)
     {
-      Optional<Game> g = GameService.getInstance().findGameByName(game.getName());
-      if (g.isPresent())
-      {
-        result.addAll(g.get().getFormatList());
-      }
+      result.addAll(findFormatByGame(game.getName()));
     }
     return result;
   }
@@ -213,6 +218,27 @@ public class FormatService
     else
     {
       fc.create(format);
+    }
+  }
+
+  public Optional<Format> findFormatForGame(String game, String format)
+  {
+    Format result = null;
+    for (Format f : findFormatByGame(game))
+    {
+      if (f.getName().equals(format))
+      {
+        result = f;
+        break;
+      }
+    }
+    if (result == null)
+    {
+      return Optional.empty();
+    }
+    else
+    {
+      return Optional.of(result);
     }
   }
 }

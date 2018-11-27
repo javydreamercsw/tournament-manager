@@ -5,10 +5,12 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
+import org.openide.util.Exceptions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 
 public class PlayerServiceNGTest extends BaseTestCase
 {
@@ -16,16 +18,24 @@ public class PlayerServiceNGTest extends BaseTestCase
   @Override
   public void setup()
   {
-    super.setup();
-    System.out.println("Creating players...");
-    PlayerService.getInstance().findPlayers("").forEach(player ->
+    try
     {
-      PlayerService.getInstance().deletePlayer(player);
-    });
-    Player p1 = new Player("Player 1");
-    PlayerService.getInstance().savePlayer(p1);
-    Player p2 = new Player("Player 2");
-    PlayerService.getInstance().savePlayer(p2);
+      super.setup();
+      System.out.println("Creating players...");
+      PlayerService.getInstance().findPlayers("").forEach(player ->
+      {
+        PlayerService.getInstance().deletePlayer(player);
+      });
+      Player p1 = new Player("Player 1");
+      PlayerService.getInstance().savePlayer(p1);
+      Player p2 = new Player("Player 2");
+      PlayerService.getInstance().savePlayer(p2);
+    }
+    catch (Exception ex)
+    {
+      Exceptions.printStackTrace(ex);
+      fail();
+    }
   }
 
   /**

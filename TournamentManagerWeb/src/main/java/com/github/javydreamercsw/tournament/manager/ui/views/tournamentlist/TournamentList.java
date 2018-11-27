@@ -19,9 +19,11 @@ import java.util.List;
 
 import org.openide.util.Exceptions;
 
+import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.server.TournamentService;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.TournamentService;
+import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
@@ -37,15 +39,13 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import com.github.javydreamercsw.database.storage.db.Tournament;
-
 /**
  * Displays the list of available categories, with a search filter as well as
  * buttons to add a new category or edit existing ones.
  */
 @Route(value = "tournaments", layout = MainLayout.class)
 @PageTitle("Tournament List")
-public class TournamentList extends VerticalLayout
+public class TournamentList extends TMView
 {
   private static final long serialVersionUID = -2389907069192934700L;
 
@@ -62,8 +62,6 @@ public class TournamentList extends VerticalLayout
 
     addSearchBar();
     addContent();
-
-    updateView();
   }
 
   private void initView()
@@ -132,7 +130,8 @@ public class TournamentList extends VerticalLayout
     return edit;
   }
 
-  private void updateView()
+  @Override
+  public void updateView()
   {
     List<Tournament> matches = TournamentService.getInstance()
             .findTournaments(searchField.getValue());

@@ -19,16 +19,15 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.server.TeamService;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.TeamService;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeListener;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
-
-import com.github.javydreamercsw.database.storage.db.Format;
-import com.github.javydreamercsw.database.storage.db.MatchEntry;
-import com.github.javydreamercsw.database.storage.db.Team;
 
 /**
  * A dialog for editing {@link Format} objects.

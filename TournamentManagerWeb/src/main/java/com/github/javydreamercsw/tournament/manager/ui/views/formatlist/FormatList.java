@@ -15,12 +15,18 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.formatlist;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.openide.util.Exceptions;
+
+import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.server.FormatService;
+import com.github.javydreamercsw.database.storage.db.server.MatchService;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
-import com.github.javydreamercsw.tournament.manager.web.backend.FormatService;
-import com.github.javydreamercsw.tournament.manager.web.backend.MatchService;
+import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
@@ -36,16 +42,13 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import com.github.javydreamercsw.database.storage.db.Format;
-import com.github.javydreamercsw.database.storage.db.MatchEntry;
-
 /**
  * Displays the list of available formats, with a search filter as well as
  * buttons to add a new format or edit existing ones.
  */
 @Route(value = "formats", layout = MainLayout.class)
 @PageTitle("Format List")
-public class FormatList extends VerticalLayout
+public class FormatList extends TMView
 {
   private static final long serialVersionUID = -2389907069192934700L;
 
@@ -62,8 +65,6 @@ public class FormatList extends VerticalLayout
 
     addSearchBar();
     addContent();
-
-    updateView();
   }
 
   private void initView()
@@ -127,10 +128,18 @@ public class FormatList extends VerticalLayout
     return Integer.toString(matchesInCategory.size());
   }
 
-  private void updateView()
+  @Override
+  public void updateView()
   {
-    List<Format> formats = FormatService.getInstance()
-            .findFormats(searchField.getValue());
+    List<Format> formats = new ArrayList<>();
+    FormatService.getInstance()
+            .findFormatByGame((String) getValue(CURRENT_GAME)).forEach(format ->
+    {
+      if (format.getGame().getName().equals((String) getValue(CURRENT_GAME)))
+      {
+        formats.add(format);
+      }
+    });
     grid.setItems(formats);
 
     if (searchField.getValue().length() > 0)
@@ -143,15 +152,24 @@ public class FormatList extends VerticalLayout
     }
   }
 
-  private void saveFormat(Format category,
+  private void saveFormat(Format format,
           AbstractEditorDialog.Operation operation)
   {
-    FormatService.getInstance().saveFormat(category);
+    try
+    {
+      FormatService.getInstance().saveFormat(format);
 
-    Notification.show(
-            "Format successfully " + operation.getNameInText() + "ed.",
-            3000, Position.BOTTOM_START);
-    updateView();
+      Notification.show(
+              "Format successfully " + operation.getNameInText() + "ed.",
+              3000, Position.BOTTOM_START);
+      updateView();
+    }
+    catch (Exception ex)
+    {
+      Exceptions.printStackTrace(ex);
+      Notification.show("Unable to save format!", 3000,
+              Position.BOTTOM_START);
+    }
   }
 
   private void deleteFormat(Format category)

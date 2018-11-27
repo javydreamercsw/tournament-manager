@@ -2,9 +2,11 @@ package com.github.javydreamercsw.tournament.manager.web.backend;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.fail;
 
 import java.util.List;
 
+import org.openide.util.Exceptions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -12,6 +14,11 @@ import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.server.FormatService;
+import com.github.javydreamercsw.database.storage.db.server.MatchService;
+import com.github.javydreamercsw.database.storage.db.server.PlayerService;
+import com.github.javydreamercsw.database.storage.db.server.TeamService;
+import com.github.javydreamercsw.database.storage.db.server.TournamentService;
 
 public class MatchServiceNGTest extends BaseTestCase
 {
@@ -19,12 +26,20 @@ public class MatchServiceNGTest extends BaseTestCase
   @Override
   public void setup()
   {
-    super.setup();
-    System.out.println("Creating players...");
-    Player p1 = new Player("Player 1");
-    PlayerService.getInstance().savePlayer(p1);
-    Player p2 = new Player("Player 2");
-    PlayerService.getInstance().savePlayer(p2);
+    try
+    {
+      super.setup();
+      System.out.println("Creating players...");
+      Player p1 = new Player("Player 1");
+      PlayerService.getInstance().savePlayer(p1);
+      Player p2 = new Player("Player 2");
+      PlayerService.getInstance().savePlayer(p2);
+    }
+    catch (Exception ex)
+    {
+      Exceptions.printStackTrace(ex);
+      fail();
+    }
   }
 
   /**
@@ -61,7 +76,7 @@ public class MatchServiceNGTest extends BaseTestCase
             .getInstance().findFormats("").get(0).getName()).size(), 1);
     assertEquals(MatchService.getInstance().findMatchesWithFormat(FormatService
             .getInstance().findFormats("").get(1).getName()).size(), 0);
-    
+
     assertFalse(MatchService.getInstance().findMatch(match.getMatchEntryPK()).isEmpty());
   }
 }
