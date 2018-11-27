@@ -28,12 +28,8 @@ public abstract class TMView extends VerticalLayout
 
   protected final void saveValue(String key, String value)
   {
-    // Save to HttpSession
     VaadinService.getCurrentRequest().getWrappedSession()
             .setAttribute(key, value);
-
-    // Show new values
-    showValue(key);
   }
 
   protected final void showValue(String key)
