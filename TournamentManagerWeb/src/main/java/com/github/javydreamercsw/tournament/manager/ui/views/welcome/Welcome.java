@@ -24,7 +24,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value = "", layout = MainLayout.class)
-@PageTitle("Tournament List")
+@PageTitle("Welcome")
 public class Welcome extends TMView
 {
   private static final long serialVersionUID = 1252548231807630022L;
