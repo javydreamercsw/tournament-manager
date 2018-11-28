@@ -93,10 +93,6 @@ public class MatchService
 
   public void saveMatch(MatchEntry match) throws Exception
   {
-    if (match.getFormat() != null)
-    {
-      FormatService.getInstance().saveFormat(match.getFormat());
-    }
     if (match.getMatchEntryPK() != null
             && mc.findMatchEntry(match.getMatchEntryPK()) != null)
     {

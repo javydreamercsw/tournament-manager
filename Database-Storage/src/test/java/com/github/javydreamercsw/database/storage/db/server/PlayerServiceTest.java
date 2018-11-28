@@ -1,13 +1,16 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Player;
-import com.github.javydreamercsw.database.storage.db.Team;
 
 /**
  *
@@ -15,35 +18,83 @@ import com.github.javydreamercsw.database.storage.db.Team;
  */
 public class PlayerServiceTest extends AbstractServerTest
 {
-
-  public PlayerServiceTest()
+  
+   @BeforeClass
+  @Override
+  public void setup()
   {
+    try
+    {
+      super.setup();
+      System.out.println("Creating players...");
+      PlayerService.getInstance().findPlayers("").forEach(player ->
+      {
+        PlayerService.getInstance().deletePlayer(player);
+      });
+      Player p1 = new Player("Player 1");
+      PlayerService.getInstance().savePlayer(p1);
+      Player p2 = new Player("Player 2");
+      PlayerService.getInstance().savePlayer(p2);
+    }
+    catch (Exception ex)
+    {
+      Exceptions.printStackTrace(ex);
+      fail();
+    }
   }
 
   /**
-   * Test of write2DB method, of class PlayerServer.
-   *
-   * @throws java.lang.Exception
+   * Test of findPlayers method, of class PlayerService.
    */
   @Test
-  public void testPlayerService() throws Exception
+  public void testFindPlayers()
   {
-    System.out.println("write2DB");
-    Player player = new Player("Test");
-    PlayerService.getInstance().savePlayer(player);
+    System.out.println("findPlayers");
+    assertEquals(2,
+            PlayerService.getInstance().findPlayers("").size());
+  }
 
-    assertTrue(player.getId() > 0);
-    assertEquals(0, player.getTeamList().size());
-    assertEquals(1, player.getRecordList().size());
+  /**
+   * Test of findPlayerByName method, of class PlayerService.
+   */
+  @Test
+  public void testFindPlayersByName()
+  {
+    System.out.println("findPlayerByName");
+    assertNotNull(PlayerService.getInstance().findPlayerByName("Player 1").get());
+    assertFalse(PlayerService.getInstance().findPlayerByName("Player").isPresent());
+  }
 
-    Player player2 = new Player("Test 2");
-    PlayerService.getInstance().savePlayer(player2);
+  /**
+   * Test of findNameOrThrow method, of class PlayerService.
+   */
+  @Test
+  public void testFindNameOrThrow()
+  {
+    System.out.println("findNameOrThrow");
+    assertNotNull(PlayerService.getInstance().findNameOrThrow("Player 1"));
+    try
+    {
+      assertNotNull(PlayerService.getInstance().findNameOrThrow("Player"));
+      fail("Expected failure!");
+    }
+    catch (IllegalStateException ex)
+    {
+      //Expected
+    }
+  }
 
-    Team team = new Team("Test Team");
-    TeamService.getInstance().saveTeam(team);
-    TeamService.getInstance().addMembers(team, player, player2);
+  /**
+   * Test of findPlayerById method, of class PlayerService.
+   */
+  @Test
+  public void testFindPlayerById()
+  {
+    System.out.println("findPlayerById");
+    Player p = PlayerService.getInstance().findPlayerByName("Player 1").get();
+    assertNotNull(p);
+    assertNotNull(PlayerService.getInstance().findPlayerById(p.getId()).get());
 
-    assertEquals(1, player.getTeamList().size());
-    assertEquals(1, player2.getTeamList().size());
+    assertFalse(PlayerService.getInstance().findPlayerById(100).isPresent());
   }
 }

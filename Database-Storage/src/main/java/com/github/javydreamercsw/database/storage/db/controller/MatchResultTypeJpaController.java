@@ -1,5 +1,7 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +18,12 @@ import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-public class MatchResultTypeJpaController implements Serializable
+public class MatchResultTypeJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -8326151340449588898L;
   public MatchResultTypeJpaController(EntityManagerFactory emf)
   {
-    this.emf = emf;
-  }
-  private EntityManagerFactory emf = null;
-
-  public EntityManager getEntityManager()
-  {
-    return emf.createEntityManager();
+    super(emf);
   }
 
   public void create(MatchResultType matchResultType)

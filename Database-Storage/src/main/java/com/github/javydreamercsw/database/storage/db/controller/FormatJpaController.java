@@ -1,17 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db.controller;
+
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
@@ -21,21 +18,13 @@ import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
-public class FormatJpaController implements Serializable
+public class FormatJpaController extends AbstractController implements Serializable
 {
+  private static final long serialVersionUID = 3999624860758827889L;
+
   public FormatJpaController(EntityManagerFactory emf)
   {
-    this.emf = emf;
-  }
-  private EntityManagerFactory emf = null;
-
-  public EntityManager getEntityManager()
-  {
-    return emf.createEntityManager();
+    super(emf);
   }
 
   public void create(Format format) throws PreexistingEntityException, Exception
@@ -227,5 +216,5 @@ public class FormatJpaController implements Serializable
       em.close();
     }
   }
-  
+
 }

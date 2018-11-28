@@ -1,5 +1,7 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +13,6 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
@@ -20,19 +21,13 @@ import com.github.javydreamercsw.database.storage.db.controller.exceptions.Illeg
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
-public class MatchEntryJpaController implements Serializable
+public class MatchEntryJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = 5498996151312014506L;
 
   public MatchEntryJpaController(EntityManagerFactory emf)
   {
-    this.emf = emf;
-  }
-  private EntityManagerFactory emf = null;
-
-  public EntityManager getEntityManager()
-  {
-    return emf.createEntityManager();
+    super(emf);
   }
 
   public void create(MatchEntry matchEntry) throws PreexistingEntityException, Exception
@@ -51,16 +46,10 @@ public class MatchEntryJpaController implements Serializable
       em = getEntityManager();
       em.getTransaction().begin();
       Round round = matchEntry.getRound();
-      Format format = matchEntry.getFormat();
       if (round != null)
       {
         round = em.getReference(round.getClass(), round.getRoundPK());
         matchEntry.setRound(round);
-      }
-      if (format != null)
-      {
-        format = em.getReference(format.getClass(), format.getFormatPK());
-        matchEntry.setFormat(format);
       }
       List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<>();
       for (MatchHasTeam matchHasTeamListMatchHasTeamToAttach : matchEntry.getMatchHasTeamList())
@@ -74,11 +63,6 @@ public class MatchEntryJpaController implements Serializable
       {
         round.getMatchEntryList().add(matchEntry);
         round = em.merge(round);
-      }
-      if (format != null)
-      {
-        format = em.getReference(format.getClass(), format.getFormatPK());
-        format = em.merge(format);
       }
       for (MatchHasTeam matchHasTeamListMatchHasTeam : matchEntry.getMatchHasTeamList())
       {
@@ -120,8 +104,6 @@ public class MatchEntryJpaController implements Serializable
       MatchEntry persistentMatchEntry = em.find(MatchEntry.class, matchEntry.getMatchEntryPK());
       Round roundOld = persistentMatchEntry.getRound();
       Round roundNew = matchEntry.getRound();
-      Format formatNew = matchEntry.getFormat();
-      Format formatOld = persistentMatchEntry.getFormat();
       List<MatchHasTeam> matchHasTeamListOld = persistentMatchEntry.getMatchHasTeamList();
       List<MatchHasTeam> matchHasTeamListNew = matchEntry.getMatchHasTeamList();
       List<String> illegalOrphanMessages = null;
@@ -145,11 +127,6 @@ public class MatchEntryJpaController implements Serializable
         roundNew = em.getReference(roundNew.getClass(), roundNew.getRoundPK());
         matchEntry.setRound(roundNew);
       }
-      if (formatNew != null)
-      {
-        formatNew = em.getReference(formatNew.getClass(), formatNew.getFormatPK());
-        matchEntry.setFormat(formatNew);
-      }
       List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<>();
       for (MatchHasTeam matchHasTeamListNewMatchHasTeamToAttach : matchHasTeamListNew)
       {
@@ -168,10 +145,6 @@ public class MatchEntryJpaController implements Serializable
       {
         roundNew.getMatchEntryList().add(matchEntry);
         roundNew = em.merge(roundNew);
-      }
-      if (formatNew != null && !formatNew.equals(formatOld))
-      {
-        formatNew = em.merge(formatNew);
       }
       for (MatchHasTeam matchHasTeamListNewMatchHasTeam : matchHasTeamListNew)
       {
@@ -320,5 +293,5 @@ public class MatchEntryJpaController implements Serializable
       em.close();
     }
   }
-
+  
 }

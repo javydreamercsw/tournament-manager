@@ -1,5 +1,7 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,18 +20,12 @@ import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
-public class RoundJpaController implements Serializable
+public class RoundJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -6387501653143947641L;
   public RoundJpaController(EntityManagerFactory emf)
   {
-    this.emf = emf;
-  }
-  private EntityManagerFactory emf = null;
-
-  public EntityManager getEntityManager()
-  {
-    return emf.createEntityManager();
+    super(emf);
   }
 
   public void create(Round round) throws PreexistingEntityException, Exception

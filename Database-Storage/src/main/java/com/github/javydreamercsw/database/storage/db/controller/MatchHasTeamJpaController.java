@@ -1,5 +1,7 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -18,19 +20,13 @@ import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
-public class MatchHasTeamJpaController implements Serializable
+public class MatchHasTeamJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -2927053439134199404L;
 
   public MatchHasTeamJpaController(EntityManagerFactory emf)
   {
-    this.emf = emf;
-  }
-  private EntityManagerFactory emf = null;
-
-  public EntityManager getEntityManager()
-  {
-    return emf.createEntityManager();
+    super(emf);
   }
 
   public void create(MatchHasTeam matchHasTeam) throws PreexistingEntityException, Exception

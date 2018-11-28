@@ -20,11 +20,6 @@ import com.github.javydreamercsw.tournament.manager.api.TournamentException;
  */
 public class MatchServiceTest extends AbstractServerTest
 {
-
-  public MatchServiceTest()
-  {
-  }
-
   /**
    * Test of write2DB method, of class MatchServer.
    *

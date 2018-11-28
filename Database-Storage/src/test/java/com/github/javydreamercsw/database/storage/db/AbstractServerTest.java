@@ -1,8 +1,9 @@
 package com.github.javydreamercsw.database.storage.db;
 
-import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 
-import org.junit.Before;
+import org.testng.annotations.BeforeClass;
+
+import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 
 /**
  *
@@ -13,8 +14,8 @@ public class AbstractServerTest {
     public AbstractServerTest() {
     }
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public void setup() {
         DataBaseManager.setPersistenceUnitName("TestTMPU");
     }
 }

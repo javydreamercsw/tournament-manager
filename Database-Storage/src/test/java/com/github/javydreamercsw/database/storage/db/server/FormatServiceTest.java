@@ -1,4 +1,5 @@
-package com.github.javydreamercsw.tournament.manager.web.backend;
+package com.github.javydreamercsw.database.storage.db.server;
+
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -11,12 +12,11 @@ import org.openide.util.Exceptions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
-import com.github.javydreamercsw.database.storage.db.server.FormatService;
-import com.github.javydreamercsw.database.storage.db.server.GameService;
 
-public class FormatServiceNGTest extends BaseTestCase
+public class FormatServiceTest extends AbstractServerTest
 {
   private Game game = new Game("Test");
 

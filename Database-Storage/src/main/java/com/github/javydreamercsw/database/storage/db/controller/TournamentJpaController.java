@@ -1,5 +1,7 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +19,12 @@ import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-public class TournamentJpaController implements Serializable
+public class TournamentJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -3241408395907726172L;
   public TournamentJpaController(EntityManagerFactory emf)
   {
-    this.emf = emf;
-  }
-  private EntityManagerFactory emf = null;
-
-  public EntityManager getEntityManager()
-  {
-    return emf.createEntityManager();
+    super(emf);
   }
 
   public void create(Tournament tournament)
