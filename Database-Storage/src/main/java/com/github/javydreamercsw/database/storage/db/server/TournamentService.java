@@ -15,10 +15,6 @@ import com.github.javydreamercsw.database.storage.db.controller.TournamentJpaCon
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 public class TournamentService
 {
   private TournamentJpaController tc

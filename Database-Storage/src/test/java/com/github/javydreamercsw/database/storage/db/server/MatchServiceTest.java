@@ -50,6 +50,9 @@ public class MatchServiceTest extends AbstractServerTest
     me.setRound(t.getRoundList().get(0));
 
     MatchService.getInstance().saveMatch(me);
+    
+    assertNotNull(me.getFormat());
+    assertNotNull(MatchService.getInstance().findMatches().get(0).getFormat());
 
     // Add teams
     Player player = new Player("Player 1");
@@ -70,7 +73,5 @@ public class MatchServiceTest extends AbstractServerTest
         fail();
       }
     });
-    
-    assertNotNull(MatchService.getInstance().findMatches().get(0).getFormat());
   }
 }

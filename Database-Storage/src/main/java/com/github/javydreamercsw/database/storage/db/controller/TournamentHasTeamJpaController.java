@@ -1,38 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
-
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import com.github.javydreamercsw.database.storage.db.Team;
-import com.github.javydreamercsw.database.storage.db.Tournament;
-import com.github.javydreamercsw.database.storage.db.Record;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
+import com.github.javydreamercsw.database.storage.db.Record;
+import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeamPK;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 public class TournamentHasTeamJpaController implements Serializable
 {
+  private static final long serialVersionUID = 2347531178226564949L;
   public TournamentHasTeamJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -52,7 +41,7 @@ public class TournamentHasTeamJpaController implements Serializable
     }
     if (tournamentHasTeam.getRecordList() == null)
     {
-      tournamentHasTeam.setRecordList(new ArrayList<Record>());
+      tournamentHasTeam.setRecordList(new ArrayList<>());
     }
     tournamentHasTeam.getTournamentHasTeamPK().setTournamentId(tournamentHasTeam.getTournament().getId());
     tournamentHasTeam.getTournamentHasTeamPK().setTeamId(tournamentHasTeam.getTeam().getId());
@@ -73,7 +62,7 @@ public class TournamentHasTeamJpaController implements Serializable
         tournament = em.getReference(tournament.getClass(), tournament.getId());
         tournamentHasTeam.setTournament(tournament);
       }
-      List<Record> attachedRecordList = new ArrayList<Record>();
+      List<Record> attachedRecordList = new ArrayList<>();
       for (Record recordListRecordToAttach : tournamentHasTeam.getRecordList())
       {
         recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getId());
@@ -141,7 +130,7 @@ public class TournamentHasTeamJpaController implements Serializable
         tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getId());
         tournamentHasTeam.setTournament(tournamentNew);
       }
-      List<Record> attachedRecordListNew = new ArrayList<Record>();
+      List<Record> attachedRecordListNew = new ArrayList<>();
       for (Record recordListNewRecordToAttach : recordListNew)
       {
         recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getId());

@@ -18,10 +18,6 @@ import com.github.javydreamercsw.database.storage.db.controller.MatchResultTypeJ
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 public class MatchService
 {
   private MatchEntryJpaController mc
@@ -97,21 +93,10 @@ public class MatchService
 
   public void saveMatch(MatchEntry match) throws Exception
   {
-    match.getMatchHasTeamList().forEach(mht ->
+    if (match.getFormat() != null)
     {
-      if (mht.getMatchHasTeamPK() == null)
-      {
-        try
-        {
-          // Needs to be created
-          mhtc.create(mht);
-        }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
-      }
-    });
+      FormatService.getInstance().saveFormat(match.getFormat());
+    }
     if (match.getMatchEntryPK() != null
             && mc.findMatchEntry(match.getMatchEntryPK()) != null)
     {

@@ -1,35 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
-
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import com.github.javydreamercsw.database.storage.db.Format;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
+import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 public class GameJpaController implements Serializable
 {
+  private static final long serialVersionUID = -3638967753299400612L;
   public GameJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -45,14 +34,14 @@ public class GameJpaController implements Serializable
   {
     if (game.getFormatList() == null)
     {
-      game.setFormatList(new ArrayList<Format>());
+      game.setFormatList(new ArrayList<>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<Format> attachedFormatList = new ArrayList<Format>();
+      List<Format> attachedFormatList = new ArrayList<>();
       for (Format formatListFormatToAttach : game.getFormatList())
       {
         formatListFormatToAttach = em.getReference(formatListFormatToAttach.getClass(), formatListFormatToAttach.getFormatPK());
@@ -99,7 +88,7 @@ public class GameJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<String>();
+            illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain Format " + formatListOldFormat + " since its game field is not nullable.");
         }
@@ -108,7 +97,7 @@ public class GameJpaController implements Serializable
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
-      List<Format> attachedFormatListNew = new ArrayList<Format>();
+      List<Format> attachedFormatListNew = new ArrayList<>();
       for (Format formatListNewFormatToAttach : formatListNew)
       {
         formatListNewFormatToAttach = em.getReference(formatListNewFormatToAttach.getClass(), formatListNewFormatToAttach.getFormatPK());
@@ -178,7 +167,7 @@ public class GameJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<String>();
+          illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This Game (" + game + ") cannot be destroyed since the Format " + formatListOrphanCheckFormat + " in its formatList field has a non-nullable game field.");
       }
