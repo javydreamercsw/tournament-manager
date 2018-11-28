@@ -97,39 +97,29 @@ public class MatchService
 
   public void saveMatch(MatchEntry match) throws Exception
   {
+    match.getMatchHasTeamList().forEach(mht ->
+    {
+      if (mht.getMatchHasTeamPK() == null)
+      {
+        try
+        {
+          // Needs to be created
+          mhtc.create(mht);
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+    });
     if (match.getMatchEntryPK() != null
             && mc.findMatchEntry(match.getMatchEntryPK()) != null)
     {
-      match.getMatchHasTeamList().forEach(mht ->
-      {
-        if (mht.getMatchHasTeamPK() == null)
-        {
-          try
-          {
-            // Needs to be created
-            mhtc.create(mht);
-          }
-          catch (Exception ex)
-          {
-            Exceptions.printStackTrace(ex);
-          }
-        }
-      });
       mc.edit(match);
     }
     else
     {
-      // Remove the teams since the entry needs to exist first
-      List<Team> teams = new ArrayList<>();
-      match.getMatchHasTeamList().forEach(mht -> teams.add(mht.getTeam()));
-      match.getMatchHasTeamList().clear();
       mc.create(match);
-
-      // Now add the teams
-      for (Team team : teams)
-      {
-        addTeam(match, team);
-      }
     }
   }
 
@@ -137,6 +127,10 @@ public class MatchService
   {
     try
     {
+      for (MatchHasTeam mht : match.getMatchHasTeamList())
+      {
+        mhtc.destroy(mht.getMatchHasTeamPK());
+      }
       mc.destroy(match.getMatchEntryPK());
     }
     catch (IllegalOrphanException | NonexistentEntityException ex)

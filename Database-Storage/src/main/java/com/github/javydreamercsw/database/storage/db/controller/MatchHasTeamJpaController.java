@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
@@ -5,8 +10,8 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
@@ -18,9 +23,12 @@ import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
+/**
+ *
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
+ */
 public class MatchHasTeamJpaController implements Serializable
 {
-  private static final long serialVersionUID = -2927053439134199404L;
   public MatchHasTeamJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -38,10 +46,10 @@ public class MatchHasTeamJpaController implements Serializable
     {
       matchHasTeam.setMatchHasTeamPK(new MatchHasTeamPK());
     }
+    matchHasTeam.getMatchHasTeamPK().setMatchId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
     matchHasTeam.getMatchHasTeamPK().setMatchResultMatchResultTypeId(matchHasTeam.getMatchResult().getMatchResultPK().getMatchResultTypeId());
     matchHasTeam.getMatchHasTeamPK().setTeamId(matchHasTeam.getTeam().getId());
     matchHasTeam.getMatchHasTeamPK().setMatchResultId(matchHasTeam.getMatchResult().getMatchResultPK().getId());
-    matchHasTeam.getMatchHasTeamPK().setMatchId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
     EntityManager em = null;
     try
     {
@@ -102,10 +110,10 @@ public class MatchHasTeamJpaController implements Serializable
 
   public void edit(MatchHasTeam matchHasTeam) throws NonexistentEntityException, Exception
   {
+    matchHasTeam.getMatchHasTeamPK().setMatchId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
     matchHasTeam.getMatchHasTeamPK().setMatchResultMatchResultTypeId(matchHasTeam.getMatchResult().getMatchResultPK().getMatchResultTypeId());
     matchHasTeam.getMatchHasTeamPK().setTeamId(matchHasTeam.getTeam().getId());
     matchHasTeam.getMatchHasTeamPK().setMatchResultId(matchHasTeam.getMatchResult().getMatchResultPK().getId());
-    matchHasTeam.getMatchHasTeamPK().setMatchId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
     EntityManager em = null;
     try
     {

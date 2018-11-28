@@ -1,24 +1,35 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
+
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import com.github.javydreamercsw.database.storage.db.MatchResult;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
-import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
+/**
+ *
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
+ */
 public class MatchResultTypeJpaController implements Serializable
 {
-  private static final long serialVersionUID = -8326151340449588898L;
   public MatchResultTypeJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -34,14 +45,14 @@ public class MatchResultTypeJpaController implements Serializable
   {
     if (matchResultType.getMatchResultList() == null)
     {
-      matchResultType.setMatchResultList(new ArrayList<>());
+      matchResultType.setMatchResultList(new ArrayList<MatchResult>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<MatchResult> attachedMatchResultList = new ArrayList<>();
+      List<MatchResult> attachedMatchResultList = new ArrayList<MatchResult>();
       for (MatchResult matchResultListMatchResultToAttach : matchResultType.getMatchResultList())
       {
         matchResultListMatchResultToAttach = em.getReference(matchResultListMatchResultToAttach.getClass(), matchResultListMatchResultToAttach.getMatchResultPK());
@@ -88,7 +99,7 @@ public class MatchResultTypeJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<>();
+            illegalOrphanMessages = new ArrayList<String>();
           }
           illegalOrphanMessages.add("You must retain MatchResult " + matchResultListOldMatchResult + " since its matchResultType field is not nullable.");
         }
@@ -97,7 +108,7 @@ public class MatchResultTypeJpaController implements Serializable
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
-      List<MatchResult> attachedMatchResultListNew = new ArrayList<>();
+      List<MatchResult> attachedMatchResultListNew = new ArrayList<MatchResult>();
       for (MatchResult matchResultListNewMatchResultToAttach : matchResultListNew)
       {
         matchResultListNewMatchResultToAttach = em.getReference(matchResultListNewMatchResultToAttach.getClass(), matchResultListNewMatchResultToAttach.getMatchResultPK());
@@ -167,7 +178,7 @@ public class MatchResultTypeJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<>();
+          illegalOrphanMessages = new ArrayList<String>();
         }
         illegalOrphanMessages.add("This MatchResultType (" + matchResultType + ") cannot be destroyed since the MatchResult " + matchResultListOrphanCheckMatchResult + " in its matchResultList field has a non-nullable matchResultType field.");
       }

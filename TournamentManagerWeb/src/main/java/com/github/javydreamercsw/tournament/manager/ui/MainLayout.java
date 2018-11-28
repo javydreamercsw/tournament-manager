@@ -15,14 +15,28 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Random;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
+import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
+import com.github.javydreamercsw.database.storage.db.server.FormatService;
+import com.github.javydreamercsw.database.storage.db.server.MatchService;
 import com.github.javydreamercsw.database.storage.db.server.PlayerService;
+import com.github.javydreamercsw.database.storage.db.server.TeamService;
+import com.github.javydreamercsw.database.storage.db.server.TournamentService;
+import com.github.javydreamercsw.tournament.manager.api.IGame;
 import com.github.javydreamercsw.tournament.manager.ui.views.formatlist.FormatList;
 import com.github.javydreamercsw.tournament.manager.ui.views.matchlist.MatchList;
 import com.github.javydreamercsw.tournament.manager.ui.views.playerlist.PlayerList;
@@ -127,6 +141,43 @@ public class MainLayout extends Div
           Exceptions.printStackTrace(ex);
         }
       }
+
+      // Add a tournaments
+      for (int i = 0; i < 10; i++)
+      {
+        Tournament t = new Tournament("Tournament " + (i + 1));
+        t.setWinPoints(3);
+        t.setLossPoints(0);
+        t.setDrawPoints(1);
+        TournamentService.getInstance().saveTournament(t);
+      }
+
+      List<Team> teams = TeamService.getInstance().findTeams("");
+      List<Format> formatList = FormatService.getInstance()
+              .findFormatByGame(Lookup.getDefault().lookup(IGame.class).getName());
+      Random r = new Random();
+      // Add matches
+      for (int i = 0; i < 10; i++)
+      {
+        try
+        {
+          MatchEntry match = new MatchEntry();
+          match.setMatchDate(LocalDate.now());
+          MatchService.getInstance().saveMatch(match);
+          MatchService.getInstance().addTeam(match,
+                  teams.get(r.nextInt(teams.size())));
+          MatchService.getInstance().addTeam(match,
+                  teams.get(r.nextInt(teams.size())));
+          match.setFormat(FormatService.getInstance().findFormatById(formatList
+                  .get(r.nextInt(formatList.size())).getFormatPK()).get());
+          MatchService.getInstance().saveMatch(match);
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+
       Notification.show(
               "Loading demo data done!",
               3000, Position.MIDDLE);

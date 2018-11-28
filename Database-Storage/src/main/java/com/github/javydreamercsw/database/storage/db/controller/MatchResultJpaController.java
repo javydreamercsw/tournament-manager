@@ -1,26 +1,37 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
+
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import com.github.javydreamercsw.database.storage.db.MatchResultType;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
-import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultPK;
-import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
+/**
+ *
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
+ */
 public class MatchResultJpaController implements Serializable
 {
-  private static final long serialVersionUID = -4857066805022202452L;
   public MatchResultJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -40,7 +51,7 @@ public class MatchResultJpaController implements Serializable
     }
     if (matchResult.getMatchHasTeamList() == null)
     {
-      matchResult.setMatchHasTeamList(new ArrayList<>());
+      matchResult.setMatchHasTeamList(new ArrayList<MatchHasTeam>());
     }
     matchResult.getMatchResultPK().setMatchResultTypeId(matchResult.getMatchResultType().getId());
     EntityManager em = null;
@@ -54,7 +65,7 @@ public class MatchResultJpaController implements Serializable
         matchResultType = em.getReference(matchResultType.getClass(), matchResultType.getId());
         matchResult.setMatchResultType(matchResultType);
       }
-      List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<>();
+      List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<MatchHasTeam>();
       for (MatchHasTeam matchHasTeamListMatchHasTeamToAttach : matchResult.getMatchHasTeamList())
       {
         matchHasTeamListMatchHasTeamToAttach = em.getReference(matchHasTeamListMatchHasTeamToAttach.getClass(), matchHasTeamListMatchHasTeamToAttach.getMatchHasTeamPK());
@@ -115,7 +126,7 @@ public class MatchResultJpaController implements Serializable
         matchResultTypeNew = em.getReference(matchResultTypeNew.getClass(), matchResultTypeNew.getId());
         matchResult.setMatchResultType(matchResultTypeNew);
       }
-      List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<>();
+      List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<MatchHasTeam>();
       for (MatchHasTeam matchHasTeamListNewMatchHasTeamToAttach : matchHasTeamListNew)
       {
         matchHasTeamListNewMatchHasTeamToAttach = em.getReference(matchHasTeamListNewMatchHasTeamToAttach.getClass(), matchHasTeamListNewMatchHasTeamToAttach.getMatchHasTeamPK());

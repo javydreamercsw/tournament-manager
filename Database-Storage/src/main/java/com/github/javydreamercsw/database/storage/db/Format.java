@@ -1,9 +1,13 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -14,21 +18,21 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ *
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
+ */
 @Entity
 @Table(name = "format")
 @XmlRootElement
 @NamedQueries(
-        {
-          @NamedQuery(name = "Format.findAll", query = "SELECT f FROM Format f"),
-          @NamedQuery(name = "Format.findById",
-                  query = "SELECT f FROM Format f WHERE f.formatPK.id = :id"),
-          @NamedQuery(name = "Format.findByName",
-                  query = "SELECT f FROM Format f WHERE f.name = :name"),
-          @NamedQuery(name = "Format.findByDescription",
-                  query = "SELECT f FROM Format f WHERE f.description = :description"),
-          @NamedQuery(name = "Format.findByGameId",
-                  query = "SELECT f FROM Format f WHERE f.formatPK.gameId = :gameId")
-        })
+{
+  @NamedQuery(name = "Format.findAll", query = "SELECT f FROM Format f"),
+  @NamedQuery(name = "Format.findById", query = "SELECT f FROM Format f WHERE f.formatPK.id = :id"),
+  @NamedQuery(name = "Format.findByName", query = "SELECT f FROM Format f WHERE f.name = :name"),
+  @NamedQuery(name = "Format.findByDescription", query = "SELECT f FROM Format f WHERE f.description = :description"),
+  @NamedQuery(name = "Format.findByGameId", query = "SELECT f FROM Format f WHERE f.formatPK.gameId = :gameId")
+})
 public class Format implements Serializable
 {
   private static final long serialVersionUID = 1L;
@@ -39,9 +43,8 @@ public class Format implements Serializable
   private String name;
   @Column(name = "description")
   private String description;
-  @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false,
-          updatable = false)
-  @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false, updatable = false)
+  @ManyToOne(optional = false)
   private Game game;
 
   public Format()
@@ -120,14 +123,17 @@ public class Format implements Serializable
       return false;
     }
     Format other = (Format) object;
-    return !((this.formatPK == null && other.formatPK != null)
-            || (this.formatPK != null && !this.formatPK.equals(other.formatPK)));
+    if ((this.formatPK == null && other.formatPK != null) || (this.formatPK != null && !this.formatPK.equals(other.formatPK)))
+    {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.Format[ formatPK="
-            + formatPK + " ]";
+    return "com.github.javydreamercsw.database.storage.db.Format[ formatPK=" + formatPK + " ]";
   }
+  
 }

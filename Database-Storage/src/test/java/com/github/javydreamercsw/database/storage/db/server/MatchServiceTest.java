@@ -1,5 +1,6 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
@@ -69,5 +70,7 @@ public class MatchServiceTest extends AbstractServerTest
         fail();
       }
     });
+    
+    assertNotNull(MatchService.getInstance().findMatches().get(0).getFormat());
   }
 }

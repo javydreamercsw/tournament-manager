@@ -35,13 +35,15 @@ import javax.xml.bind.annotation.XmlRootElement;
         })
 public class MatchEntry implements Serializable
 {
+  @Basic(optional = false)
+  @Column(name = "match_date")
+  private LocalDate matchDate;
   private static final long serialVersionUID = 1L;
 
   @EmbeddedId
   protected MatchEntryPK matchEntryPK;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false,
-          cascade = CascadeType.PERSIST)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumns(
           {
             @JoinColumn(name = "FORMAT_ID", referencedColumnName = "ID",
@@ -51,8 +53,7 @@ public class MatchEntry implements Serializable
           })
   private Format format;
 
-  @ManyToOne(optional = true, fetch = FetchType.LAZY,
-          cascade = CascadeType.PERSIST)
+  @ManyToOne(optional = true, fetch = FetchType.LAZY)
   @JoinColumns(
           {
             @JoinColumn(name = "ROUND_ID", referencedColumnName = "ID",
@@ -63,12 +64,9 @@ public class MatchEntry implements Serializable
   private Round round;
 
   @OneToMany(mappedBy = "matchEntry", fetch = FetchType.LAZY,
-          cascade = CascadeType.PERSIST)
+          cascade = CascadeType.ALL)
   private List<MatchHasTeam> matchHasTeamList;
 
-  @Basic(optional = false)
-  @Column(name = "match_date")
-  private LocalDate matchDate;
 
   public MatchEntry()
   {

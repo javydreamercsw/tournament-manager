@@ -1,27 +1,38 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
+
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import com.github.javydreamercsw.database.storage.db.Round;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
-import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
-import com.github.javydreamercsw.database.storage.db.Round;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
+/**
+ *
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
+ */
 public class MatchEntryJpaController implements Serializable
 {
-  private static final long serialVersionUID = 5498996151312014506L;
   public MatchEntryJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -41,7 +52,7 @@ public class MatchEntryJpaController implements Serializable
     }
     if (matchEntry.getMatchHasTeamList() == null)
     {
-      matchEntry.setMatchHasTeamList(new ArrayList<>());
+      matchEntry.setMatchHasTeamList(new ArrayList<MatchHasTeam>());
     }
     EntityManager em = null;
     try
@@ -54,7 +65,7 @@ public class MatchEntryJpaController implements Serializable
         round = em.getReference(round.getClass(), round.getRoundPK());
         matchEntry.setRound(round);
       }
-      List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<>();
+      List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<MatchHasTeam>();
       for (MatchHasTeam matchHasTeamListMatchHasTeamToAttach : matchEntry.getMatchHasTeamList())
       {
         matchHasTeamListMatchHasTeamToAttach = em.getReference(matchHasTeamListMatchHasTeamToAttach.getClass(), matchHasTeamListMatchHasTeamToAttach.getMatchHasTeamPK());
@@ -116,7 +127,7 @@ public class MatchEntryJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<>();
+            illegalOrphanMessages = new ArrayList<String>();
           }
           illegalOrphanMessages.add("You must retain MatchHasTeam " + matchHasTeamListOldMatchHasTeam + " since its matchEntry field is not nullable.");
         }
@@ -130,7 +141,7 @@ public class MatchEntryJpaController implements Serializable
         roundNew = em.getReference(roundNew.getClass(), roundNew.getRoundPK());
         matchEntry.setRound(roundNew);
       }
-      List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<>();
+      List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<MatchHasTeam>();
       for (MatchHasTeam matchHasTeamListNewMatchHasTeamToAttach : matchHasTeamListNew)
       {
         matchHasTeamListNewMatchHasTeamToAttach = em.getReference(matchHasTeamListNewMatchHasTeamToAttach.getClass(), matchHasTeamListNewMatchHasTeamToAttach.getMatchHasTeamPK());
@@ -210,7 +221,7 @@ public class MatchEntryJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<>();
+          illegalOrphanMessages = new ArrayList<String>();
         }
         illegalOrphanMessages.add("This MatchEntry (" + matchEntry + ") cannot be destroyed since the MatchHasTeam " + matchHasTeamListOrphanCheckMatchHasTeam + " in its matchHasTeamList field has a non-nullable matchEntry field.");
       }

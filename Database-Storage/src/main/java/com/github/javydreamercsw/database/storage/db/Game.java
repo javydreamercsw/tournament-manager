@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
@@ -23,10 +18,6 @@ import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
- */
 @Entity
 @Table(name = "game")
 @XmlRootElement
@@ -59,7 +50,7 @@ public class Game implements Serializable
   private String name;
   @Column(name = "description")
   private String description;
-  @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "game")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
   private List<Format> formatList;
 
   public Game()

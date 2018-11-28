@@ -1,26 +1,37 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
+
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import com.github.javydreamercsw.database.storage.db.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
-import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
+/**
+ *
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
+ */
 public class TeamJpaController implements Serializable
 {
-  private static final long serialVersionUID = -948309699404935164L;
   public TeamJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -36,36 +47,36 @@ public class TeamJpaController implements Serializable
   {
     if (team.getPlayerList() == null)
     {
-      team.setPlayerList(new ArrayList<>());
+      team.setPlayerList(new ArrayList<Player>());
     }
     if (team.getMatchHasTeamList() == null)
     {
-      team.setMatchHasTeamList(new ArrayList<>());
+      team.setMatchHasTeamList(new ArrayList<MatchHasTeam>());
     }
     if (team.getTournamentHasTeamList() == null)
     {
-      team.setTournamentHasTeamList(new ArrayList<>());
+      team.setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<Player> attachedPlayerList = new ArrayList<>();
+      List<Player> attachedPlayerList = new ArrayList<Player>();
       for (Player playerListPlayerToAttach : team.getPlayerList())
       {
         playerListPlayerToAttach = em.getReference(playerListPlayerToAttach.getClass(), playerListPlayerToAttach.getId());
         attachedPlayerList.add(playerListPlayerToAttach);
       }
       team.setPlayerList(attachedPlayerList);
-      List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<>();
+      List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<MatchHasTeam>();
       for (MatchHasTeam matchHasTeamListMatchHasTeamToAttach : team.getMatchHasTeamList())
       {
         matchHasTeamListMatchHasTeamToAttach = em.getReference(matchHasTeamListMatchHasTeamToAttach.getClass(), matchHasTeamListMatchHasTeamToAttach.getMatchHasTeamPK());
         attachedMatchHasTeamList.add(matchHasTeamListMatchHasTeamToAttach);
       }
       team.setMatchHasTeamList(attachedMatchHasTeamList);
-      List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<>();
+      List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<TournamentHasTeam>();
       for (TournamentHasTeam tournamentHasTeamListTournamentHasTeamToAttach : team.getTournamentHasTeamList())
       {
         tournamentHasTeamListTournamentHasTeamToAttach = em.getReference(tournamentHasTeamListTournamentHasTeamToAttach.getClass(), tournamentHasTeamListTournamentHasTeamToAttach.getTournamentHasTeamPK());
@@ -132,7 +143,7 @@ public class TeamJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<>();
+            illegalOrphanMessages = new ArrayList<String>();
           }
           illegalOrphanMessages.add("You must retain MatchHasTeam " + matchHasTeamListOldMatchHasTeam + " since its team field is not nullable.");
         }
@@ -143,7 +154,7 @@ public class TeamJpaController implements Serializable
         {
           if (illegalOrphanMessages == null)
           {
-            illegalOrphanMessages = new ArrayList<>();
+            illegalOrphanMessages = new ArrayList<String>();
           }
           illegalOrphanMessages.add("You must retain TournamentHasTeam " + tournamentHasTeamListOldTournamentHasTeam + " since its team field is not nullable.");
         }
@@ -152,7 +163,7 @@ public class TeamJpaController implements Serializable
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
-      List<Player> attachedPlayerListNew = new ArrayList<>();
+      List<Player> attachedPlayerListNew = new ArrayList<Player>();
       for (Player playerListNewPlayerToAttach : playerListNew)
       {
         playerListNewPlayerToAttach = em.getReference(playerListNewPlayerToAttach.getClass(), playerListNewPlayerToAttach.getId());
@@ -160,7 +171,7 @@ public class TeamJpaController implements Serializable
       }
       playerListNew = attachedPlayerListNew;
       team.setPlayerList(playerListNew);
-      List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<>();
+      List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<MatchHasTeam>();
       for (MatchHasTeam matchHasTeamListNewMatchHasTeamToAttach : matchHasTeamListNew)
       {
         matchHasTeamListNewMatchHasTeamToAttach = em.getReference(matchHasTeamListNewMatchHasTeamToAttach.getClass(), matchHasTeamListNewMatchHasTeamToAttach.getMatchHasTeamPK());
@@ -168,7 +179,7 @@ public class TeamJpaController implements Serializable
       }
       matchHasTeamListNew = attachedMatchHasTeamListNew;
       team.setMatchHasTeamList(matchHasTeamListNew);
-      List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<>();
+      List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<TournamentHasTeam>();
       for (TournamentHasTeam tournamentHasTeamListNewTournamentHasTeamToAttach : tournamentHasTeamListNew)
       {
         tournamentHasTeamListNewTournamentHasTeamToAttach = em.getReference(tournamentHasTeamListNewTournamentHasTeamToAttach.getClass(), tournamentHasTeamListNewTournamentHasTeamToAttach.getTournamentHasTeamPK());
@@ -268,7 +279,7 @@ public class TeamJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<>();
+          illegalOrphanMessages = new ArrayList<String>();
         }
         illegalOrphanMessages.add("This Team (" + team + ") cannot be destroyed since the MatchHasTeam " + matchHasTeamListOrphanCheckMatchHasTeam + " in its matchHasTeamList field has a non-nullable team field.");
       }
@@ -277,7 +288,7 @@ public class TeamJpaController implements Serializable
       {
         if (illegalOrphanMessages == null)
         {
-          illegalOrphanMessages = new ArrayList<>();
+          illegalOrphanMessages = new ArrayList<String>();
         }
         illegalOrphanMessages.add("This Team (" + team + ") cannot be destroyed since the TournamentHasTeam " + tournamentHasTeamListOrphanCheckTournamentHasTeam + " in its tournamentHasTeamList field has a non-nullable team field.");
       }

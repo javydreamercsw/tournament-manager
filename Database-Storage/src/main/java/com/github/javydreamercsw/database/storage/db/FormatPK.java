@@ -85,8 +85,6 @@ public class FormatPK implements Serializable
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.FormatPK[ id=" 
-            + id + ", gameId=" + gameId + " ]";
+    return "com.github.javydreamercsw.database.storage.db.FormatPK[ id=" + id + ", gameId=" + gameId + " ]";
   }
-  
 }

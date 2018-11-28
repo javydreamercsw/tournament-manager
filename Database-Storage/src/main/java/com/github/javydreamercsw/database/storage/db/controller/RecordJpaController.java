@@ -1,24 +1,35 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
+
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import com.github.javydreamercsw.database.storage.db.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
-import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
+/**
+ *
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
+ */
 public class RecordJpaController implements Serializable
 {
-  private static final long serialVersionUID = -5982649688889824490L;
   public RecordJpaController(EntityManagerFactory emf)
   {
     this.emf = emf;
@@ -34,25 +45,25 @@ public class RecordJpaController implements Serializable
   {
     if (record.getPlayerList() == null)
     {
-      record.setPlayerList(new ArrayList<>());
+      record.setPlayerList(new ArrayList<Player>());
     }
     if (record.getTournamentHasTeamList() == null)
     {
-      record.setTournamentHasTeamList(new ArrayList<>());
+      record.setTournamentHasTeamList(new ArrayList<TournamentHasTeam>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<Player> attachedPlayerList = new ArrayList<>();
+      List<Player> attachedPlayerList = new ArrayList<Player>();
       for (Player playerListPlayerToAttach : record.getPlayerList())
       {
         playerListPlayerToAttach = em.getReference(playerListPlayerToAttach.getClass(), playerListPlayerToAttach.getId());
         attachedPlayerList.add(playerListPlayerToAttach);
       }
       record.setPlayerList(attachedPlayerList);
-      List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<>();
+      List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<TournamentHasTeam>();
       for (TournamentHasTeam tournamentHasTeamListTournamentHasTeamToAttach : record.getTournamentHasTeamList())
       {
         tournamentHasTeamListTournamentHasTeamToAttach = em.getReference(tournamentHasTeamListTournamentHasTeamToAttach.getClass(), tournamentHasTeamListTournamentHasTeamToAttach.getTournamentHasTeamPK());
@@ -93,7 +104,7 @@ public class RecordJpaController implements Serializable
       List<Player> playerListNew = record.getPlayerList();
       List<TournamentHasTeam> tournamentHasTeamListOld = persistentRecord.getTournamentHasTeamList();
       List<TournamentHasTeam> tournamentHasTeamListNew = record.getTournamentHasTeamList();
-      List<Player> attachedPlayerListNew = new ArrayList<>();
+      List<Player> attachedPlayerListNew = new ArrayList<Player>();
       for (Player playerListNewPlayerToAttach : playerListNew)
       {
         playerListNewPlayerToAttach = em.getReference(playerListNewPlayerToAttach.getClass(), playerListNewPlayerToAttach.getId());
@@ -101,7 +112,7 @@ public class RecordJpaController implements Serializable
       }
       playerListNew = attachedPlayerListNew;
       record.setPlayerList(playerListNew);
-      List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<>();
+      List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<TournamentHasTeam>();
       for (TournamentHasTeam tournamentHasTeamListNewTournamentHasTeamToAttach : tournamentHasTeamListNew)
       {
         tournamentHasTeamListNewTournamentHasTeamToAttach = em.getReference(tournamentHasTeamListNewTournamentHasTeamToAttach.getClass(), tournamentHasTeamListNewTournamentHasTeamToAttach.getTournamentHasTeamPK());
