@@ -46,6 +46,7 @@
         <module>Swiss-Tournament</module>
         <module>Database-Storage</module>
         <module>TournamentManagerWeb</module>
+        <module>MTG</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
