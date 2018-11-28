@@ -10,11 +10,14 @@ import org.openide.util.Exceptions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.server.FormatService;
+import com.github.javydreamercsw.database.storage.db.server.GameService;
 import com.github.javydreamercsw.database.storage.db.server.MatchService;
 import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.database.storage.db.server.TeamService;
@@ -65,9 +68,22 @@ public class MatchServiceNGTest extends BaseTestCase
 
     // Update
     TournamentService.getInstance().saveTournament(t);
+    
+    // Create Game
+    Game game = new Game("Test Game");
+    GameService.getInstance().saveGame(game);
+    
+    // Create formats
+    Format format = new Format("Test Format");
+    format.setGame(game);
+    FormatService.getInstance().saveFormat(format);
+    
+    Format format2 = new Format("Test Format2");
+    format2.setGame(game);
+    FormatService.getInstance().saveFormat(format2);
 
     MatchEntry match = new MatchEntry();
-    match.setFormat(FormatService.getInstance().findFormats("").get(0));
+    match.setFormat(format);
     match.setRound(t.getRoundList().get(0));
     MatchService.getInstance().saveMatch(match);
 
