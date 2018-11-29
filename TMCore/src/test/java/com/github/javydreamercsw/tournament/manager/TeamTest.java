@@ -1,18 +1,11 @@
 package com.github.javydreamercsw.tournament.manager;
 
-import com.github.javydreamercsw.tournament.manager.UIPlayer;
-import com.github.javydreamercsw.tournament.manager.Team;
-
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 
@@ -22,30 +15,6 @@ import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterfac
  */
 public class TeamTest
 {
-
-  public TeamTest()
-  {
-  }
-
-  @BeforeClass
-  public static void setUpClass()
-  {
-  }
-
-  @AfterClass
-  public static void tearDownClass()
-  {
-  }
-
-  @Before
-  public void setUp()
-  {
-  }
-
-  @After
-  public void tearDown()
-  {
-  }
 
   /**
    * Test of getTeamMembers method, of class Team.

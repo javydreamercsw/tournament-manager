@@ -1,15 +1,12 @@
 package com.github.javydreamercsw.tournament.manager;
 
-import com.github.javydreamercsw.tournament.manager.UIPlayer;
-import com.github.javydreamercsw.tournament.manager.Team;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.tournament.manager.api.Encounter;
 import com.github.javydreamercsw.tournament.manager.api.EncounterResult;

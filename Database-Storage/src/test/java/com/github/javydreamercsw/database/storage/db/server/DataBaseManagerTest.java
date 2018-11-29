@@ -3,10 +3,14 @@ package com.github.javydreamercsw.database.storage.db.server;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
 
 import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
+import com.github.javydreamercsw.database.storage.db.MatchEntry;
 
 public class DataBaseManagerTest extends AbstractServerTest
 {
@@ -32,6 +36,16 @@ public class DataBaseManagerTest extends AbstractServerTest
     {
       assertEquals(me.getMatchHasTeamList().size(), 2);
       assertNotNull(me.getFormat());
+    });
+    
+    List<Object> results = DataBaseManager.namedQuery("MatchEntry.findAll");
+    assertTrue(results.size() > 0);
+
+    results.forEach(result ->
+    {
+      MatchEntry m = (MatchEntry) result;
+      assertEquals(m.getMatchHasTeamList().size(), 2);
+      assertNotNull(m.getFormat());
     });
   }
 }

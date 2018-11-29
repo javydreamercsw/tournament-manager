@@ -18,7 +18,7 @@
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:~/TournamentManager/data/tournament-manager;AUTO_SERVER=TRUE"/>
       <property name="javax.persistence.jdbc.password" value=""/>
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-      <property name="javax.persistence.jdbc.user" value="vm_user"/>
+      <property name="javax.persistence.jdbc.user" value="tm_user"/>
       <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
       <property name="eclipselink.logging.logger" value="org.eclipse.persistence.logging.DefaultSessionLog"/>
       <property name="eclipselink.logging.level" value="SEVERE"/>
@@ -44,7 +44,7 @@
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:./target/data/test/tournament-manager;AUTO_SERVER=TRUE"/>
       <property name="javax.persistence.jdbc.password" value=""/>
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-      <property name="javax.persistence.jdbc.user" value="vm_user"/>
+      <property name="javax.persistence.jdbc.user" value="tm_user"/>
       <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
       <property name="eclipselink.logging.logger" value="org.eclipse.persistence.logging.DefaultSessionLog"/>
       <property name="eclipselink.logging.level" value="SEVERE"/>

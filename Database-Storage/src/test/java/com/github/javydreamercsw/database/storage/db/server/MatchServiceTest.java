@@ -2,7 +2,10 @@ package com.github.javydreamercsw.database.storage.db.server;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+
+import java.util.List;
 
 import org.openide.util.Exceptions;
 import org.testng.annotations.Test;
@@ -75,5 +78,15 @@ public class MatchServiceTest extends AbstractServerTest
     match = MatchService.getInstance().findMatch(me.getMatchEntryPK()).get(0);
     assertEquals(match.getMatchHasTeamList().size(), 2);
     assertNotNull(match.getFormat());
+
+    List<Object> results = DataBaseManager.namedQuery("MatchEntry.findAll");
+    assertTrue(results.size() > 0);
+
+    results.forEach(result ->
+    {
+      MatchEntry m = (MatchEntry) result;
+      assertEquals(m.getMatchHasTeamList().size(), 2);
+      assertNotNull(m.getFormat());
+    });
   }
 }

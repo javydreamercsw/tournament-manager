@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -36,6 +37,7 @@ public class Format implements Serializable
   @Basic(optional = false)
   @Column(name = "name")
   private String name;
+  @Lob 
   @Column(name = "description")
   private String description;
   @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false, 

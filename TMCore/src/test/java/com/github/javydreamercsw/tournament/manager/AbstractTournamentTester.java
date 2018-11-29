@@ -1,12 +1,8 @@
 package com.github.javydreamercsw.tournament.manager;
 
-import com.github.javydreamercsw.tournament.manager.UIPlayer;
-import com.github.javydreamercsw.tournament.manager.Team;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -16,23 +12,20 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Test;
-
-import junit.framework.TestCase;
+import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.tournament.manager.api.Encounter;
 import com.github.javydreamercsw.tournament.manager.api.EncounterResult;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
-
 import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public abstract class AbstractTournamentTester extends TestCase
+public abstract class AbstractTournamentTester
 {
   private static final Logger LOG
           = Logger.getLogger(AbstractTournamentTester.class.getSimpleName());
@@ -361,4 +354,9 @@ public abstract class AbstractTournamentTester extends TestCase
    * @return
    */
   public abstract TournamentInterface generateRandomTournament();
+
+  private void fail()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
 }

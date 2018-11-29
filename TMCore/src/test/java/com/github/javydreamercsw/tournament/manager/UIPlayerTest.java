@@ -1,10 +1,9 @@
 package com.github.javydreamercsw.tournament.manager;
 
-import com.github.javydreamercsw.tournament.manager.UIPlayer;
+import static org.testng.Assert.assertEquals;
 
-import static org.junit.Assert.assertEquals;
+import org.testng.annotations.Test;
 
-import org.junit.Test;
 
 /**
  *

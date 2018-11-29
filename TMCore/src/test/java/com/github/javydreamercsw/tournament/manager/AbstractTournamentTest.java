@@ -1,8 +1,8 @@
 package com.github.javydreamercsw.tournament.manager;
 
-import com.github.javydreamercsw.tournament.manager.UIPlayer;
-import com.github.javydreamercsw.tournament.manager.Team;
-import com.github.javydreamercsw.tournament.manager.AbstractTournament;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -13,42 +13,22 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.Exceptions;
 
-import junit.framework.TestCase;
-
 import com.github.javydreamercsw.tournament.manager.api.EncounterResult;
 import com.github.javydreamercsw.tournament.manager.api.NoShowListener;
 import com.github.javydreamercsw.tournament.manager.api.RoundTimeListener;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
-
 import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 /**
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class AbstractTournamentTest extends TestCase
+public class AbstractTournamentTest
 {
   private static final Logger LOG
           = Logger.getLogger(AbstractTournamentTest.class.getName());
-
-  public AbstractTournamentTest(String testName)
-  {
-    super(testName);
-  }
-
-  @Override
-  protected void setUp() throws Exception
-  {
-    super.setUp();
-  }
-
-  @Override
-  protected void tearDown() throws Exception
-  {
-    super.tearDown();
-  }
 
   /**
    * Test of getRound method, of class AbstractTournament.

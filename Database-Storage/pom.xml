@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.github.javydreamercsw</groupId>
     <artifactId>Database-Storage</artifactId>
-    <name>Database Storage</name>
+    <name>Database</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

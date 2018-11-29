@@ -2,6 +2,7 @@ package com.github.javydreamercsw.database.storage.db.server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.openide.util.Exceptions;
 
@@ -9,7 +10,6 @@ import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
-import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.MatchEntryJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.MatchHasTeamJpaController;
@@ -28,10 +28,6 @@ public class MatchService extends Service<MatchEntry>
           = new MatchResultJpaController(DataBaseManager.getEntityManagerFactory());
   private MatchResultTypeJpaController mrtc
           = new MatchResultTypeJpaController(DataBaseManager.getEntityManagerFactory());
-  private final String[] matchResults = new String[]
-  {
-    "UNDEFINED", "DRAW", "WIN", "LOSE"
-  };
 
   /**
    * Helper class to initialize the singleton Service in a thread-safe way and
@@ -61,24 +57,6 @@ public class MatchService extends Service<MatchEntry>
    */
   private MatchService()
   {
-    // Initialize the match result types
-    for (String type : matchResults)
-    {
-      boolean found = false;
-      for (MatchResultType mrt : mrtc.findMatchResultTypeEntities())
-      {
-        if (mrt.getType().equals(type))
-        {
-          found = true;
-          break;
-        }
-      }
-      if (!found)
-      {
-        MatchResultType mrt = new MatchResultType(type);
-        mrtc.create(mrt);
-      }
-    }
   }
 
   /**
@@ -153,12 +131,10 @@ public class MatchService extends Service<MatchEntry>
   public boolean addTeam(MatchEntry match, Team team) throws Exception
   {
     // Check the team is not in this match already
-    for (MatchHasTeam mht : match.getMatchHasTeamList())
+    if (!match.getMatchHasTeamList().stream().noneMatch((mht)
+            -> (Objects.equals(mht.getTeam().getId(), team.getId()))))
     {
-      if (mht.getTeam().getId() == team.getId())
-      {
-        return false;
-      }
+      return false;
     }
     MatchHasTeam mht = new MatchHasTeam();
     mht.setTeam(team);

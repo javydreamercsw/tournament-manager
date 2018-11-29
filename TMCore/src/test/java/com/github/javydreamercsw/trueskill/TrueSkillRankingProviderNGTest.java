@@ -1,29 +1,25 @@
 package com.github.javydreamercsw.trueskill;
 
-import com.github.javydreamercsw.trueskill.TrueSkillRankingProvider;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.Test;
 import org.openide.util.Lookup;
+import org.testng.annotations.Test;
+
+import com.github.javydreamercsw.tournament.manager.Team;
+import com.github.javydreamercsw.tournament.manager.UIPlayer;
+import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
+import com.github.javydreamercsw.tournament.manager.api.standing.RankingProvider;
 
 import de.gesundkrank.jskills.IPlayer;
 import de.gesundkrank.jskills.ITeam;
 import de.gesundkrank.jskills.Rating;
 import de.gesundkrank.jskills.trueskill.TwoPlayerTrueSkillCalculator;
-
-import com.github.javydreamercsw.tournament.manager.UIPlayer;
-import com.github.javydreamercsw.tournament.manager.Team;
-
-import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
-
-import com.github.javydreamercsw.tournament.manager.api.standing.RankingProvider;
 
 /**
  *

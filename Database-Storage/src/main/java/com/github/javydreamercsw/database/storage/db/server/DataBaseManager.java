@@ -51,18 +51,12 @@ public class DataBaseManager
           = Logger.getLogger(DataBaseManager.class.getSimpleName());
   private static boolean dbError = false;
   private static DBState state;
+  public static final String JNDI_DATASOURCE_NAME
+          = "java:comp/env/jdbc/TMDB";
 
   public DataBaseManager()
   {
-    try
-    {
-      state = DBState.START_UP;
-      reload();
-    }
-    catch (StorageException ex)
-    {
-      LOG.log(Level.SEVERE, null, ex);
-    }
+    state = DBState.START_UP;
   }
 
   public static EntityManagerFactory getEntityManagerFactory()
@@ -129,39 +123,32 @@ public class DataBaseManager
     ResultSet rs = null;
     try
     {
-      ds = (javax.sql.DataSource) new InitialContext().lookup("java:comp/env/jdbc/TMDB");
+      ds = (javax.sql.DataSource) new InitialContext().lookup(JNDI_DATASOURCE_NAME);
       conn = ds.getConnection();
     }
     catch (NamingException ne)
     {
       LOG.log(Level.FINE, null, ne);
-      if (emf == null)
+      try
       {
-        try
-        {
-          //It might be the tests, use an H2 Database
-          ds = new JdbcDataSource();
-          ((JdbcDataSource) ds).setPassword("");
-          ((JdbcDataSource) ds).setUser("tm_user");
-          ((JdbcDataSource) ds).setURL(
-                  "jdbc:h2:file:data/tournament-manager;AUTO_SERVER=TRUE");
-          //Load the H2 driver
-          Class.forName("org.h2.Driver");
-          conn = ds.getConnection();
-        }
-        catch (ClassNotFoundException | SQLException ex)
-        {
-          LOG.log(Level.SEVERE, null, ex);
-          dbError = true;
-        }
+        //It might be the tests.
+        ds = new JdbcDataSource();
+        ((JdbcDataSource) ds).setPassword((String) getProperties().get("javax.persistence.jdbc.password"));
+        ((JdbcDataSource) ds).setUser((String) getProperties().get("javax.persistence.jdbc.user"));
+        ((JdbcDataSource) ds).setURL(
+                (String) getProperties().get("javax.persistence.jdbc.url"));
+        //Load the driver
+        Class.forName((String) getProperties().get("javax.persistence.jdbc.driver"));
       }
-      else
+      catch (ClassNotFoundException ex)
       {
-        EntityTransaction transaction = getEntityManager().getTransaction();
-        transaction.begin();
-        conn = getEntityManager().unwrap(java.sql.Connection.class);
-        transaction.commit();
+        LOG.log(Level.SEVERE, null, ex);
+        dbError = true;
       }
+      EntityTransaction transaction = getEntityManager().getTransaction();
+      transaction.begin();
+      conn = getEntityManager().unwrap(java.sql.Connection.class);
+      transaction.commit();
     }
     catch (SQLException ex)
     {
@@ -503,7 +490,7 @@ public class DataBaseManager
     IGame gameAPI = Lookup.getDefault().lookup(IGame.class);
     Game game = new Game(gameAPI.getName());
     GameService.getInstance().saveGame(game);
-    List<Team> teams = TeamService.getInstance().findTeams("");
+    List<Team> teams = TeamService.getInstance().getAll();
     //Load formats
     for (GameFormat format : gameAPI.gameFormats())
     {
@@ -522,8 +509,7 @@ public class DataBaseManager
       }
     }
     List<Format> formatList = FormatService.getInstance()
-            .findFormatByGame(gameAPI.getName()
-            );
+            .findFormatByGame(gameAPI.getName());
     Random r = new Random();
     // Add matches
     for (int i = 0; i < 10; i++)
@@ -533,7 +519,7 @@ public class DataBaseManager
       MatchService.getInstance().saveMatch(match);
       for (int j = 0; j < 2; j++)
       {
-        while(!MatchService.getInstance().addTeam(match,
+        while (!MatchService.getInstance().addTeam(match,
                 teams.get(r.nextInt(teams.size()))));
       }
       match.setFormat(FormatService.getInstance().findFormatById(formatList
