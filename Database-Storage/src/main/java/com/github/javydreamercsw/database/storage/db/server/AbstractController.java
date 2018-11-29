@@ -10,7 +10,6 @@ import javax.persistence.EntityManagerFactory;
 public class AbstractController
 {
   private EntityManagerFactory emf = null;
-  private EntityManager em = null;
 
   public AbstractController(EntityManagerFactory emf)
   {
@@ -19,10 +18,6 @@ public class AbstractController
 
   public EntityManager getEntityManager()
   {
-    if (em == null || !em.isOpen())
-    {
-      em = emf.createEntityManager();
-    }
-    return em;
+    return emf.createEntityManager();
   }
 }

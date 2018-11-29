@@ -17,7 +17,7 @@ import com.github.javydreamercsw.tournament.manager.UIPlayer;
 /**
  * Simple backend service to store and retrieve {@link UIPlayer} instances.
  */
-public class PlayerService
+public class PlayerService extends Service<Player>
 {
   private final PlayerJpaController pc
           = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
@@ -170,11 +170,12 @@ public class PlayerService
   }
 
   /**
-   * Persists the given player into the player store.If the category is already persistent, the saved category will get updated
- with the name of the given category object.
+   * Persists the given player into the player store.If the category is already
+   * persistent, the saved category will get updated with the name of the given
+   * category object.
    *
-   * If the category is new (i.e.
- its id is null), it will get a new unique id before being saved.
+   * If the category is new (i.e. its id is null), it will get a new unique id
+   * before being saved.
    *
    * @param player the category to save
    * @throws java.lang.Exception
@@ -195,17 +196,23 @@ public class PlayerService
     else
     {
       pc.create(player);
-      
+
       Record record = new Record();
       record.getPlayerList().add(player);
       RecordService.getInstance().saveRecord(record);
       player.getRecordList().add(record);
-      
+
       //Create the single player's team
       Team alone = new Team();
       alone.setName(player.getName());
       alone.getPlayerList().add(player);
       TeamService.getInstance().saveTeam(alone);
     }
+  }
+
+   @Override
+  public List<Player> getAll()
+  {
+    return pc.findPlayerEntities();
   }
 }

@@ -1,9 +1,11 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
+import java.util.List;
+
 import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.controller.RecordJpaController;
 
-public class RecordService
+public class RecordService extends Service<Record>
 {
   private RecordJpaController rc
           = new RecordJpaController(DataBaseManager.getEntityManagerFactory());
@@ -58,5 +60,11 @@ public class RecordService
     {
       rc.edit(record);
     }
+  }
+  
+  @Override
+  public List<Record> getAll()
+  {
+    return rc.findRecordEntities();
   }
 }

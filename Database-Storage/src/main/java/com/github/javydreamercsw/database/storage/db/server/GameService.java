@@ -1,6 +1,7 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.openide.util.Exceptions;
@@ -8,7 +9,7 @@ import org.openide.util.Exceptions;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.controller.GameJpaController;
 
-public class GameService
+public class GameService extends Service<Game>
 {
   private final GameJpaController gc
           = new GameJpaController(DataBaseManager.getEntityManagerFactory());
@@ -93,5 +94,11 @@ public class GameService
     {
       Exceptions.printStackTrace(ex);
     }
+  }
+  
+  @Override
+  public List<Game> getAll()
+  {
+    return gc.findGameEntities();
   }
 }

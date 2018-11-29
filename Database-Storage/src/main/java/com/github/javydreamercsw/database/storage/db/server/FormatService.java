@@ -15,7 +15,7 @@ import com.github.javydreamercsw.database.storage.db.controller.exceptions.Nonex
 /**
  * Simple backend service to store and retrieve {@link Format} instances.
  */
-public class FormatService
+public class FormatService extends Service<Format>
 {
   private FormatJpaController fc
           = new FormatJpaController(DataBaseManager.getEntityManagerFactory());
@@ -240,5 +240,11 @@ public class FormatService
     {
       return Optional.of(result);
     }
+  }
+
+  @Override
+  public List<Format> getAll()
+  {
+    return fc.findFormatEntities();
   }
 }

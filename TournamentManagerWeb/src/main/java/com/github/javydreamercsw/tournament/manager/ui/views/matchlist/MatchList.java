@@ -16,11 +16,13 @@
 package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.server.MatchService;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
@@ -101,7 +103,7 @@ public class MatchList extends TMView
     {
       //Build a match name
       StringBuilder sb = new StringBuilder();
-      match.getMatchHasTeamList().forEach(mht ->
+      match.getMatchHasTeamList().forEach((mht) ->
       {
         if (!sb.toString().trim().isEmpty())
         {
@@ -160,6 +162,13 @@ public class MatchList extends TMView
     {
       if (match.getMatchHasTeamList().size() >= 2)
       {
+        // Remove the teams ot be added after creating the match.
+        List<Team> teams = new ArrayList<>();
+        match.getMatchHasTeamList().forEach(mht ->
+        {
+          teams.add(mht.getTeam());
+        });
+        match.getMatchHasTeamList().clear();
         if (match.getFormat() == null)
         {
           Notification.show(
@@ -172,6 +181,19 @@ public class MatchList extends TMView
           match.setMatchDate(LocalDate.now());
         }
         MatchService.getInstance().saveMatch(match);
+
+        // Add any teams
+        teams.forEach(team ->
+        {
+          try
+          {
+            MatchService.getInstance().addTeam(match, team);
+          }
+          catch (Exception ex)
+          {
+            Exceptions.printStackTrace(ex);
+          }
+        });
 
         Notification.show(
                 "Match successfully " + operation.getNameInText() + "ed.",

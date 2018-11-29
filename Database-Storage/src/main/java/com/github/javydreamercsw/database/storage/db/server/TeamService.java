@@ -14,7 +14,7 @@ import com.github.javydreamercsw.database.storage.db.controller.TeamJpaControlle
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-public class TeamService
+public class TeamService extends Service<Team>
 {
   private TeamJpaController tc
           = new TeamJpaController(DataBaseManager.getEntityManagerFactory());
@@ -24,7 +24,7 @@ public class TeamService
   private TeamService()
   {
   }
-
+  
   /**
    * Helper class to initialize the singleton Service in a thread-safe way and
    * to keep the initialization ordering clear between the two services. See
@@ -169,5 +169,11 @@ public class TeamService
     {
       saveTeam(team);
     }
+  }
+  
+  @Override
+  public List<Team> getAll()
+  {
+    return tc.findTeamEntities();
   }
 }

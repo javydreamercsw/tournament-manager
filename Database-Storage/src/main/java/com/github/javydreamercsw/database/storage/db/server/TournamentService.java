@@ -15,7 +15,7 @@ import com.github.javydreamercsw.database.storage.db.controller.TournamentJpaCon
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-public class TournamentService
+public class TournamentService extends Service<Tournament>
 {
   private TournamentJpaController tc
           = new TournamentJpaController(DataBaseManager.getEntityManagerFactory());
@@ -23,6 +23,10 @@ public class TournamentService
           = new TournamentHasTeamJpaController(DataBaseManager.getEntityManagerFactory());
   private RoundJpaController rc
           = new RoundJpaController(DataBaseManager.getEntityManagerFactory());
+
+  private TournamentService()
+  {
+  }
 
   /**
    * Helper class to initialize the singleton Service in a thread-safe way and
@@ -218,5 +222,11 @@ public class TournamentService
           throws NonexistentEntityException
   {
     thtc.destroy(tht.getTournamentHasTeamPK());
+  }
+
+  @Override
+  public List<Tournament> getAll()
+  {
+    return tc.findTournamentEntities();
   }
 }

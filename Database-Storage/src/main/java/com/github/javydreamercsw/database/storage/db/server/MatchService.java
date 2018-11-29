@@ -18,7 +18,7 @@ import com.github.javydreamercsw.database.storage.db.controller.MatchResultTypeJ
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
-public class MatchService
+public class MatchService extends Service<MatchEntry>
 {
   private MatchEntryJpaController mc
           = new MatchEntryJpaController(DataBaseManager.getEntityManagerFactory());
@@ -150,8 +150,16 @@ public class MatchService
     return mc.findMatchEntryEntities();
   }
 
-  public void addTeam(MatchEntry match, Team team) throws Exception
+  public boolean addTeam(MatchEntry match, Team team) throws Exception
   {
+    // Check the team is not in this match already
+    for (MatchHasTeam mht : match.getMatchHasTeamList())
+    {
+      if (mht.getTeam().getId() == team.getId())
+      {
+        return false;
+      }
+    }
     MatchHasTeam mht = new MatchHasTeam();
     mht.setTeam(team);
     mht.setMatchEntry(match);
@@ -172,6 +180,7 @@ public class MatchService
     }
 
     match.getMatchHasTeamList().add(mht);
+    return true;
   }
 
   public void removeTeam(MatchEntry match, Team team)
@@ -194,5 +203,11 @@ public class MatchService
         mhtc.destroy(mht.getMatchHasTeamPK());
       }
     }
+  }
+
+  @Override
+  public List<MatchEntry> getAll()
+  {
+    return mc.findMatchEntryEntities();
   }
 }
