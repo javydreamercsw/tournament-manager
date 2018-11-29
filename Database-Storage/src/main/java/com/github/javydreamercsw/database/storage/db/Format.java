@@ -59,9 +59,9 @@ public class Format implements Serializable
     this.name = name;
   }
 
-  public Format(int id, int gameId)
+  public Format(int gameId)
   {
-    this.formatPK = new FormatPK(id, gameId);
+    this.formatPK = new FormatPK(gameId);
   }
 
   public FormatPK getFormatPK()

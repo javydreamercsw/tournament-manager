@@ -11,7 +11,6 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
@@ -23,7 +22,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class MatchEntryJpaController extends AbstractController implements Serializable
 {
-  private static final long serialVersionUID = 5498996151312014506L;
+  private static final long serialVersionUID = 4229788197108543246L;
 
   public MatchEntryJpaController(EntityManagerFactory emf)
   {
@@ -40,6 +39,11 @@ public class MatchEntryJpaController extends AbstractController implements Seria
     {
       matchEntry.setMatchHasTeamList(new ArrayList<>());
     }
+    matchEntry.getMatchEntryPK().setFormatId(matchEntry.getFormat().getFormatPK().getId());
+    if (matchEntry.getRound() != null)
+    {
+      matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
+    }
     EntityManager em = null;
     try
     {
@@ -50,12 +54,6 @@ public class MatchEntryJpaController extends AbstractController implements Seria
       {
         round = em.getReference(round.getClass(), round.getRoundPK());
         matchEntry.setRound(round);
-      }
-      Format format = matchEntry.getFormat();
-      if (format != null)
-      {
-        format = em.getReference(format.getClass(), format.getFormatPK());
-        matchEntry.setFormat(format);
       }
       List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<>();
       for (MatchHasTeam matchHasTeamListMatchHasTeamToAttach : matchEntry.getMatchHasTeamList())
@@ -104,6 +102,11 @@ public class MatchEntryJpaController extends AbstractController implements Seria
 
   public void edit(MatchEntry matchEntry) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
+    matchEntry.getMatchEntryPK().setFormatId(matchEntry.getFormat().getFormatPK().getId());
+    if (matchEntry.getRound() != null)
+    {
+      matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
+    }
     EntityManager em = null;
     try
     {
@@ -112,8 +115,6 @@ public class MatchEntryJpaController extends AbstractController implements Seria
       MatchEntry persistentMatchEntry = em.find(MatchEntry.class, matchEntry.getMatchEntryPK());
       Round roundOld = persistentMatchEntry.getRound();
       Round roundNew = matchEntry.getRound();
-      Format formatOld = persistentMatchEntry.getFormat();
-      Format formatNew = matchEntry.getFormat();
       List<MatchHasTeam> matchHasTeamListOld = persistentMatchEntry.getMatchHasTeamList();
       List<MatchHasTeam> matchHasTeamListNew = matchEntry.getMatchHasTeamList();
       List<String> illegalOrphanMessages = null;
@@ -136,11 +137,6 @@ public class MatchEntryJpaController extends AbstractController implements Seria
       {
         roundNew = em.getReference(roundNew.getClass(), roundNew.getRoundPK());
         matchEntry.setRound(roundNew);
-      }
-      if (formatNew != null)
-      {
-        formatNew = em.getReference(formatNew.getClass(), formatNew.getFormatPK());
-        matchEntry.setFormat(formatNew);
       }
       List<MatchHasTeam> attachedMatchHasTeamListNew = new ArrayList<>();
       for (MatchHasTeam matchHasTeamListNewMatchHasTeamToAttach : matchHasTeamListNew)

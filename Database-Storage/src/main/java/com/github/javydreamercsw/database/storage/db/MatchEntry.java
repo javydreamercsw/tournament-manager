@@ -46,9 +46,9 @@ public class MatchEntry implements Serializable
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumns(
           {
-            @JoinColumn(name = "FORMAT_ID", referencedColumnName = "ID",
+            @JoinColumn(name = "format_id", referencedColumnName = "id",
                     insertable = false, updatable = false),
-            @JoinColumn(name = "GAME_ID", referencedColumnName = "ID",
+            @JoinColumn(name = "game_id", referencedColumnName = "id",
                     insertable = false, updatable = false)
           })
   private Format format;
@@ -56,9 +56,9 @@ public class MatchEntry implements Serializable
   @ManyToOne(optional = true, fetch = FetchType.LAZY)
   @JoinColumns(
           {
-            @JoinColumn(name = "ROUND_ID", referencedColumnName = "ID",
+            @JoinColumn(name = "round_id", referencedColumnName = "id",
                     insertable = false, updatable = false),
-            @JoinColumn(name = "TOURNAMENT_ID", referencedColumnName = "ID",
+            @JoinColumn(name = "tournament_id", referencedColumnName = "id",
                     insertable = false, updatable = false)
           })
   private Round round;

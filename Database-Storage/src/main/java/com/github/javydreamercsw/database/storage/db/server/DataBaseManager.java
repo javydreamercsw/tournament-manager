@@ -525,15 +525,14 @@ public class DataBaseManager
     {
       MatchEntry match = new MatchEntry();
       match.setMatchDate(LocalDate.now());
+      match.setFormat(FormatService.getInstance().findFormatById(formatList
+              .get(r.nextInt(formatList.size())).getFormatPK()).get());
       MatchService.getInstance().saveMatch(match);
       for (int j = 0; j < 2; j++)
       {
         while (!MatchService.getInstance().addTeam(match,
                 teams.get(r.nextInt(teams.size()))));
       }
-      match.setFormat(FormatService.getInstance().findFormatById(formatList
-              .get(r.nextInt(formatList.size())).getFormatPK()).get());
-      MatchService.getInstance().saveMatch(match);
     }
   }
 }

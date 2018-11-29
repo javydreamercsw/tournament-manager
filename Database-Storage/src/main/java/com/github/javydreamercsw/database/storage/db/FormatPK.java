@@ -31,9 +31,8 @@ public class FormatPK implements Serializable
   {
   }
 
-  public FormatPK(int id, int gameId)
+  public FormatPK(int gameId)
   {
-    this.id = id;
     this.gameId = gameId;
   }
 
