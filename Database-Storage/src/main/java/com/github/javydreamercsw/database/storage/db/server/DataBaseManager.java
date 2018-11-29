@@ -488,7 +488,16 @@ public class DataBaseManager
     }
 
     IGame gameAPI = Lookup.getDefault().lookup(IGame.class);
-    Game game = new Game(gameAPI.getName());
+    Optional<Game> fg = GameService.getInstance().findGameByName(gameAPI.getName());
+    Game game;
+    if (fg.isPresent())
+    {
+      game = fg.get();
+    }
+    else
+    {
+      game = new Game(gameAPI.getName());
+    }
     GameService.getInstance().saveGame(game);
     List<Team> teams = TeamService.getInstance().getAll();
     //Load formats
