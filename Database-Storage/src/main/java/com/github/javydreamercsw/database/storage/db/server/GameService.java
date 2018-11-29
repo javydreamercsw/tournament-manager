@@ -8,6 +8,8 @@ import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.controller.GameJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
 public class GameService extends Service<Game>
 {
@@ -100,5 +102,17 @@ public class GameService extends Service<Game>
   public List<Game> getAll()
   {
     return gc.findGameEntities();
+  }
+  
+  public void deleteGame(Game game)
+  {
+    try
+    {
+      gc.destroy(game.getId());
+    }
+    catch (IllegalOrphanException | NonexistentEntityException ex)
+    {
+      Exceptions.printStackTrace(ex);
+    }
   }
 }

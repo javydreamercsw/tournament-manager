@@ -1,8 +1,8 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Player;
@@ -15,11 +15,6 @@ import com.github.javydreamercsw.database.storage.db.Tournament;
  */
 public class TournamentServiceTest extends AbstractServerTest
 {
-
-  public TournamentServiceTest()
-  {
-  }
-
   /**
    * Test of write2DB method, of class TournamentHasTeamServer.
    *

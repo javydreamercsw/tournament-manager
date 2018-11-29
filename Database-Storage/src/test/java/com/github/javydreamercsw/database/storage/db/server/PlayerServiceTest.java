@@ -1,13 +1,13 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.fail;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.openide.util.Exceptions;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Player;
@@ -18,8 +18,8 @@ import com.github.javydreamercsw.database.storage.db.Player;
  */
 public class PlayerServiceTest extends AbstractServerTest
 {
-  
-   @BeforeClass
+
+  @BeforeClass
   @Override
   public void setup()
   {
@@ -27,10 +27,6 @@ public class PlayerServiceTest extends AbstractServerTest
     {
       super.setup();
       System.out.println("Creating players...");
-      PlayerService.getInstance().findPlayers("").forEach(player ->
-      {
-        PlayerService.getInstance().deletePlayer(player);
-      });
       Player p1 = new Player("Player 1");
       PlayerService.getInstance().savePlayer(p1);
       Player p2 = new Player("Player 2");

@@ -1,10 +1,11 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.fail;
 
-import org.junit.Test;
 import org.openide.util.Exceptions;
+import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Format;
@@ -45,9 +46,11 @@ public class MatchServiceTest extends AbstractServerTest
     me.setRound(t.getRoundList().get(0));
 
     MatchService.getInstance().saveMatch(me);
-    
+
+    MatchEntry match
+            = MatchService.getInstance().findMatch(me.getMatchEntryPK()).get(0);
     assertNotNull(me.getFormat());
-    assertNotNull(MatchService.getInstance().findMatches().get(0).getFormat());
+    assertNotNull(match.getFormat());
 
     // Add teams
     Player player = new Player("Player 1");
@@ -56,7 +59,7 @@ public class MatchServiceTest extends AbstractServerTest
     Player player2 = new Player("Player 2");
     PlayerService.getInstance().savePlayer(player2);
 
-    TeamService.getInstance().findTeams("").forEach(team ->
+    TeamService.getInstance().getAll().forEach(team ->
     {
       try
       {
@@ -68,5 +71,9 @@ public class MatchServiceTest extends AbstractServerTest
         fail();
       }
     });
+
+    match = MatchService.getInstance().findMatch(me.getMatchEntryPK()).get(0);
+    assertEquals(match.getMatchHasTeamList().size(), 2);
+    assertNotNull(match.getFormat());
   }
 }
