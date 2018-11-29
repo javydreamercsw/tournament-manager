@@ -129,7 +129,7 @@ public class DataBaseManager
     ResultSet rs = null;
     try
     {
-      ds = (javax.sql.DataSource) new InitialContext().lookup("java:comp/env/jdbc/VMDB");
+      ds = (javax.sql.DataSource) new InitialContext().lookup("java:comp/env/jdbc/TMDB");
       conn = ds.getConnection();
     }
     catch (NamingException ne)
