@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle.Messages;
 
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
@@ -40,6 +41,13 @@ import com.googlecode.flyway.core.api.MigrationInfo;
 import com.googlecode.flyway.core.api.MigrationState;
 import com.googlecode.flyway.core.exception.FlywayException;
 
+@Messages({
+    "result.win=Win",
+    "result.loss=Loss",
+    "result.draw=Draw",
+    "result.forfeit=Forfeit",
+    "result.no_show=No Show"
+})
 public class DataBaseManager
 {
 
