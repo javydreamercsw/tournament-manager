@@ -21,6 +21,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 public class TournamentJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -3241408395907726172L;
+
   public TournamentJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -309,5 +310,5 @@ public class TournamentJpaController extends AbstractController implements Seria
       em.close();
     }
   }
-  
+
 }

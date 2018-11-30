@@ -22,6 +22,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 public class TeamJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -948309699404935164L;
+
   public TeamJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -358,5 +359,5 @@ public class TeamJpaController extends AbstractController implements Serializabl
       em.close();
     }
   }
-  
+
 }
