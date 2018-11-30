@@ -3,13 +3,16 @@ package com.github.javydreamercsw.database.storage.db.server;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeamPK;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
+import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.MatchEntryJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.MatchHasTeamJpaController;
@@ -92,7 +95,7 @@ public class MatchService extends Service<MatchEntry>
       }
       mc.destroy(match.getMatchEntryPK());
     }
-    catch (IllegalOrphanException | NonexistentEntityException ex)
+    catch (NonexistentEntityException | IllegalOrphanException ex)
     {
       Exceptions.printStackTrace(ex);
     }
@@ -139,17 +142,19 @@ public class MatchService extends Service<MatchEntry>
     MatchHasTeam mht = new MatchHasTeam();
     mht.setTeam(team);
     mht.setMatchEntry(match);
+    mht.setMatchHasTeamPK(new MatchHasTeamPK(match.getMatchEntryPK().getId(),
+            match.getMatchEntryPK().getFormatId(), match.getFormat().getGame().getId(),
+            team.getId()));
 
-    MatchResult mr = new MatchResult();
-    mr.setMatchResultType(mrtc.findMatchResultType(1));
-
-    if (match.getMatchEntryPK() != null)
-    {
-      mrc.create(mr);
-    }
-
-    mht.setMatchResult(mr);
-
+//    MatchResult mr = new MatchResult();
+//    mr.setMatchResultType(mrtc.findMatchResultType(1));
+//
+//    if (match.getMatchEntryPK() != null)
+//    {
+//      mrc.create(mr);
+//    }
+//
+//    mht.setMatchResult(mr);
     if (match.getMatchEntryPK() != null)
     {
       mhtc.create(mht);
@@ -185,5 +190,37 @@ public class MatchService extends Service<MatchEntry>
   public List<MatchEntry> getAll()
   {
     return mc.findMatchEntryEntities();
+  }
+
+  public Optional<MatchResultType> getResultType(String type)
+  {
+    for (MatchResultType mrt : getResultTypes())
+    {
+      if (mrt.getType().equals(type))
+      {
+        return Optional.of(mrt);
+      }
+    }
+    return Optional.empty();
+  }
+
+  public List<MatchResultType> getResultTypes()
+  {
+    return mrtc.findMatchResultTypeEntities();
+  }
+
+  public void setResult(MatchHasTeam mht, MatchResultType mrt)
+          throws NonexistentEntityException, Exception
+  {
+    if (mht.getMatchResult() != null)
+    {
+      //Delete the old one.
+      mrc.destroy(mht.getMatchResult().getMatchResultPK());
+    }
+    MatchResult mr = new MatchResult();
+    mr.setMatchResultType(mrt);
+    mr.getMatchHasTeamList().add(mht);
+    mrc.create(mr);
+    mht.setMatchResult(mr);
   }
 }

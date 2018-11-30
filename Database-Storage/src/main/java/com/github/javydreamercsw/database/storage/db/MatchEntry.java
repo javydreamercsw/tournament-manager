@@ -18,6 +18,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -36,6 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class MatchEntry implements Serializable
 {
   @Basic(optional = false)
+  @NotNull()
   @Column(name = "match_date")
   private LocalDate matchDate;
   private static final long serialVersionUID = 1L;

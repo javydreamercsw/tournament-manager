@@ -10,6 +10,7 @@ import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.FormatPK;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.controller.FormatJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
 /**
@@ -196,7 +197,7 @@ public class FormatService extends Service<Format>
     {
       fc.destroy(format.getFormatPK());
     }
-    catch (NonexistentEntityException ex)
+    catch (NonexistentEntityException | IllegalOrphanException ex)
     {
       Exceptions.printStackTrace(ex);
     }

@@ -14,6 +14,7 @@ import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
@@ -78,6 +79,12 @@ public class MatchServiceTest extends AbstractServerTest
     match = MatchService.getInstance().findMatch(me.getMatchEntryPK()).get(0);
     assertEquals(match.getMatchHasTeamList().size(), 2);
     assertNotNull(match.getFormat());
+
+    for(MatchHasTeam mht:match.getMatchHasTeamList())
+    {
+      MatchService.getInstance().setResult(mht, 
+              MatchService.getInstance().getResultTypes().get(0));
+    }
 
     List<Object> results = DataBaseManager.namedQuery("MatchEntry.findAll");
     assertTrue(results.size() > 0);

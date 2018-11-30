@@ -22,7 +22,6 @@ public class DataBaseManagerTest extends AbstractServerTest
   @Test
   public void testLoadDemoData() throws Exception
   {
-    System.out.println("loadDemoData");
     //Load demo data
     DataBaseManager.loadDemoData();
 

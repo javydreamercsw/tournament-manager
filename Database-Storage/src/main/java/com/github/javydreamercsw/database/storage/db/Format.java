@@ -1,8 +1,10 @@
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -11,8 +13,10 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @Table(name = "format")
@@ -31,6 +35,8 @@ import javax.xml.bind.annotation.XmlRootElement;
         })
 public class Format implements Serializable
 {
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "format")
+  private List<MatchEntry> matchEntryList;
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected FormatPK formatPK;
@@ -130,6 +136,17 @@ public class Format implements Serializable
   {
     return "com.github.javydreamercsw.database.storage.db.Format[ formatPK=" + 
             formatPK + " ]";
+  }
+
+  @XmlTransient
+  public List<MatchEntry> getMatchEntryList()
+  {
+    return matchEntryList;
+  }
+
+  public void setMatchEntryList(List<MatchEntry> matchEntryList)
+  {
+    this.matchEntryList = matchEntryList;
   }
 
 }

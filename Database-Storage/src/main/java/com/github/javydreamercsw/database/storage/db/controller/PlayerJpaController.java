@@ -1,7 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
-import com.github.javydreamercsw.database.storage.db.server.AbstractController;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +15,12 @@ import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class PlayerJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -8056351033264261722L;
+
   public PlayerJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -263,5 +263,5 @@ public class PlayerJpaController extends AbstractController implements Serializa
       em.close();
     }
   }
-  
+
 }

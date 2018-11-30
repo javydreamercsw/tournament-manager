@@ -21,7 +21,7 @@ public class MatchResultPK implements Serializable
           valueColumnName = "last_id",
           pkColumnValue = "match_result",
           allocationSize = 1,
-          initialValue = 1_000)
+          initialValue = 1)
   private int id;
   @Basic(optional = false)
   @Column(name = "match_result_type_id")

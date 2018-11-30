@@ -11,6 +11,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
@@ -22,7 +23,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class MatchEntryJpaController extends AbstractController implements Serializable
 {
-  private static final long serialVersionUID = 4229788197108543246L;
+  private static final long serialVersionUID = 5498996151312014506L;
 
   public MatchEntryJpaController(EntityManagerFactory emf)
   {
@@ -49,6 +50,12 @@ public class MatchEntryJpaController extends AbstractController implements Seria
     {
       em = getEntityManager();
       em.getTransaction().begin();
+      Format format = matchEntry.getFormat();
+      if (format != null)
+      {
+        format = em.getReference(format.getClass(), format.getFormatPK());
+        matchEntry.setFormat(format);
+      }
       Round round = matchEntry.getRound();
       if (round != null)
       {
@@ -58,13 +65,17 @@ public class MatchEntryJpaController extends AbstractController implements Seria
       List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<>();
       for (MatchHasTeam matchHasTeamListMatchHasTeamToAttach : matchEntry.getMatchHasTeamList())
       {
-        matchHasTeamListMatchHasTeamToAttach
-                = em.getReference(matchHasTeamListMatchHasTeamToAttach.getClass(),
-                        matchHasTeamListMatchHasTeamToAttach.getMatchHasTeamPK());
+        matchHasTeamListMatchHasTeamToAttach = em.getReference(matchHasTeamListMatchHasTeamToAttach.getClass(),
+                matchHasTeamListMatchHasTeamToAttach.getMatchHasTeamPK());
         attachedMatchHasTeamList.add(matchHasTeamListMatchHasTeamToAttach);
       }
       matchEntry.setMatchHasTeamList(attachedMatchHasTeamList);
       em.persist(matchEntry);
+      if (format != null)
+      {
+        format.getMatchEntryList().add(matchEntry);
+        format = em.merge(format);
+      }
       if (round != null)
       {
         round.getMatchEntryList().add(matchEntry);
@@ -102,17 +113,16 @@ public class MatchEntryJpaController extends AbstractController implements Seria
 
   public void edit(MatchEntry matchEntry) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
+    matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
     matchEntry.getMatchEntryPK().setFormatId(matchEntry.getFormat().getFormatPK().getId());
-    if (matchEntry.getRound() != null)
-    {
-      matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
-    }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
       MatchEntry persistentMatchEntry = em.find(MatchEntry.class, matchEntry.getMatchEntryPK());
+      Format formatOld = persistentMatchEntry.getFormat();
+      Format formatNew = matchEntry.getFormat();
       Round roundOld = persistentMatchEntry.getRound();
       Round roundNew = matchEntry.getRound();
       List<MatchHasTeam> matchHasTeamListOld = persistentMatchEntry.getMatchHasTeamList();
@@ -133,6 +143,11 @@ public class MatchEntryJpaController extends AbstractController implements Seria
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
+      if (formatNew != null)
+      {
+        formatNew = em.getReference(formatNew.getClass(), formatNew.getFormatPK());
+        matchEntry.setFormat(formatNew);
+      }
       if (roundNew != null)
       {
         roundNew = em.getReference(roundNew.getClass(), roundNew.getRoundPK());
@@ -147,6 +162,16 @@ public class MatchEntryJpaController extends AbstractController implements Seria
       matchHasTeamListNew = attachedMatchHasTeamListNew;
       matchEntry.setMatchHasTeamList(matchHasTeamListNew);
       matchEntry = em.merge(matchEntry);
+      if (formatOld != null && !formatOld.equals(formatNew))
+      {
+        formatOld.getMatchEntryList().remove(matchEntry);
+        formatOld = em.merge(formatOld);
+      }
+      if (formatNew != null && !formatNew.equals(formatOld))
+      {
+        formatNew.getMatchEntryList().add(matchEntry);
+        formatNew = em.merge(formatNew);
+      }
       if (roundOld != null && !roundOld.equals(roundNew))
       {
         roundOld.getMatchEntryList().remove(matchEntry);
@@ -225,6 +250,12 @@ public class MatchEntryJpaController extends AbstractController implements Seria
       if (illegalOrphanMessages != null)
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
+      }
+      Format format = matchEntry.getFormat();
+      if (format != null)
+      {
+        format.getMatchEntryList().remove(matchEntry);
+        format = em.merge(format);
       }
       Round round = matchEntry.getRound();
       if (round != null)

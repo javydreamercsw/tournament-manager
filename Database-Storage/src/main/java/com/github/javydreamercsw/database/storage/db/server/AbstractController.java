@@ -16,7 +16,7 @@ public class AbstractController
     this.emf = emf;
   }
 
-  public EntityManager getEntityManager()
+  public final EntityManager getEntityManager()
   {
     return emf.createEntityManager();
   }

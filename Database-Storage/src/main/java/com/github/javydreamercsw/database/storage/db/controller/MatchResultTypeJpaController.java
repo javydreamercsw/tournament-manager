@@ -1,7 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
-import com.github.javydreamercsw.database.storage.db.server.AbstractController;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +15,12 @@ import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class MatchResultTypeJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -8326151340449588898L;
+
   public MatchResultTypeJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -243,5 +243,5 @@ public class MatchResultTypeJpaController extends AbstractController implements 
       em.close();
     }
   }
-  
+
 }

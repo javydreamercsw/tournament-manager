@@ -1,7 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
-import com.github.javydreamercsw.database.storage.db.server.AbstractController;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +15,15 @@ import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultPK;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class MatchResultJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -4857066805022202452L;
+
   public MatchResultJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -93,7 +94,7 @@ public class MatchResultJpaController extends AbstractController implements Seri
     }
   }
 
-  public void edit(MatchResult matchResult) throws NonexistentEntityException, Exception
+  public void edit(MatchResult matchResult) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
     matchResult.getMatchResultPK().setMatchResultTypeId(matchResult.getMatchResultType().getId());
     EntityManager em = null;
@@ -106,6 +107,22 @@ public class MatchResultJpaController extends AbstractController implements Seri
       MatchResultType matchResultTypeNew = matchResult.getMatchResultType();
       List<MatchHasTeam> matchHasTeamListOld = persistentMatchResult.getMatchHasTeamList();
       List<MatchHasTeam> matchHasTeamListNew = matchResult.getMatchHasTeamList();
+      List<String> illegalOrphanMessages = null;
+      for (MatchHasTeam matchHasTeamListOldMatchHasTeam : matchHasTeamListOld)
+      {
+        if (!matchHasTeamListNew.contains(matchHasTeamListOldMatchHasTeam))
+        {
+          if (illegalOrphanMessages == null)
+          {
+            illegalOrphanMessages = new ArrayList<>();
+          }
+          illegalOrphanMessages.add("You must retain MatchHasTeam " + matchHasTeamListOldMatchHasTeam + " since its matchResult field is not nullable.");
+        }
+      }
+      if (illegalOrphanMessages != null)
+      {
+        throw new IllegalOrphanException(illegalOrphanMessages);
+      }
       if (matchResultTypeNew != null)
       {
         matchResultTypeNew = em.getReference(matchResultTypeNew.getClass(), matchResultTypeNew.getId());
@@ -129,14 +146,6 @@ public class MatchResultJpaController extends AbstractController implements Seri
       {
         matchResultTypeNew.getMatchResultList().add(matchResult);
         matchResultTypeNew = em.merge(matchResultTypeNew);
-      }
-      for (MatchHasTeam matchHasTeamListOldMatchHasTeam : matchHasTeamListOld)
-      {
-        if (!matchHasTeamListNew.contains(matchHasTeamListOldMatchHasTeam))
-        {
-          matchHasTeamListOldMatchHasTeam.setMatchResult(null);
-          matchHasTeamListOldMatchHasTeam = em.merge(matchHasTeamListOldMatchHasTeam);
-        }
       }
       for (MatchHasTeam matchHasTeamListNewMatchHasTeam : matchHasTeamListNew)
       {
@@ -176,7 +185,7 @@ public class MatchResultJpaController extends AbstractController implements Seri
     }
   }
 
-  public void destroy(MatchResultPK id) throws NonexistentEntityException
+  public void destroy(MatchResultPK id) throws IllegalOrphanException, NonexistentEntityException
   {
     EntityManager em = null;
     try
@@ -193,17 +202,25 @@ public class MatchResultJpaController extends AbstractController implements Seri
       {
         throw new NonexistentEntityException("The matchResult with id " + id + " no longer exists.", enfe);
       }
+      List<String> illegalOrphanMessages = null;
+      List<MatchHasTeam> matchHasTeamListOrphanCheck = matchResult.getMatchHasTeamList();
+      for (MatchHasTeam matchHasTeamListOrphanCheckMatchHasTeam : matchHasTeamListOrphanCheck)
+      {
+        if (illegalOrphanMessages == null)
+        {
+          illegalOrphanMessages = new ArrayList<>();
+        }
+        illegalOrphanMessages.add("This MatchResult (" + matchResult + ") cannot be destroyed since the MatchHasTeam " + matchHasTeamListOrphanCheckMatchHasTeam + " in its matchHasTeamList field has a non-nullable matchResult field.");
+      }
+      if (illegalOrphanMessages != null)
+      {
+        throw new IllegalOrphanException(illegalOrphanMessages);
+      }
       MatchResultType matchResultType = matchResult.getMatchResultType();
       if (matchResultType != null)
       {
         matchResultType.getMatchResultList().remove(matchResult);
         matchResultType = em.merge(matchResultType);
-      }
-      List<MatchHasTeam> matchHasTeamList = matchResult.getMatchHasTeamList();
-      for (MatchHasTeam matchHasTeamListMatchHasTeam : matchHasTeamList)
-      {
-        matchHasTeamListMatchHasTeam.setMatchResult(null);
-        matchHasTeamListMatchHasTeam = em.merge(matchHasTeamListMatchHasTeam);
       }
       em.remove(matchResult);
       em.getTransaction().commit();
@@ -277,5 +294,5 @@ public class MatchResultJpaController extends AbstractController implements Seri
       em.close();
     }
   }
-  
+
 }

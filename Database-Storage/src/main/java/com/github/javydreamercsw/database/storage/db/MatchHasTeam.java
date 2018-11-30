@@ -22,11 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
           @NamedQuery(name = "MatchHasTeam.findByMatchId",
                   query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchId = :matchId"),
           @NamedQuery(name = "MatchHasTeam.findByTeamId",
-                  query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.teamId = :teamId"),
-          @NamedQuery(name = "MatchHasTeam.findByMatchResultId",
-                  query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchResultId = :matchResultId"),
-          @NamedQuery(name = "MatchHasTeam.findByMatchResultMatchResultTypeId",
-                  query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.matchResultMatchResultTypeId = :matchResultMatchResultTypeId")
+                  query = "SELECT m FROM MatchHasTeam m WHERE m.matchHasTeamPK.teamId = :teamId")
         })
 public class MatchHasTeam implements Serializable
 {
@@ -35,13 +31,13 @@ public class MatchHasTeam implements Serializable
   protected MatchHasTeamPK matchHasTeamPK;
   @JoinColumns(
           {
-            @JoinColumn(name = "match_id", referencedColumnName = "id", 
+            @JoinColumn(name = "match_id", referencedColumnName = "id",
                     insertable = false,
                     updatable = false),
-            @JoinColumn(name = "round_id", referencedColumnName = "id", 
+            @JoinColumn(name = "round_id", referencedColumnName = "id",
                     insertable = false,
                     updatable = false),
-            @JoinColumn(name = "format_id", referencedColumnName = "id", 
+            @JoinColumn(name = "format_id", referencedColumnName = "id",
                     insertable = false,
                     updatable = false)
           })
@@ -55,11 +51,11 @@ public class MatchHasTeam implements Serializable
                     referencedColumnName = "match_result_type_id", insertable = false,
                     updatable = false)
           })
-  @ManyToOne(optional = true, fetch = FetchType.LAZY)
+  @ManyToOne(optional = false)
   private MatchResult matchResult;
   @JoinColumn(name = "team_id", referencedColumnName = "id", insertable = false,
           updatable = false)
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @ManyToOne(optional = false)
   private Team team;
 
   public MatchHasTeam()
@@ -71,9 +67,9 @@ public class MatchHasTeam implements Serializable
     this.matchHasTeamPK = matchHasTeamPK;
   }
 
-  public MatchHasTeam(int matchId, int teamId, int matchResultId, int matchResultMatchResultTypeId)
+  public MatchHasTeam(int matchId, int formatId, int gameId, int teamId)
   {
-    this.matchHasTeamPK = new MatchHasTeamPK(matchId, teamId, matchResultId, matchResultMatchResultTypeId);
+    this.matchHasTeamPK = new MatchHasTeamPK(matchId, formatId, gameId, teamId);
   }
 
   public MatchHasTeamPK getMatchHasTeamPK()

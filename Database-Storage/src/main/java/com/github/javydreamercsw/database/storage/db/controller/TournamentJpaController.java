@@ -1,7 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
-import com.github.javydreamercsw.database.storage.db.server.AbstractController;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +16,7 @@ import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class TournamentJpaController extends AbstractController implements Serializable
 {
@@ -45,8 +44,7 @@ public class TournamentJpaController extends AbstractController implements Seria
       List<Round> attachedRoundList = new ArrayList<>();
       for (Round roundListRoundToAttach : tournament.getRoundList())
       {
-        roundListRoundToAttach = em.getReference(roundListRoundToAttach.getClass(), 
-                roundListRoundToAttach.getRoundPK());
+        roundListRoundToAttach = em.getReference(roundListRoundToAttach.getClass(), roundListRoundToAttach.getRoundPK());
         attachedRoundList.add(roundListRoundToAttach);
       }
       tournament.setRoundList(attachedRoundList);
