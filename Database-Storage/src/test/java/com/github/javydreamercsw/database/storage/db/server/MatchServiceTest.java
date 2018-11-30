@@ -1,11 +1,9 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 import java.util.List;
+import java.util.Random;
 
 import org.openide.util.Exceptions;
 import org.testng.annotations.Test;
@@ -15,6 +13,8 @@ import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
+import com.github.javydreamercsw.database.storage.db.MatchResult;
+import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
@@ -80,10 +80,12 @@ public class MatchServiceTest extends AbstractServerTest
     assertEquals(match.getMatchHasTeamList().size(), 2);
     assertNotNull(match.getFormat());
 
-    for(MatchHasTeam mht:match.getMatchHasTeamList())
+    Random random = new Random();
+    List<MatchResultType> resultTypes = MatchService.getInstance().getResultTypes();
+    for (MatchHasTeam mht : match.getMatchHasTeamList())
     {
-      MatchService.getInstance().setResult(mht, 
-              MatchService.getInstance().getResultTypes().get(0));
+      MatchService.getInstance().setResult(mht,
+              resultTypes.get(random.nextInt(resultTypes.size())));
     }
 
     List<Object> results = DataBaseManager.namedQuery("MatchEntry.findAll");
@@ -94,6 +96,52 @@ public class MatchServiceTest extends AbstractServerTest
       MatchEntry m = (MatchEntry) result;
       assertEquals(m.getMatchHasTeamList().size(), 2);
       assertNotNull(m.getFormat());
+    });
+
+    assertTrue(match.getMatchHasTeamList().size() > 0);
+    //Check that the record is updated accordingly.
+    for (MatchHasTeam mht : match.getMatchHasTeamList())
+    {
+      MatchResult result = mht.getMatchResult();
+      MatchService.getInstance().lockMatchResult(result);
+
+      assertTrue(mht.getTeam().getPlayerList().size() > 0);
+      mht.getTeam().getPlayerList().forEach(p ->
+      {
+        switch (result.getMatchResultType().getType())
+        {
+          case "result.loss":
+            assertEquals(p.getRecordList().get(0).getWins(), 0);
+            assertEquals(p.getRecordList().get(0).getLoses(), 1);
+            assertEquals(p.getRecordList().get(0).getDraws(), 0);
+            break;
+          case "result.draw":
+            assertEquals(p.getRecordList().get(0).getWins(), 0);
+            assertEquals(p.getRecordList().get(0).getLoses(), 0);
+            assertEquals(p.getRecordList().get(0).getDraws(), 1);
+            break;
+          //Various reasons leading to a win.
+          case "result.win":
+          //Fall thru
+          case "result.forfeit":
+          //Fall thru
+          case "result.no_show":
+            assertEquals(p.getRecordList().get(0).getWins(), 1);
+            assertEquals(p.getRecordList().get(0).getLoses(), 0);
+            assertEquals(p.getRecordList().get(0).getDraws(), 0);
+            break;
+        }
+      });
+    }
+
+    // All players must hava a non-zero record.
+    assertFalse(PlayerService.getInstance().getAll().isEmpty());
+    PlayerService.getInstance().getAll().forEach(p ->
+    {
+      assertTrue(p.getRecordList().size() == 1);
+      assertTrue(p.getRecordList().get(0).getDraws()
+              + p.getRecordList().get(0).getLoses()
+              + p.getRecordList().get(0).getWins() > 0);
     });
   }
 }

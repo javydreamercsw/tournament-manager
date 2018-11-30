@@ -15,6 +15,8 @@ import org.testng.annotations.Test;
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
 public class FormatServiceTest extends AbstractServerTest
 {
@@ -22,7 +24,7 @@ public class FormatServiceTest extends AbstractServerTest
 
   @BeforeClass
   @Override
-  public void setup()
+  public void setup() throws NonexistentEntityException, IllegalOrphanException
   {
     super.setup();
     GameService.getInstance().saveGame(game);

@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -12,6 +14,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -37,6 +40,10 @@ public class MatchResult implements Serializable
   private MatchResultType matchResultType;
   @OneToMany(mappedBy = "matchResult")
   private List<MatchHasTeam> matchHasTeamList;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "locked")
+  private boolean locked;
 
   public MatchResult()
   {
@@ -84,6 +91,17 @@ public class MatchResult implements Serializable
   public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
   {
     this.matchHasTeamList = matchHasTeamList;
+  }
+  
+  
+  public boolean getLocked()
+  {
+    return locked;
+  }
+
+  public void setLocked(boolean locked)
+  {
+    this.locked = locked;
   }
 
   @Override

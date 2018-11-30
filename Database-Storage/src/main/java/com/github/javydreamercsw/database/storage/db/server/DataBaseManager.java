@@ -42,13 +42,13 @@ import com.googlecode.flyway.core.api.MigrationState;
 import com.googlecode.flyway.core.exception.FlywayException;
 
 @Messages(
-{
-  "result.win=Win",
-  "result.loss=Loss",
-  "result.draw=Draw",
-  "result.forfeit=Forfeit",
-  "result.no_show=No Show"
-})
+        {
+          "result.win=Win",
+          "result.loss=Loss",
+          "result.draw=Draw",
+          "result.forfeit=Forfeit",
+          "result.no_show=No Show"
+        })
 public class DataBaseManager
 {
 
@@ -546,11 +546,15 @@ public class DataBaseManager
       //Add a result
       boolean win = r.nextBoolean();
       MatchService.getInstance().setResult(match.getMatchHasTeamList().get(0),
-              MatchService.getInstance().getResultType(win ? 
-                      "result.win" : "result.loss").get());
+              MatchService.getInstance().getResultType(win
+                      ? "result.win" : "result.loss").get());
       MatchService.getInstance().setResult(match.getMatchHasTeamList().get(1),
-              MatchService.getInstance().getResultType(win ? 
-                      "result.loss" : "result.win").get());
+              MatchService.getInstance().getResultType(win
+                      ? "result.loss" : "result.win").get());
+      
+      //Lock the results so records are updated.
+      match.getMatchHasTeamList().forEach(mht
+              -> MatchService.getInstance().lockMatchResult(mht.getMatchResult()));
     }
   }
 }
