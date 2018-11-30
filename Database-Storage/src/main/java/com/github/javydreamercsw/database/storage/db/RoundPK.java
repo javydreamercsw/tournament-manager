@@ -8,11 +8,12 @@ import javax.persistence.Embeddable;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class RoundPK implements Serializable
 {
-  private static final long serialVersionUID = 5947445359540449916L;
+  private static final long serialVersionUID = -8356585559628974067L;
   @Basic(optional = false)
   @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "RoundGen")
@@ -24,6 +25,7 @@ public class RoundPK implements Serializable
           initialValue = 1)
   private int id;
   @Basic(optional = false)
+  @NotNull
   @Column(name = "tournament_id")
   private int tournamentId;
 
@@ -84,7 +86,7 @@ public class RoundPK implements Serializable
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.RoundPK[ id=" 
-            + id + ", tournamentId=" + tournamentId + " ]";
+    return "com.github.javydreamercsw.database.storage.db.RoundPK[ id=" + id
+            + ", tournamentId=" + tournamentId + " ]";
   }
 }

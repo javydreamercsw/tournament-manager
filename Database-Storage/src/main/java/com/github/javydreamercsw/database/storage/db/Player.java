@@ -7,7 +7,6 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,6 +17,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -25,13 +26,13 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "player")
 @XmlRootElement
 @NamedQueries(
-{
-  @NamedQuery(name = "Player.findAll", query = "SELECT p FROM Player p"),
-  @NamedQuery(name = "Player.findById", 
-          query = "SELECT p FROM Player p WHERE p.id = :id"),
-  @NamedQuery(name = "Player.findByName", 
-          query = "SELECT p FROM Player p WHERE p.name = :name")
-})
+        {
+          @NamedQuery(name = "Player.findAll", query = "SELECT p FROM Player p"),
+          @NamedQuery(name = "Player.findById",
+                  query = "SELECT p FROM Player p WHERE p.id = :id"),
+          @NamedQuery(name = "Player.findByName",
+                  query = "SELECT p FROM Player p WHERE p.name = :name")
+        })
 public class Player implements Serializable
 {
   private static final long serialVersionUID = 1L;
@@ -47,6 +48,8 @@ public class Player implements Serializable
   @Column(name = "id")
   private Integer id;
   @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 245)
   @Column(name = "name")
   private String name;
   @JoinTable(name = "team_has_player", joinColumns =
@@ -56,7 +59,7 @@ public class Player implements Serializable
   {
     @JoinColumn(name = "team_id", referencedColumnName = "id")
   })
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany
   private List<Team> teamList;
   @JoinTable(name = "player_has_record", joinColumns =
   {
@@ -65,13 +68,13 @@ public class Player implements Serializable
   {
     @JoinColumn(name = "record_id", referencedColumnName = "id")
   })
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany
   private List<Record> recordList;
 
   public Player()
   {
-    setRecordList(new ArrayList<>());
-    setTeamList(new ArrayList<>());
+    recordList = new ArrayList<>();
+    teamList = new ArrayList<>();
   }
 
   public Player(String name)
@@ -106,7 +109,7 @@ public class Player implements Serializable
     return teamList;
   }
 
-  public final void setTeamList(List<Team> teamList)
+  public void setTeamList(List<Team> teamList)
   {
     this.teamList = teamList;
   }
@@ -117,7 +120,7 @@ public class Player implements Serializable
     return recordList;
   }
 
-  public final void setRecordList(List<Record> recordList)
+  public void setRecordList(List<Record> recordList)
   {
     this.recordList = recordList;
   }

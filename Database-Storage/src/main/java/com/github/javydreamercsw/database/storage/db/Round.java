@@ -7,7 +7,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -22,7 +21,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries(
         {
-          @NamedQuery(name = "Round.findAll", query = "SELECT r FROM Round r"),
+          @NamedQuery(name = "Round.findAll",
+                  query = "SELECT r FROM Round r"),
           @NamedQuery(name = "Round.findById",
                   query = "SELECT r FROM Round r WHERE r.roundPK.id = :id"),
           @NamedQuery(name = "Round.findByTournamentId",
@@ -35,14 +35,14 @@ public class Round implements Serializable
   protected RoundPK roundPK;
   @JoinColumn(name = "tournament_id", referencedColumnName = "id",
           insertable = false, updatable = false)
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @ManyToOne(optional = false)
   private Tournament tournament;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "round", fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "round")
   private List<MatchEntry> matchEntryList;
 
   public Round()
   {
-    setMatchEntryList(new ArrayList<>());
+    matchEntryList = new ArrayList<>();
   }
 
   public Round(RoundPK roundPK)
@@ -81,7 +81,7 @@ public class Round implements Serializable
     return matchEntryList;
   }
 
-  public final void setMatchEntryList(List<MatchEntry> matchEntryList)
+  public void setMatchEntryList(List<MatchEntry> matchEntryList)
   {
     this.matchEntryList = matchEntryList;
   }
@@ -103,7 +103,7 @@ public class Round implements Serializable
       return false;
     }
     Round other = (Round) object;
-    return !((this.roundPK == null && other.roundPK != null)
+    return !((this.roundPK == null && other.roundPK != null) 
             || (this.roundPK != null && !this.roundPK.equals(other.roundPK)));
   }
 
