@@ -15,28 +15,28 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.openide.util.Exceptions;
 
-import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
-import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.tournament.manager.ui.views.formatlist.FormatList;
 import com.github.javydreamercsw.tournament.manager.ui.views.matchlist.MatchList;
 import com.github.javydreamercsw.tournament.manager.ui.views.playerlist.PlayerList;
 import com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist.TournamentList;
 import com.github.javydreamercsw.tournament.manager.ui.views.welcome.Welcome;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.page.Viewport;
-import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.InitialPageSettings;
@@ -53,16 +53,14 @@ public class MainLayout extends Div
 {
   private static final long serialVersionUID = 1412472530637429687L;
   private static boolean demo = false;
+  private static final Logger LOG
+          = Logger.getLogger(MainLayout.class.getSimpleName());
 
   static
   {
     try
     {
       InitialContext context = new InitialContext();
-      String JNDIDB = (String) context
-              .lookup("java:comp/env/tm/JNDIDB");
-      DataBaseManager.setPersistenceUnitName(JNDIDB);
-
       demo = (Boolean) context
               .lookup("java:comp/env/tm/demo");
     }
@@ -81,25 +79,37 @@ public class MainLayout extends Div
     welcome.add(new Icon(VaadinIcon.HOME), new Text("Welcome"));
     welcome.addClassName("main-layout__nav-item");
 
-    RouterLink tournaments = new RouterLink(null, TournamentList.class);
-    tournaments.add(new Icon(VaadinIcon.TROPHY), new Text("Tournaments"));
-    tournaments.addClassName("main-layout__nav-item");
+    RouterLink players = new RouterLink(null, PlayerList.class);
+    players.add(new Icon(VaadinIcon.USERS), new Text("Players"));
+    players.addClassName("main-layout__nav-item");
 
-    RouterLink matches = new RouterLink(null, MatchList.class);
-    matches.add(new Icon(VaadinIcon.LIST), new Text("Matches"));
-    matches.addClassName("main-layout__nav-item");
-    // Only show as active for the exact URL, but not for sub paths
-    matches.setHighlightCondition(HighlightConditions.sameLocation());
+    List<Component> components = new ArrayList<>();
+    components.add(welcome);
+    components.add(players);
+
+    if (demo)
+    {
+      RouterLink tournaments = new RouterLink(null, TournamentList.class);
+      tournaments.add(new Icon(VaadinIcon.TROPHY), new Text("Tournaments"));
+      tournaments.addClassName("main-layout__nav-item");
+      components.add(tournaments);
+    }
+
+    if (demo)
+    {
+      RouterLink matches = new RouterLink(null, MatchList.class);
+      matches.add(new Icon(VaadinIcon.LIST), new Text("Matches"));
+      matches.addClassName("main-layout__nav-item");
+      components.add(matches);
+    }
 
     RouterLink formats = new RouterLink(null, FormatList.class);
     formats.add(new Icon(VaadinIcon.ARCHIVES), new Text("Formats"));
     formats.addClassName("main-layout__nav-item");
 
-    RouterLink players = new RouterLink(null, PlayerList.class);
-    players.add(new Icon(VaadinIcon.USERS), new Text("Players"));
-    players.addClassName("main-layout__nav-item");
+    components.add(formats);
 
-    Div navigation = new Div(welcome, players, tournaments, matches, formats);
+    Div navigation = new Div(components.toArray(new Component[0]));
     navigation.addClassName("main-layout__nav");
 
     Div header = new Div(title, navigation);
@@ -107,29 +117,6 @@ public class MainLayout extends Div
     add(header);
 
     addClassName("main-layout");
-
-    // Check if it's configured for demo
-    if (demo && PlayerService.getInstance().findPlayers("").isEmpty())
-    {
-      try
-      {
-        Notification.show(
-                "Loading demo data...",
-                3000, Position.MIDDLE);
-
-        DataBaseManager.loadDemoData();
-
-        Notification.show(
-                "Loading demo data done!",
-                3000, Position.MIDDLE);
-      }
-      catch (Exception ex)
-      {
-        Notification.show(
-                "Error loading demo data!",
-                3000, Position.MIDDLE);
-      }
-    }
   }
 
   @Override

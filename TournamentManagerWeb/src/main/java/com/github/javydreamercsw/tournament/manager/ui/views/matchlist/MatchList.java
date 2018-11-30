@@ -28,6 +28,7 @@ import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
@@ -120,6 +121,28 @@ public class MatchList extends TMView
             .setResizable(true);
     grid.addColumn(MatchEntry::getMatchDate).setHeader("Date").setWidth("8em")
             .setResizable(true);
+    grid.addColumn(match ->
+    {
+      //Build a match name
+      StringBuilder sb = new StringBuilder();
+      match.getMatchHasTeamList().forEach((mht) ->
+      {
+        if (mht.getMatchResult() != null
+                && mht.getMatchResult().getMatchResultType().getType()
+                        .equals("result.win"))
+        {
+          sb.append("Winner: ").append(mht.getTeam().getName());
+        }
+      });
+      if (sb.toString().trim().isEmpty())
+      {
+        sb.append("TBD");
+      }
+      return sb.toString();
+    }).setHeader("Matches").setWidth("8em")
+            .setResizable(true);
+    grid.addColumn(new ComponentRenderer<>(this::resultButton))
+            .setWidth("4em");
     grid.addColumn(new ComponentRenderer<>(this::createEditButton))
             .setFlexGrow(0);
     grid.setSelectionMode(SelectionMode.NONE);
@@ -128,12 +151,29 @@ public class MatchList extends TMView
     add(container);
   }
 
-  private Button createEditButton(MatchEntry category)
+  private Button createEditButton(MatchEntry me)
   {
-    Button edit = new Button("Edit", event -> form.open(category,
+    Button edit = new Button("Edit", event -> form.open(me,
             AbstractEditorDialog.Operation.EDIT));
     edit.setIcon(new Icon("lumo", "edit"));
     edit.addClassName("match__edit");
+    edit.getElement().setAttribute("theme", "tertiary");
+    return edit;
+  }
+
+  private Button resultButton(MatchEntry me)
+  {
+    Button edit = new Button("Results", event ->
+    { // List all the teams so results can be seen/set.
+      Dialog dialog = new Dialog();
+      dialog.add(new ResultForm(me));
+      dialog.setCloseOnOutsideClick(true);
+      dialog.setHeight("25em");
+      dialog.setWidth("75em");
+      dialog.open();
+    });
+    edit.setIcon(new Icon("lumo", "edit"));
+    edit.addClassName("match__result");
     edit.getElement().setAttribute("theme", "tertiary");
     return edit;
   }

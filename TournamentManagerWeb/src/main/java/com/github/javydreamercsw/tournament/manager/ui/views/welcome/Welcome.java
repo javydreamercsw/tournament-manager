@@ -4,14 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.vaadin.maxime.MarkdownArea;
 
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
+import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 import com.github.javydreamercsw.database.storage.db.server.FormatService;
 import com.github.javydreamercsw.database.storage.db.server.GameService;
+import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.tournament.manager.api.IGame;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
@@ -19,6 +24,8 @@ import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeListener;
 import com.vaadin.flow.component.ItemLabelGenerator;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -28,6 +35,26 @@ import com.vaadin.flow.router.Route;
 public class Welcome extends TMView
 {
   private static final long serialVersionUID = 1252548231807630022L;
+  private static boolean demo = false;
+  
+  static
+  {
+    try
+    {
+      InitialContext context = new InitialContext();
+      
+      String JNDIDB = (String) context
+              .lookup("java:comp/env/tm/JNDIDB");
+      
+      DataBaseManager.setPersistenceUnitName(JNDIDB);
+      demo = (Boolean) context
+              .lookup("java:comp/env/tm/demo");
+    }
+    catch (NamingException ex)
+    {
+      Exceptions.printStackTrace(ex);
+    }
+  }
 
   public Welcome()
   {
@@ -90,6 +117,30 @@ public class Welcome extends TMView
           }
         });
         saveValue(CURRENT_GAME, gameAPI.getName());
+
+        // Check if it's configured for demo
+        if (demo && PlayerService.getInstance().getAll().isEmpty())
+        {
+          try
+          {
+            Notification.show(
+                    "Loading demo data...",
+                    3000, Position.MIDDLE);
+
+            DataBaseManager.loadDemoData();
+
+            Notification.show(
+                    "Loading demo data done!",
+                    3000, Position.MIDDLE);
+          }
+          catch (Exception ex)
+          {
+            Notification.show(
+                    "Error loading demo data!",
+                    3000, Position.MIDDLE);
+            Exceptions.printStackTrace(ex);
+          }
+        }
       }
     });
     cb.setEnabled(games.size() > 1);
