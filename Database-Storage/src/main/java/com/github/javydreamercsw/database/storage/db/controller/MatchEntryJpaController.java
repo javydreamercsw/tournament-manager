@@ -113,7 +113,10 @@ public class MatchEntryJpaController extends AbstractController implements Seria
 
   public void edit(MatchEntry matchEntry) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
-    matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
+    if (matchEntry.getRound() != null)
+    {
+      matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
+    }
     matchEntry.getMatchEntryPK().setFormatId(matchEntry.getFormat().getFormatPK().getId());
     EntityManager em = null;
     try

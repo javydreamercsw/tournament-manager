@@ -142,19 +142,11 @@ public class MatchService extends Service<MatchEntry>
     MatchHasTeam mht = new MatchHasTeam();
     mht.setTeam(team);
     mht.setMatchEntry(match);
-    mht.setMatchHasTeamPK(new MatchHasTeamPK(match.getMatchEntryPK().getId(),
-            match.getMatchEntryPK().getFormatId(), match.getFormat().getGame().getId(),
-            team.getId()));
+    mht.setMatchHasTeamPK(new MatchHasTeamPK(team.getId(),
+            match.getMatchEntryPK().getId(),
+            match.getMatchEntryPK().getFormatId(),
+            match.getFormat().getGame().getId()));
 
-//    MatchResult mr = new MatchResult();
-//    mr.setMatchResultType(mrtc.findMatchResultType(1));
-//
-//    if (match.getMatchEntryPK() != null)
-//    {
-//      mrc.create(mr);
-//    }
-//
-//    mht.setMatchResult(mr);
     if (match.getMatchEntryPK() != null)
     {
       mhtc.create(mht);

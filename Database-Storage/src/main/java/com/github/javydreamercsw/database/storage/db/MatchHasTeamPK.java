@@ -10,50 +10,35 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class MatchHasTeamPK implements Serializable
 {
-  private static final long serialVersionUID = 6311823088197369673L;
-  @Basic(optional = false)
-  @NotNull
-  @Column(name = "match_id")
-  private int matchId;
-  @Basic(optional = false)
-  @NotNull
-  @Column(name = "match_format_id")
-  private int formatId;
-  @Basic(optional = false)
-  @NotNull
-  @Column(name = "match_game_id")
-  private int gameId;
+  private static final long serialVersionUID = 7694489413464173357L;
   @Basic(optional = false)
   @NotNull
   @Column(name = "team_id")
   private int teamId;
-  @Basic(optional = true)
-  @Column(name = "match_result_id")
-  private int matchResultId;
-  @Basic(optional = true)
-  @Column(name = "match_result_match_result_type_id")
-  private int matchResultMatchResultTypeId;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "match_entry_id")
+  private int matchEntryId;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "match_entry_format_id")
+  private int matchEntryFormatId;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "match_entry_format_game_id")
+  private int matchEntryFormatGameId;
 
   public MatchHasTeamPK()
   {
   }
 
-  public MatchHasTeamPK(int matchId, int formatId, int gameId, int teamId)
+  public MatchHasTeamPK(int teamId, int matchEntryId, int matchEntryFormatId, 
+          int matchEntryFormatGameId)
   {
-    this.matchId = matchId;
-    this.formatId = formatId;
-    this.gameId = gameId;
     this.teamId = teamId;
-  }
-
-  public int getMatchId()
-  {
-    return matchId;
-  }
-
-  public void setMatchId(int matchId)
-  {
-    this.matchId = matchId;
+    this.matchEntryId = matchEntryId;
+    this.matchEntryFormatId = matchEntryFormatId;
+    this.matchEntryFormatGameId = matchEntryFormatGameId;
   }
 
   public int getTeamId()
@@ -66,12 +51,44 @@ public class MatchHasTeamPK implements Serializable
     this.teamId = teamId;
   }
 
+  public int getMatchEntryId()
+  {
+    return matchEntryId;
+  }
+
+  public void setMatchEntryId(int matchEntryId)
+  {
+    this.matchEntryId = matchEntryId;
+  }
+
+  public int getMatchEntryFormatId()
+  {
+    return matchEntryFormatId;
+  }
+
+  public void setMatchEntryFormatId(int matchEntryFormatId)
+  {
+    this.matchEntryFormatId = matchEntryFormatId;
+  }
+
+  public int getMatchEntryFormatGameId()
+  {
+    return matchEntryFormatGameId;
+  }
+
+  public void setMatchEntryFormatGameId(int matchEntryFormatGameId)
+  {
+    this.matchEntryFormatGameId = matchEntryFormatGameId;
+  }
+
   @Override
   public int hashCode()
   {
     int hash = 0;
-    hash += (int) matchId;
     hash += (int) teamId;
+    hash += (int) matchEntryId;
+    hash += (int) matchEntryFormatId;
+    hash += (int) matchEntryFormatGameId;
     return hash;
   }
 
@@ -84,85 +101,27 @@ public class MatchHasTeamPK implements Serializable
       return false;
     }
     MatchHasTeamPK other = (MatchHasTeamPK) object;
-    if (this.matchId != other.matchId)
-    {
-      return false;
-    }
     if (this.teamId != other.teamId)
     {
       return false;
     }
-    return true;
+    if (this.matchEntryId != other.matchEntryId)
+    {
+      return false;
+    }
+    if (this.matchEntryFormatId != other.matchEntryFormatId)
+    {
+      return false;
+    }
+    return this.matchEntryFormatGameId == other.matchEntryFormatGameId;
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.MatchHasTeamPK[ matchId=" + matchId + ", teamId=" + teamId + " ]";
+    return "com.github.javydreamercsw.database.storage.db.MatchHasTeamPK[ teamId=" 
+            + teamId + ", matchEntryId=" + matchEntryId + ", matchEntryFormatId="
+            + matchEntryFormatId + ", matchEntryFormatGameId="
+            + matchEntryFormatGameId + " ]";
   }
-
-  /**
-   * @return the formatId
-   */
-  public int getFormatId()
-  {
-    return formatId;
-  }
-
-  /**
-   * @param formatId the formatId to set
-   */
-  public void setFormatId(int formatId)
-  {
-    this.formatId = formatId;
-  }
-
-  /**
-   * @return the gameId
-   */
-  public int getGameId()
-  {
-    return gameId;
-  }
-
-  /**
-   * @param gameId the gameId to set
-   */
-  public void setGameId(int gameId)
-  {
-    this.gameId = gameId;
-  }
-
-  /**
-   * @return the matchResultId
-   */
-  public int getMatchResultId()
-  {
-    return matchResultId;
-  }
-
-  /**
-   * @param matchResultId the matchResultId to set
-   */
-  public void setMatchResultId(int matchResultId)
-  {
-    this.matchResultId = matchResultId;
-  }
-
-  /**
-   * @return the matchResultMatchResultTypeId
-   */
-  public int getMatchResultMatchResultTypeId()
-  {
-    return matchResultMatchResultTypeId;
-  }
-
-  /**
-   * @param matchResultMatchResultTypeId the matchResultMatchResultTypeId to set
-   */
-  public void setMatchResultMatchResultTypeId(int matchResultMatchResultTypeId)
-  {
-    this.matchResultMatchResultTypeId = matchResultMatchResultTypeId;
-  }
-
 }

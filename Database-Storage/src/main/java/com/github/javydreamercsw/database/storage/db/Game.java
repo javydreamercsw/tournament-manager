@@ -15,6 +15,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -36,6 +38,7 @@ public class Game implements Serializable
   private static final long serialVersionUID = 1L;
   @Id
   @Basic(optional = false)
+  @NotNull
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "GameGen")
   @TableGenerator(name = "GameGen", table = "tm_id",
           pkColumnName = "table_name",
@@ -46,8 +49,11 @@ public class Game implements Serializable
   @Column(name = "id")
   private Integer id;
   @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 45)
   @Column(name = "name")
   private String name;
+  @Size(max = 255)
   @Column(name = "description")
   private String description;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
@@ -129,5 +135,4 @@ public class Game implements Serializable
   {
     return "com.github.javydreamercsw.database.storage.db.Game[ id=" + id + " ]";
   }
-  
 }
