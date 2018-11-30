@@ -5,44 +5,40 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class MatchHasTeamPK implements Serializable
 {
-  private static final long serialVersionUID = 1692252424439773610L;
+  private static final long serialVersionUID = 7694489413464173357L;
   @Basic(optional = false)
-  @Column(name = "match_id")
-  private int matchId;
-  @Basic(optional = false)
+  @NotNull
   @Column(name = "team_id")
   private int teamId;
   @Basic(optional = false)
-  @Column(name = "match_result_id")
-  private int matchResultId;
+  @NotNull
+  @Column(name = "match_entry_id")
+  private int matchEntryId;
   @Basic(optional = false)
-  @Column(name = "match_result_match_result_type_id")
-  private int matchResultMatchResultTypeId;
+  @NotNull
+  @Column(name = "match_entry_format_id")
+  private int matchEntryFormatId;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "match_entry_format_game_id")
+  private int matchEntryFormatGameId;
 
   public MatchHasTeamPK()
   {
   }
 
-  public MatchHasTeamPK(int matchId, int teamId, int matchResultId, int matchResultMatchResultTypeId)
+  public MatchHasTeamPK(int teamId, int matchEntryId, int matchEntryFormatId, 
+          int matchEntryFormatGameId)
   {
-    this.matchId = matchId;
     this.teamId = teamId;
-    this.matchResultId = matchResultId;
-    this.matchResultMatchResultTypeId = matchResultMatchResultTypeId;
-  }
-
-  public int getMatchId()
-  {
-    return matchId;
-  }
-
-  public void setMatchId(int matchId)
-  {
-    this.matchId = matchId;
+    this.matchEntryId = matchEntryId;
+    this.matchEntryFormatId = matchEntryFormatId;
+    this.matchEntryFormatGameId = matchEntryFormatGameId;
   }
 
   public int getTeamId()
@@ -55,34 +51,44 @@ public class MatchHasTeamPK implements Serializable
     this.teamId = teamId;
   }
 
-  public int getMatchResultId()
+  public int getMatchEntryId()
   {
-    return matchResultId;
+    return matchEntryId;
   }
 
-  public void setMatchResultId(int matchResultId)
+  public void setMatchEntryId(int matchEntryId)
   {
-    this.matchResultId = matchResultId;
+    this.matchEntryId = matchEntryId;
   }
 
-  public int getMatchResultMatchResultTypeId()
+  public int getMatchEntryFormatId()
   {
-    return matchResultMatchResultTypeId;
+    return matchEntryFormatId;
   }
 
-  public void setMatchResultMatchResultTypeId(int matchResultMatchResultTypeId)
+  public void setMatchEntryFormatId(int matchEntryFormatId)
   {
-    this.matchResultMatchResultTypeId = matchResultMatchResultTypeId;
+    this.matchEntryFormatId = matchEntryFormatId;
+  }
+
+  public int getMatchEntryFormatGameId()
+  {
+    return matchEntryFormatGameId;
+  }
+
+  public void setMatchEntryFormatGameId(int matchEntryFormatGameId)
+  {
+    this.matchEntryFormatGameId = matchEntryFormatGameId;
   }
 
   @Override
   public int hashCode()
   {
     int hash = 0;
-    hash += (int) matchId;
     hash += (int) teamId;
-    hash += (int) matchResultId;
-    hash += (int) matchResultMatchResultTypeId;
+    hash += (int) matchEntryId;
+    hash += (int) matchEntryFormatId;
+    hash += (int) matchEntryFormatGameId;
     return hash;
   }
 
@@ -95,27 +101,27 @@ public class MatchHasTeamPK implements Serializable
       return false;
     }
     MatchHasTeamPK other = (MatchHasTeamPK) object;
-    if (this.matchId != other.matchId)
-    {
-      return false;
-    }
     if (this.teamId != other.teamId)
     {
       return false;
     }
-    if (this.matchResultId != other.matchResultId)
+    if (this.matchEntryId != other.matchEntryId)
     {
       return false;
     }
-    return this.matchResultMatchResultTypeId == other.matchResultMatchResultTypeId;
+    if (this.matchEntryFormatId != other.matchEntryFormatId)
+    {
+      return false;
+    }
+    return this.matchEntryFormatGameId == other.matchEntryFormatGameId;
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.MatchHasTeamPK[ matchId="
-            + matchId + ", teamId=" + teamId + ", matchResultId=" + matchResultId
-            + ", matchResultMatchResultTypeId=" + matchResultMatchResultTypeId + " ]";
+    return "com.github.javydreamercsw.database.storage.db.MatchHasTeamPK[ teamId=" 
+            + teamId + ", matchEntryId=" + matchEntryId + ", matchEntryFormatId="
+            + matchEntryFormatId + ", matchEntryFormatGameId="
+            + matchEntryFormatGameId + " ]";
   }
-
 }

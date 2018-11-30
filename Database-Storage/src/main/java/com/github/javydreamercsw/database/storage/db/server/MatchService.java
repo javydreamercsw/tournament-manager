@@ -3,13 +3,17 @@ package com.github.javydreamercsw.database.storage.db.server;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeamPK;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
+import com.github.javydreamercsw.database.storage.db.MatchResultType;
+import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.MatchEntryJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.MatchHasTeamJpaController;
@@ -69,6 +73,12 @@ public class MatchService extends Service<MatchEntry>
     return SingletonHolder.INSTANCE;
   }
 
+  /**
+   * Save a match to the database.
+   *
+   * @param match Match to save.
+   * @throws Exception if something goes wrong with the database.
+   */
   public void saveMatch(MatchEntry match) throws Exception
   {
     if (match.getMatchEntryPK() != null
@@ -82,22 +92,29 @@ public class MatchService extends Service<MatchEntry>
     }
   }
 
-  public void deleteMatch(MatchEntry match)
+  /**
+   * Delete a match from the database.
+   *
+   * @param match Match to delete.
+   * @throws NonexistentEntityException if match doesn't exist
+   * @throws IllegalOrphanException if an entity was left orphan.
+   */
+  public void deleteMatch(MatchEntry match) throws NonexistentEntityException,
+          IllegalOrphanException
   {
-    try
+    for (MatchHasTeam mht : match.getMatchHasTeamList())
     {
-      for (MatchHasTeam mht : match.getMatchHasTeamList())
-      {
-        mhtc.destroy(mht.getMatchHasTeamPK());
-      }
-      mc.destroy(match.getMatchEntryPK());
+      mhtc.destroy(mht.getMatchHasTeamPK());
     }
-    catch (IllegalOrphanException | NonexistentEntityException ex)
-    {
-      Exceptions.printStackTrace(ex);
-    }
+    mc.destroy(match.getMatchEntryPK());
   }
 
+  /**
+   * Find matches of the specified format.
+   *
+   * @param format Format name to look for.
+   * @return List of matches with the specified format.
+   */
   public List<MatchEntry> findMatchesWithFormat(String format)
   {
     List<MatchEntry> results = new ArrayList<>();
@@ -112,6 +129,12 @@ public class MatchService extends Service<MatchEntry>
     return results;
   }
 
+  /**
+   * Find a match by db key.
+   *
+   * @param key Key for the match.
+   * @return Match or null if not found.
+   */
   public List<MatchEntry> findMatch(MatchEntryPK key)
   {
     List<MatchEntry> results = new ArrayList<>();
@@ -123,11 +146,15 @@ public class MatchService extends Service<MatchEntry>
     return results;
   }
 
-  public List<MatchEntry> findMatches()
-  {
-    return mc.findMatchEntryEntities();
-  }
-
+  /**
+   * Add a team to a match.
+   *
+   * @param match Match to be added to.
+   * @param team Team to add
+   * @return true if added. False if team already in the match or was unable to
+   * be added.
+   * @throws Exception persisting to data base.
+   */
   public boolean addTeam(MatchEntry match, Team team) throws Exception
   {
     // Check the team is not in this match already
@@ -139,16 +166,10 @@ public class MatchService extends Service<MatchEntry>
     MatchHasTeam mht = new MatchHasTeam();
     mht.setTeam(team);
     mht.setMatchEntry(match);
-
-    MatchResult mr = new MatchResult();
-    mr.setMatchResultType(mrtc.findMatchResultType(1));
-
-    if (match.getMatchEntryPK() != null)
-    {
-      mrc.create(mr);
-    }
-
-    mht.setMatchResult(mr);
+    mht.setMatchHasTeamPK(new MatchHasTeamPK(team.getId(),
+            match.getMatchEntryPK().getId(),
+            match.getMatchEntryPK().getFormatId(),
+            match.getFormat().getGame().getId()));
 
     if (match.getMatchEntryPK() != null)
     {
@@ -159,6 +180,13 @@ public class MatchService extends Service<MatchEntry>
     return true;
   }
 
+  /**
+   * Remove team from match.
+   *
+   * @param match Match to remove from.
+   * @param team Team to remove.
+   * @throws NonexistentEntityException if team doesn't exist in match.
+   */
   public void removeTeam(MatchEntry match, Team team)
           throws NonexistentEntityException
   {
@@ -185,5 +213,101 @@ public class MatchService extends Service<MatchEntry>
   public List<MatchEntry> getAll()
   {
     return mc.findMatchEntryEntities();
+  }
+
+  /**
+   * Get result type by name.
+   *
+   * @param type type to search for (as found in the data base).
+   * @return Optional type.
+   */
+  public Optional<MatchResultType> getResultType(String type)
+  {
+    for (MatchResultType mrt : getResultTypes())
+    {
+      if (mrt.getType().equals(type))
+      {
+        return Optional.of(mrt);
+      }
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Get all Result Types.
+   *
+   * @return list of result types.
+   */
+  public List<MatchResultType> getResultTypes()
+  {
+    return mrtc.findMatchResultTypeEntities();
+  }
+
+  /**
+   * Set result for a match.
+   *
+   * @param mht Team to assign result to.
+   * @param mrt Result type.
+   * @throws NonexistentEntityException If something doesn't exist.
+   * @throws Exception persisting to data base
+   */
+  public void setResult(MatchHasTeam mht, MatchResultType mrt)
+          throws NonexistentEntityException, Exception
+  {
+    if (mht.getMatchResult() != null)
+    {
+      //Delete the old one.
+      mrc.destroy(mht.getMatchResult().getMatchResultPK());
+    }
+    MatchResult mr = new MatchResult();
+    mr.setMatchResultType(mrt);
+    mr.getMatchHasTeamList().add(mht);
+    mrc.create(mr);
+    mht.setMatchResult(mr);
+  }
+
+  /**
+   * Lock the match result. This is meant not to be undone as it calculates
+   * experience and update records which is dependent on when it happens.
+   *
+   * @param mr Match Result to lock.
+   */
+  public void lockMatchResult(MatchResult mr)
+  {
+    mr.setLocked(true);
+
+    // Update the record
+    mr.getMatchHasTeamList().forEach(mht ->
+    {
+      mht.getTeam().getPlayerList().forEach(player ->
+      {
+        Record record = player.getRecordList().get(0);
+        switch (mr.getMatchResultType().getType())
+        {
+          case "result.loss":
+            record.setLoses(record.getLoses() + 1);
+            break;
+          case "result.draw":
+            record.setDraws(record.getDraws() + 1);
+            break;
+            //Various reasons leading to a win.
+          case "result.win":
+          //Fall thru
+          case "result.forfeit":
+          //Fall thru
+          case "result.no_show":
+            record.setWins(record.getWins() + 1);
+            break;
+        }
+        try
+        {
+          RecordService.getInstance().saveRecord(record);
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      });
+    });
   }
 }

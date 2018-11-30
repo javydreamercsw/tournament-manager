@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -31,15 +30,15 @@ public class TournamentHasTeam implements Serializable
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected TournamentHasTeamPK tournamentHasTeamPK;
-  @ManyToMany(mappedBy = "tournamentHasTeamList", fetch = FetchType.LAZY)
+  @ManyToMany(mappedBy = "tournamentHasTeamList")
   private List<Record> recordList;
   @JoinColumn(name = "team_id", referencedColumnName = "id", insertable = false, 
           updatable = false)
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @ManyToOne(optional = false)
   private Team team;
   @JoinColumn(name = "tournament_id", referencedColumnName = "id", 
           insertable = false, updatable = false)
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @ManyToOne(optional = false)
   private Tournament tournament;
 
   public TournamentHasTeam()

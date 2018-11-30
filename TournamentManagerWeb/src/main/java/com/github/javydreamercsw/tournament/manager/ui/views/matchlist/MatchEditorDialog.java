@@ -55,7 +55,7 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
   private final Grid<Team> grid = new Grid<>();
   private final ComboBox<Format> cb = new ComboBox<>();
   private final DatePicker datePicker = new DatePicker();
-  
+
   public MatchEditorDialog(BiConsumer<MatchEntry, Operation> itemSaver,
           Consumer<MatchEntry> itemDeleter)
   {
@@ -65,12 +65,12 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
     addDate();
     validate();
   }
-  
+
   @Override
   protected void confirmDelete()
   {
     boolean canDelete = getCurrentItem().getRound() != null;
-    
+
     if (canDelete)
     {
       // Check if it has results already.
@@ -94,14 +94,14 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
       doDelete(getCurrentItem());
     }
   }
-  
+
   private void addTeams()
   {
     getFormLayout().add(grid);
-    
+
     grid.addColumn(Team::getName).setHeader("Name").setWidth("8em")
             .setResizable(true);
-    
+
     grid.addColumn(new ComponentRenderer<>(team ->
     {
       Checkbox checkbox = new Checkbox("", new TeamSelectionListener(team));
@@ -118,13 +118,13 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
       return checkbox;
     })).setHeader("Selected");
   }
-  
+
   private void addFormat()
   {
     List<Format> formats = FormatService.getInstance().findFormatByGame(
             (String) VaadinService.getCurrentRequest().getWrappedSession()
                     .getAttribute(CURRENT_GAME));
-    
+
     cb.setLabel("Select a Format: ");
     cb.setDataProvider(new ListDataProvider(formats));
     cb.setItemLabelGenerator(new FormatLabelGenerator());
@@ -134,35 +134,35 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
     cb.addValueChangeListener(new ValueChangeListener()
     {
       private static final long serialVersionUID = 5377566605252849942L;
-      
+
       @Override
       public void valueChanged(ValueChangeEvent e)
       {
         validate();
       }
     });
-    
+
     getBinder().forField(cb).bind(MatchEntry::getFormat, MatchEntry::setFormat);
-    
+
     cb.setEnabled(formats.size() > 1);
     if (formats.size() == 1)
     {
       // Select the only option
       cb.setValue(formats.get(0));
     }
-    
+
     getFormLayout().add(cb);
   }
-  
+
   private void addDate()
   {
     getBinder().forField(datePicker)
             .bind(MatchEntry::getMatchDate, MatchEntry::setMatchDate);
-    
+
     datePicker.addValueChangeListener(new ValueChangeListener()
     {
       private static final long serialVersionUID = 5377566605252849942L;
-      
+
       @Override
       public void valueChanged(ValueChangeEvent e)
       {
@@ -170,13 +170,13 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
       }
     });
     getFormLayout().add(datePicker);
-    
+
     if (datePicker.getValue() == null)
     {
       datePicker.setValue(LocalDate.now());
     }
   }
-  
+
   @Override
   protected boolean isValid()
   {
@@ -184,18 +184,18 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
             && datePicker.getValue() != null
             && getCurrentItem().getMatchHasTeamList().size() >= 2;
   }
-  
+
   private class TeamSelectionListener implements
           ValueChangeListener<ComponentValueChangeEvent<Checkbox, Boolean>>
   {
     private static final long serialVersionUID = 1991737314876349305L;
     private final Team team;
-    
+
     public TeamSelectionListener(Team team)
     {
       this.team = team;
     }
-    
+
     @Override
     public void valueChanged(ComponentValueChangeEvent<Checkbox, Boolean> e)
     {
@@ -226,19 +226,19 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
       validate();
     }
   }
-  
+
   @Override
   public void open()
   {
-    List<Team> teams = TeamService.getInstance().findTeams("");
+    List<Team> teams = TeamService.getInstance().getAll();
     grid.setItems(teams);
     super.open();
   }
-  
+
   private class FormatLabelGenerator implements ItemLabelGenerator<Format>
   {
     private static final long serialVersionUID = -738603579674658479L;
-    
+
     @Override
     public String apply(Format f)
     {

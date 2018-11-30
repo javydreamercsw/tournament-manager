@@ -5,15 +5,18 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class TournamentHasTeamPK implements Serializable
 {
-  private static final long serialVersionUID = -5811393046410368312L;
+  private static final long serialVersionUID = 2563324495027629204L;
   @Basic(optional = false)
+  @NotNull
   @Column(name = "tournament_id")
   private int tournamentId;
   @Basic(optional = false)
+  @NotNull
   @Column(name = "team_id")
   private int teamId;
 

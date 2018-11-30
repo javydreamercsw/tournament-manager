@@ -6,12 +6,18 @@
     <!-- H2 Embedded Database, not for production.
     Note: For H2, make sure this values match the contents of
     web.xml for proper shutdown of H2 database!-->
-    <Resource auth="Container" driverClassName="org.h2.Driver" maxActive="100" maxIdle="30" maxWait="10000" name="jdbc/TMDB" password="" type="javax.sql.DataSource" url="jdbc:h2:file:~/TournamentManager/data/TM;CREATE=TRUE;LOCK_TIMEOUT=10000;AUTO_SERVER=TRUE" username="root"/>
-    <!-- MySQL Database
-<Resource auth="Container" driverClassName="com.mysql.jdbc.Driver"
+    <Resource auth="Container" driverClassName="org.h2.Driver" 
+              maxActive="100" maxIdle="30" maxWait="10000" 
+              name="jdbc/TMDB" 
+              password=""
+              username="root"
+              type="javax.sql.DataSource" 
+              url="jdbc:h2:file:~/TournamentManager/data/TM;CREATE=TRUE;LOCK_TIMEOUT=10000;AUTO_SERVER=TRUE"/>
+    <!-- MySQL Database 
+<Resource auth="Container" driverClassName="com.mysql.cj.jdbc.Driver"
     maxActive="100" maxIdle="30" maxWait="10000" name="jdbc/TMDB"
     password="" type="javax.sql.DataSource"
-    url="jdbc:mysql://localhost:3306/TM?autoReconnect=true"
+    url="jdbc:mysql://localhost:3306/Tournament?autoReconnect=true"
     username="root"/>-->
     <!-- Oracle Database
 <Resource auth="Container" driverClassName="oracle.jdbc.driver.OracleDriver"

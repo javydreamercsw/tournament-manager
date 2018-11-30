@@ -7,7 +7,6 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,6 +17,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -25,17 +25,17 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "record")
 @XmlRootElement
 @NamedQueries(
-        {
-          @NamedQuery(name = "Record.findAll", query = "SELECT r FROM Record r"),
-          @NamedQuery(name = "Record.findById",
-                  query = "SELECT r FROM Record r WHERE r.id = :id"),
-          @NamedQuery(name = "Record.findByWins",
-                  query = "SELECT r FROM Record r WHERE r.wins = :wins"),
-          @NamedQuery(name = "Record.findByLoses",
-                  query = "SELECT r FROM Record r WHERE r.loses = :loses"),
-          @NamedQuery(name = "Record.findByDraws",
-                  query = "SELECT r FROM Record r WHERE r.draws = :draws")
-        })
+{
+  @NamedQuery(name = "Record.findAll", query = "SELECT r FROM Record r"),
+  @NamedQuery(name = "Record.findById", 
+          query = "SELECT r FROM Record r WHERE r.id = :id"),
+  @NamedQuery(name = "Record.findByWins", 
+          query = "SELECT r FROM Record r WHERE r.wins = :wins"),
+  @NamedQuery(name = "Record.findByLoses", 
+          query = "SELECT r FROM Record r WHERE r.loses = :loses"),
+  @NamedQuery(name = "Record.findByDraws", 
+          query = "SELECT r FROM Record r WHERE r.draws = :draws")
+})
 public class Record implements Serializable
 {
   private static final long serialVersionUID = 1L;
@@ -51,27 +51,30 @@ public class Record implements Serializable
   @Column(name = "id")
   private Integer id;
   @Basic(optional = false)
+  @NotNull
   @Column(name = "wins")
   private int wins;
   @Basic(optional = false)
+  @NotNull
   @Column(name = "loses")
   private int loses;
   @Basic(optional = false)
+  @NotNull
   @Column(name = "draws")
   private int draws;
-  @ManyToMany(mappedBy = "recordList", fetch = FetchType.LAZY)
+  @ManyToMany(mappedBy = "recordList")
   private List<Player> playerList;
   @JoinTable(name = "tournament_has_team_has_record", joinColumns =
   {
     @JoinColumn(name = "record_id", referencedColumnName = "id")
   }, inverseJoinColumns =
   {
-    @JoinColumn(name = "tournament_has_team_tournament_id",
+    @JoinColumn(name = "tournament_has_team_tournament_id", 
             referencedColumnName = "tournament_id"),
-    @JoinColumn(name = "tournament_has_team_team_id",
+    @JoinColumn(name = "tournament_has_team_team_id", 
             referencedColumnName = "team_id")
   })
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany
   private List<TournamentHasTeam> tournamentHasTeamList;
 
   public Record()
@@ -167,7 +170,7 @@ public class Record implements Serializable
       return false;
     }
     Record other = (Record) object;
-    return !((this.id == null && other.id != null)
+    return !((this.id == null && other.id != null) 
             || (this.id != null && !this.id.equals(other.id)));
   }
 

@@ -1,7 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
-import com.github.javydreamercsw.database.storage.db.server.AbstractController;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +17,12 @@ import com.github.javydreamercsw.database.storage.db.MatchResultPK;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class MatchResultJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -4857066805022202452L;
+
   public MatchResultJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -277,5 +277,5 @@ public class MatchResultJpaController extends AbstractController implements Seri
       em.close();
     }
   }
-  
+
 }

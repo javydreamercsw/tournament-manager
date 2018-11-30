@@ -63,8 +63,6 @@ public class PlayerList extends TMView
 
     addSearchBar();
     addContent();
-
-    updateView();
   }
 
   private void initView()

@@ -2,6 +2,8 @@ package com.github.javydreamercsw.database.storage.db;
 
 import org.testng.annotations.BeforeClass;
 
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 import com.github.javydreamercsw.database.storage.db.server.FormatService;
 import com.github.javydreamercsw.database.storage.db.server.GameService;
@@ -21,11 +23,13 @@ public class AbstractServerTest
   }
 
   @BeforeClass
-  public void setup()
+  public void setup() throws NonexistentEntityException, IllegalOrphanException
   {
     DataBaseManager.setPersistenceUnitName("TestTMPU");
-    MatchService.getInstance().getAll().forEach(match
-            -> MatchService.getInstance().deleteMatch(match));
+    for (MatchEntry match : MatchService.getInstance().getAll())
+    {
+      MatchService.getInstance().deleteMatch(match);
+    }
     TeamService.getInstance().getAll().forEach(team
             -> TeamService.getInstance().deleteTeam(team));
     PlayerService.getInstance().getAll().forEach(player

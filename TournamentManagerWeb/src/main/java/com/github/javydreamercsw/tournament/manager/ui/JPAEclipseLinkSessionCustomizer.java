@@ -1,5 +1,6 @@
 package com.github.javydreamercsw.tournament.manager.ui;
 
+import static com.github.javydreamercsw.database.storage.db.server.DataBaseManager.JNDI_DATASOURCE_NAME;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 
@@ -20,8 +21,6 @@ import org.eclipse.persistence.sessions.Session;
  */
 public class JPAEclipseLinkSessionCustomizer implements SessionCustomizer {
 
-    public static final String JNDI_DATASOURCE_NAME
-            = "java:comp/env/jdbc/TMDB";
     private static final Logger LOG
             = getLogger(JPAEclipseLinkSessionCustomizer.class.getSimpleName());
 

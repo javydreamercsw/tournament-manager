@@ -8,11 +8,12 @@ import javax.persistence.Embeddable;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class MatchResultPK implements Serializable
 {
-  private static final long serialVersionUID = 1317423482141205015L;
+  private static final long serialVersionUID = -4935072391952815681L;
   @Basic(optional = false)
   @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "MatchResultGen")
@@ -21,9 +22,10 @@ public class MatchResultPK implements Serializable
           valueColumnName = "last_id",
           pkColumnValue = "match_result",
           allocationSize = 1,
-          initialValue = 1_000)
+          initialValue = 1)
   private int id;
   @Basic(optional = false)
+  @NotNull
   @Column(name = "match_result_type_id")
   private int matchResultTypeId;
 
@@ -84,7 +86,7 @@ public class MatchResultPK implements Serializable
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.MatchResultPK[ id=" 
+    return "com.github.javydreamercsw.database.storage.db.MatchResultPK[ id="
             + id + ", matchResultTypeId=" + matchResultTypeId + " ]";
-  } 
+  }
 }

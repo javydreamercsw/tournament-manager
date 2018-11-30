@@ -8,6 +8,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class FormatPK implements Serializable
@@ -24,6 +25,7 @@ public class FormatPK implements Serializable
           initialValue = 1)
   private int id;
   @Basic(optional = false)
+  @NotNull
   @Column(name = "game_id")
   private int gameId;
 
@@ -84,6 +86,7 @@ public class FormatPK implements Serializable
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.FormatPK[ id=" + id + ", gameId=" + gameId + " ]";
+    return "com.github.javydreamercsw.database.storage.db.FormatPK[ id=" + id 
+            + ", gameId=" + gameId + " ]";
   }
 }

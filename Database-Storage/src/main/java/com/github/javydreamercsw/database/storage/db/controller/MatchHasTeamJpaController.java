@@ -1,7 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.controller;
 
-import com.github.javydreamercsw.database.storage.db.server.AbstractController;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -19,6 +17,7 @@ import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
+import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class MatchHasTeamJpaController extends AbstractController implements Serializable
 {
@@ -35,10 +34,10 @@ public class MatchHasTeamJpaController extends AbstractController implements Ser
     {
       matchHasTeam.setMatchHasTeamPK(new MatchHasTeamPK());
     }
-    matchHasTeam.getMatchHasTeamPK().setMatchId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
-    matchHasTeam.getMatchHasTeamPK().setMatchResultMatchResultTypeId(matchHasTeam.getMatchResult().getMatchResultPK().getMatchResultTypeId());
+    matchHasTeam.getMatchHasTeamPK().setMatchEntryFormatId(matchHasTeam.getMatchEntry().getMatchEntryPK().getFormatId());
     matchHasTeam.getMatchHasTeamPK().setTeamId(matchHasTeam.getTeam().getId());
-    matchHasTeam.getMatchHasTeamPK().setMatchResultId(matchHasTeam.getMatchResult().getMatchResultPK().getId());
+    matchHasTeam.getMatchHasTeamPK().setMatchEntryId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
+    matchHasTeam.getMatchHasTeamPK().setMatchEntryFormatGameId(matchHasTeam.getMatchEntry().getMatchEntryPK().getFormatGameId());
     EntityManager em = null;
     try
     {
@@ -99,10 +98,10 @@ public class MatchHasTeamJpaController extends AbstractController implements Ser
 
   public void edit(MatchHasTeam matchHasTeam) throws NonexistentEntityException, Exception
   {
-    matchHasTeam.getMatchHasTeamPK().setMatchId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
-    matchHasTeam.getMatchHasTeamPK().setMatchResultMatchResultTypeId(matchHasTeam.getMatchResult().getMatchResultPK().getMatchResultTypeId());
+    matchHasTeam.getMatchHasTeamPK().setMatchEntryFormatId(matchHasTeam.getMatchEntry().getMatchEntryPK().getFormatId());
     matchHasTeam.getMatchHasTeamPK().setTeamId(matchHasTeam.getTeam().getId());
-    matchHasTeam.getMatchHasTeamPK().setMatchResultId(matchHasTeam.getMatchResult().getMatchResultPK().getId());
+    matchHasTeam.getMatchHasTeamPK().setMatchEntryId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
+    matchHasTeam.getMatchHasTeamPK().setMatchEntryFormatGameId(matchHasTeam.getMatchEntry().getMatchEntryPK().getFormatGameId());
     EntityManager em = null;
     try
     {

@@ -8,7 +8,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,6 +17,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -46,20 +46,21 @@ public class Team implements Serializable
           initialValue = 1)
   @Column(name = "id")
   private Integer id;
+  @Size(max = 245)
   @Column(name = "name")
   private String name;
-  @ManyToMany(mappedBy = "teamList", fetch = FetchType.LAZY)
+  @ManyToMany(mappedBy = "teamList")
   private List<Player> playerList;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "team", fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "team")
   private List<MatchHasTeam> matchHasTeamList;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "team", fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "team")
   private List<TournamentHasTeam> tournamentHasTeamList;
 
   public Team()
   {
-    setMatchHasTeamList(new ArrayList<>());
-    setPlayerList(new ArrayList<>());
-    setTournamentHasTeamList(new ArrayList<>());
+    matchHasTeamList = new ArrayList<>();
+    playerList = new ArrayList<>();
+    tournamentHasTeamList = new ArrayList<>();
   }
 
   public Team(String name)
@@ -94,7 +95,7 @@ public class Team implements Serializable
     return playerList;
   }
 
-  public final void setPlayerList(List<Player> playerList)
+  public void setPlayerList(List<Player> playerList)
   {
     this.playerList = playerList;
   }
@@ -105,7 +106,7 @@ public class Team implements Serializable
     return matchHasTeamList;
   }
 
-  public final void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
+  public void setMatchHasTeamList(List<MatchHasTeam> matchHasTeamList)
   {
     this.matchHasTeamList = matchHasTeamList;
   }
@@ -116,7 +117,7 @@ public class Team implements Serializable
     return tournamentHasTeamList;
   }
 
-  public final void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
+  public void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
   {
     this.tournamentHasTeamList = tournamentHasTeamList;
   }
@@ -138,14 +139,13 @@ public class Team implements Serializable
       return false;
     }
     Team other = (Team) object;
-    return !((this.id == null && other.id != null) 
+    return !((this.id == null && other.id != null)
             || (this.id != null && !this.id.equals(other.id)));
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.Team[ id="
-            + id + " ]";
+    return "com.github.javydreamercsw.database.storage.db.Team[ id=" + id + " ]";
   }
 }
