@@ -40,11 +40,8 @@ public class MatchEntryJpaController extends AbstractController implements Seria
     {
       matchEntry.setMatchHasTeamList(new ArrayList<>());
     }
+    matchEntry.getMatchEntryPK().setFormatGameId(matchEntry.getFormat().getFormatPK().getGameId());
     matchEntry.getMatchEntryPK().setFormatId(matchEntry.getFormat().getFormatPK().getId());
-    if (matchEntry.getRound() != null)
-    {
-      matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
-    }
     EntityManager em = null;
     try
     {
@@ -65,7 +62,8 @@ public class MatchEntryJpaController extends AbstractController implements Seria
       List<MatchHasTeam> attachedMatchHasTeamList = new ArrayList<>();
       for (MatchHasTeam matchHasTeamListMatchHasTeamToAttach : matchEntry.getMatchHasTeamList())
       {
-        matchHasTeamListMatchHasTeamToAttach = em.getReference(matchHasTeamListMatchHasTeamToAttach.getClass(),
+        matchHasTeamListMatchHasTeamToAttach = 
+                em.getReference(matchHasTeamListMatchHasTeamToAttach.getClass(), 
                 matchHasTeamListMatchHasTeamToAttach.getMatchHasTeamPK());
         attachedMatchHasTeamList.add(matchHasTeamListMatchHasTeamToAttach);
       }
@@ -113,10 +111,7 @@ public class MatchEntryJpaController extends AbstractController implements Seria
 
   public void edit(MatchEntry matchEntry) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
-    if (matchEntry.getRound() != null)
-    {
-      matchEntry.getMatchEntryPK().setRoundId(matchEntry.getRound().getRoundPK().getId());
-    }
+    matchEntry.getMatchEntryPK().setFormatGameId(matchEntry.getFormat().getFormatPK().getGameId());
     matchEntry.getMatchEntryPK().setFormatId(matchEntry.getFormat().getFormatPK().getId());
     EntityManager em = null;
     try

@@ -34,9 +34,10 @@ public class MatchHasTeamJpaController extends AbstractController implements Ser
     {
       matchHasTeam.setMatchHasTeamPK(new MatchHasTeamPK());
     }
-    matchHasTeam.getMatchHasTeamPK().setTeamId(matchHasTeam.getTeam().getId());
     matchHasTeam.getMatchHasTeamPK().setMatchEntryFormatId(matchHasTeam.getMatchEntry().getMatchEntryPK().getFormatId());
+    matchHasTeam.getMatchHasTeamPK().setTeamId(matchHasTeam.getTeam().getId());
     matchHasTeam.getMatchHasTeamPK().setMatchEntryId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
+    matchHasTeam.getMatchHasTeamPK().setMatchEntryFormatGameId(matchHasTeam.getMatchEntry().getMatchEntryPK().getFormatGameId());
     EntityManager em = null;
     try
     {
@@ -97,9 +98,10 @@ public class MatchHasTeamJpaController extends AbstractController implements Ser
 
   public void edit(MatchHasTeam matchHasTeam) throws NonexistentEntityException, Exception
   {
-    matchHasTeam.getMatchHasTeamPK().setTeamId(matchHasTeam.getTeam().getId());
     matchHasTeam.getMatchHasTeamPK().setMatchEntryFormatId(matchHasTeam.getMatchEntry().getMatchEntryPK().getFormatId());
+    matchHasTeam.getMatchHasTeamPK().setTeamId(matchHasTeam.getTeam().getId());
     matchHasTeam.getMatchHasTeamPK().setMatchEntryId(matchHasTeam.getMatchEntry().getMatchEntryPK().getId());
+    matchHasTeam.getMatchHasTeamPK().setMatchEntryFormatGameId(matchHasTeam.getMatchEntry().getMatchEntryPK().getFormatGameId());
     EntityManager em = null;
     try
     {

@@ -15,6 +15,7 @@ import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.Round;
 import com.github.javydreamercsw.database.storage.db.RoundPK;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 import com.github.javydreamercsw.database.storage.db.server.AbstractController;
@@ -22,6 +23,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 public class RoundJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -6387501653143947641L;
+
   public RoundJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -92,7 +94,7 @@ public class RoundJpaController extends AbstractController implements Serializab
     }
   }
 
-  public void edit(Round round) throws NonexistentEntityException, Exception
+  public void edit(Round round) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
     round.getRoundPK().setTournamentId(round.getTournament().getId());
     EntityManager em = null;
@@ -105,6 +107,22 @@ public class RoundJpaController extends AbstractController implements Serializab
       Tournament tournamentNew = round.getTournament();
       List<MatchEntry> matchEntryListOld = persistentRound.getMatchEntryList();
       List<MatchEntry> matchEntryListNew = round.getMatchEntryList();
+      List<String> illegalOrphanMessages = null;
+      for (MatchEntry matchEntryListOldMatchEntry : matchEntryListOld)
+      {
+        if (!matchEntryListNew.contains(matchEntryListOldMatchEntry))
+        {
+          if (illegalOrphanMessages == null)
+          {
+            illegalOrphanMessages = new ArrayList<>();
+          }
+          illegalOrphanMessages.add("You must retain MatchEntry " + matchEntryListOldMatchEntry + " since its round field is not nullable.");
+        }
+      }
+      if (illegalOrphanMessages != null)
+      {
+        throw new IllegalOrphanException(illegalOrphanMessages);
+      }
       if (tournamentNew != null)
       {
         tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getId());
@@ -128,14 +146,6 @@ public class RoundJpaController extends AbstractController implements Serializab
       {
         tournamentNew.getRoundList().add(round);
         tournamentNew = em.merge(tournamentNew);
-      }
-      for (MatchEntry matchEntryListOldMatchEntry : matchEntryListOld)
-      {
-        if (!matchEntryListNew.contains(matchEntryListOldMatchEntry))
-        {
-          matchEntryListOldMatchEntry.setRound(null);
-          matchEntryListOldMatchEntry = em.merge(matchEntryListOldMatchEntry);
-        }
       }
       for (MatchEntry matchEntryListNewMatchEntry : matchEntryListNew)
       {
@@ -175,7 +185,7 @@ public class RoundJpaController extends AbstractController implements Serializab
     }
   }
 
-  public void destroy(RoundPK id) throws NonexistentEntityException
+  public void destroy(RoundPK id) throws IllegalOrphanException, NonexistentEntityException
   {
     EntityManager em = null;
     try
@@ -192,17 +202,25 @@ public class RoundJpaController extends AbstractController implements Serializab
       {
         throw new NonexistentEntityException("The round with id " + id + " no longer exists.", enfe);
       }
+      List<String> illegalOrphanMessages = null;
+      List<MatchEntry> matchEntryListOrphanCheck = round.getMatchEntryList();
+      for (MatchEntry matchEntryListOrphanCheckMatchEntry : matchEntryListOrphanCheck)
+      {
+        if (illegalOrphanMessages == null)
+        {
+          illegalOrphanMessages = new ArrayList<>();
+        }
+        illegalOrphanMessages.add("This Round (" + round + ") cannot be destroyed since the MatchEntry " + matchEntryListOrphanCheckMatchEntry + " in its matchEntryList field has a non-nullable round field.");
+      }
+      if (illegalOrphanMessages != null)
+      {
+        throw new IllegalOrphanException(illegalOrphanMessages);
+      }
       Tournament tournament = round.getTournament();
       if (tournament != null)
       {
         tournament.getRoundList().remove(round);
         tournament = em.merge(tournament);
-      }
-      List<MatchEntry> matchEntryList = round.getMatchEntryList();
-      for (MatchEntry matchEntryListMatchEntry : matchEntryList)
-      {
-        matchEntryListMatchEntry.setRound(null);
-        matchEntryListMatchEntry = em.merge(matchEntryListMatchEntry);
       }
       em.remove(round);
       em.getTransaction().commit();
@@ -276,5 +294,5 @@ public class RoundJpaController extends AbstractController implements Serializab
       em.close();
     }
   }
-  
+
 }
