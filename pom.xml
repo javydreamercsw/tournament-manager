@@ -50,8 +50,8 @@
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans.version>RELEASE80</netbeans.version>
-        <junit.version>4.12</junit.version>
+        <netbeans.version>RELEASE802</netbeans.version>
+        <testng.version>6.14.3</testng.version>
     </properties>
     <repositories>
         <!--
