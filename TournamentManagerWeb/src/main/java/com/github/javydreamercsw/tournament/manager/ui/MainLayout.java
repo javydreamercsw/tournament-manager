@@ -95,13 +95,10 @@ public class MainLayout extends Div
       components.add(tournaments);
     }
 
-    if (demo)
-    {
-      RouterLink matches = new RouterLink(null, MatchList.class);
-      matches.add(new Icon(VaadinIcon.LIST), new Text("Matches"));
-      matches.addClassName("main-layout__nav-item");
-      components.add(matches);
-    }
+    RouterLink matches = new RouterLink(null, MatchList.class);
+    matches.add(new Icon(VaadinIcon.LIST), new Text("Matches"));
+    matches.addClassName("main-layout__nav-item");
+    components.add(matches);
 
     RouterLink formats = new RouterLink(null, FormatList.class);
     formats.add(new Icon(VaadinIcon.ARCHIVES), new Text("Formats"));
