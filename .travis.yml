@@ -1,8 +1,15 @@
 language: java
 
+CODECOV_TOKEN="106d1987-6ab3-4019-9c63-56f38aba2e67"
+
 jdk:
   - oraclejdk8
   - openjdk8
 #  - openjdk11
 
 script: mvn sonar:sonar -Dsonar.organization=javydreamercsw-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=6e3a9d4d7b11e581b919b9ba1498f02ac35a3fa8
+
+script: "mvn cobertura:cobertura"
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
