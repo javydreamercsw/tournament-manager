@@ -1,4 +1,6 @@
-# Tournament Manager
+# Tournament Manager [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.javydreamercsw:Tournament-Manager&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.javydreamercsw:Tournament-Manager) [![Build Status](https://travis-ci.org/javydreamercsw/tournament-manager.svg?branch=master)](https://travis-ci.org/javydreamercsw/tournament-manager) 
+
+<!--[![codecov.io](http://codecov.io/github/mirumee/saleor/coverage.svg?branch=master)](http://codecov.io/github/mirumee/saleor?branch=master)-->
 
 Tools to manage your tournament!
 
