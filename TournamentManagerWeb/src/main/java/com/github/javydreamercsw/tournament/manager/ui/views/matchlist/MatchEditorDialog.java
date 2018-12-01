@@ -17,7 +17,6 @@ package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
 import static com.github.javydreamercsw.tournament.manager.ui.views.TMView.CURRENT_GAME;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -170,11 +169,6 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
       }
     });
     getFormLayout().add(datePicker);
-
-    if (datePicker.getValue() == null)
-    {
-      datePicker.setValue(LocalDate.now());
-    }
   }
 
   @Override

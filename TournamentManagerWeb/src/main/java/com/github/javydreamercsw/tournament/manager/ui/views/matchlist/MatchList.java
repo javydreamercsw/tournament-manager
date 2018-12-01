@@ -22,6 +22,7 @@ import java.util.List;
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.server.MatchService;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
@@ -158,24 +159,40 @@ public class MatchList extends TMView
     edit.setIcon(new Icon("lumo", "edit"));
     edit.addClassName("match__edit");
     edit.getElement().setAttribute("theme", "tertiary");
+    edit.setEnabled(isMatchLocked(me));
     return edit;
   }
 
   private Button resultButton(MatchEntry me)
   {
-    Button edit = new Button("Results", event ->
+    Button result = new Button("Results", event ->
     { // List all the teams so results can be seen/set.
       Dialog dialog = new Dialog();
-      dialog.add(new ResultForm(me));
+      dialog.add(new ResultForm(this, dialog, me));
       dialog.setCloseOnOutsideClick(true);
       dialog.setHeight("25em");
       dialog.setWidth("75em");
       dialog.open();
     });
-    edit.setIcon(new Icon("lumo", "edit"));
-    edit.addClassName("match__result");
-    edit.getElement().setAttribute("theme", "tertiary");
-    return edit;
+    result.setIcon(new Icon("lumo", "edit"));
+    result.addClassName("match__result");
+    result.getElement().setAttribute("theme", "tertiary");
+    result.setEnabled(isMatchLocked(me));
+    return result;
+  }
+
+  private boolean isMatchLocked(MatchEntry me)
+  {
+    boolean enable = false;
+    for (MatchHasTeam mht : me.getMatchHasTeamList())
+    {
+      if (mht.getMatchResult() == null || !mht.getMatchResult().getLocked())
+      {
+        enable = true;
+        break;
+      }
+    }
+    return enable || me.getMatchHasTeamList().isEmpty();
   }
 
   @Override
