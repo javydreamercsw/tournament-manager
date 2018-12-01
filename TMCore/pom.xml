@@ -3,11 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.sourceforge.javydreamercsw</groupId>
+        <groupId>com.github.javydreamercsw</groupId>
         <artifactId>Tournament-Manager</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>net.sourceforge.javydreamercsw</groupId>
+    <groupId>com.github.javydreamercsw</groupId>
     <artifactId>TMCore</artifactId>
     <name>Tournament Manager Core</name>
     <url>http://maven.apache.org</url>
@@ -21,19 +21,32 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.7</version>
+            <version>3.8</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -46,6 +59,11 @@
             <artifactId>org-netbeans-modules-projectapi</artifactId>
             <version>${netbeans.version}</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>de.gesundkrank.jskills</groupId>
+            <artifactId>jskills</artifactId>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 </project>

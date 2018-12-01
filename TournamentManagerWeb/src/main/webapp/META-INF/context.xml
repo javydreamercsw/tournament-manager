@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/tournamentmanager">
+    <!-- #################### PLEASE CONFIGURE #############################-->
+    <!-- ### Params: username, password, url, driverClassName            ###-->
+    <!-- ###################################################################-->
+    <!-- H2 Embedded Database, not for production.
+    Note: For H2, make sure this values match the contents of
+    web.xml for proper shutdown of H2 database!-->
+    <Resource auth="Container" driverClassName="org.h2.Driver" 
+              maxActive="100" maxIdle="30" maxWait="10000" 
+              name="jdbc/TMDB" 
+              password=""
+              username="root"
+              type="javax.sql.DataSource" 
+              url="jdbc:h2:file:~/TournamentManager/data/TM;CREATE=TRUE;LOCK_TIMEOUT=10000;AUTO_SERVER=TRUE"/>
+    <!-- MySQL Database 
+<Resource auth="Container" driverClassName="com.mysql.cj.jdbc.Driver"
+    maxActive="100" maxIdle="30" maxWait="10000" name="jdbc/TMDB"
+    password="" type="javax.sql.DataSource"
+    url="jdbc:mysql://localhost:3306/Tournament?autoReconnect=true"
+    username="root"/>-->
+    <!-- Oracle Database
+<Resource auth="Container" driverClassName="oracle.jdbc.driver.OracleDriver"
+    maxActive="100" maxIdle="30" maxWait="10000" name="jdbc/TMDB"
+    password="" type="javax.sql.DataSource"
+    url="jdbc:oracle:thin:@//server.local:1521/<service name>"
+    username="root"/> -->
+    <!-- PostgreSQL Database
+<Resource auth="Container" driverClassName="org.postgresql.Driver"
+    maxActive="100" maxIdle="30" maxWait="10000" name="jdbc/TMDB"
+    password="" type="javax.sql.DataSource"
+    url="jdbc:postgresql://localhost:5432/TM"
+    username="root"/> -->
+    <!-- Turn off session serialization -->
+    <Manager pathname=""/>
+    <!-- ################# Optional Configuration #################-->
+    <!-- Database JNDI Name -->
+    <Environment name="tm/JNDIDB" override="false" type="java.lang.String" value="TMPUJNDI"/>
+    <!-- If set to true demo data will be loaded -->
+    <Environment name="tm/demo" override="false" type="java.lang.Boolean" value="true"/>
+</Context>

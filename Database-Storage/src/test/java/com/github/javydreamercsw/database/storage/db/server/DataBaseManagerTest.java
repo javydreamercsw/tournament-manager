@@ -1,0 +1,50 @@
+package com.github.javydreamercsw.database.storage.db.server;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
+
+import org.testng.annotations.Test;
+
+import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
+import com.github.javydreamercsw.database.storage.db.MatchEntry;
+
+public class DataBaseManagerTest extends AbstractServerTest
+{
+  /**
+   * Test of loadDemoData method, of class DataBaseManager.
+   *
+   * @throws java.lang.Exception
+   */
+  @Test
+  public void testLoadDemoData() throws Exception
+  {
+    //Load demo data
+    DataBaseManager.loadDemoData();
+
+    assertFalse(PlayerService.getInstance().getAll().isEmpty());
+    assertFalse(TournamentService.getInstance().getAll().isEmpty());
+    assertFalse(MatchService.getInstance().getAll().isEmpty());
+    assertFalse(TeamService.getInstance().getAll().isEmpty());
+    assertFalse(RecordService.getInstance().getAll().isEmpty());
+
+    MatchService.getInstance().getAll().forEach(me ->
+    {
+      assertEquals(me.getMatchHasTeamList().size(), 2);
+      assertNotNull(me.getFormat());
+    });
+    
+    List<Object> results = DataBaseManager.namedQuery("MatchEntry.findAll");
+    assertTrue(results.size() > 0);
+
+    results.forEach(result ->
+    {
+      MatchEntry m = (MatchEntry) result;
+      assertEquals(m.getMatchHasTeamList().size(), 2);
+      assertNotNull(m.getFormat());
+    });
+  }
+}
