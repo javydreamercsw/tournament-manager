@@ -2,6 +2,7 @@ package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -65,21 +66,25 @@ public class MatchEntry implements Serializable
 
   public MatchEntry()
   {
+    matchHasTeamList= new ArrayList<>();
   }
 
   public MatchEntry(MatchEntryPK matchEntryPK)
   {
+    this();
     this.matchEntryPK = matchEntryPK;
   }
 
   public MatchEntry(MatchEntryPK matchEntryPK, LocalDate matchDate)
   {
+    this();
     this.matchEntryPK = matchEntryPK;
     this.matchDate = matchDate;
   }
 
   public MatchEntry(int formatId, int formatGameId)
   {
+    this();
     this.matchEntryPK = new MatchEntryPK(formatId, formatGameId);
   }
 

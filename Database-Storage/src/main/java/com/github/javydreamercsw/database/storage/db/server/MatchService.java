@@ -135,15 +135,9 @@ public class MatchService extends Service<MatchEntry>
    * @param key Key for the match.
    * @return Match or null if not found.
    */
-  public List<MatchEntry> findMatch(MatchEntryPK key)
+  public MatchEntry findMatch(MatchEntryPK key)
   {
-    List<MatchEntry> results = new ArrayList<>();
-    MatchEntry match = mc.findMatchEntry(key);
-    if (match != null)
-    {
-      results.add(match);
-    }
-    return results;
+    return mc.findMatchEntry(key);
   }
 
   /**
@@ -166,10 +160,13 @@ public class MatchService extends Service<MatchEntry>
     MatchHasTeam mht = new MatchHasTeam();
     mht.setTeam(team);
     mht.setMatchEntry(match);
-    mht.setMatchHasTeamPK(new MatchHasTeamPK(team.getId(),
-            match.getMatchEntryPK().getId(),
-            match.getMatchEntryPK().getFormatId(),
-            match.getFormat().getGame().getId()));
+    if (match.getMatchEntryPK() != null)
+    {
+      mht.setMatchHasTeamPK(new MatchHasTeamPK(team.getId(),
+              match.getMatchEntryPK().getId(),
+              match.getMatchEntryPK().getFormatId(),
+              match.getFormat().getGame().getId()));
+    }
 
     if (match.getMatchEntryPK() != null)
     {
@@ -272,7 +269,7 @@ public class MatchService extends Service<MatchEntry>
    *
    * @param mr Match Result to lock.
    */
-  public void lockMatchResult(MatchResult mr)
+  public void lockMatchResult(MatchResult mr) throws Exception
   {
     mr.setLocked(true);
 
@@ -290,7 +287,7 @@ public class MatchService extends Service<MatchEntry>
           case "result.draw":
             record.setDraws(record.getDraws() + 1);
             break;
-            //Various reasons leading to a win.
+          //Various reasons leading to a win.
           case "result.win":
           //Fall thru
           case "result.forfeit":
@@ -309,5 +306,6 @@ public class MatchService extends Service<MatchEntry>
         }
       });
     });
+    mrc.edit(mr);
   }
 }
