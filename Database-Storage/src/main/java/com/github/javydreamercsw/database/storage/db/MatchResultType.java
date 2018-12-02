@@ -35,6 +35,11 @@ import javax.xml.bind.annotation.XmlTransient;
 })
 public class MatchResultType implements Serializable
 {
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 45)
+  @Column(name = "type")
+  private String type;
   private static final long serialVersionUID = 1L;
   @Id
   @Basic(optional = false)
@@ -48,11 +53,6 @@ public class MatchResultType implements Serializable
           initialValue = 1)
   @Column(name = "id")
   private Integer id;
-  @Basic(optional = false)
-  @NotNull
-  @Size(min = 1, max = 45)
-  @Column(name = "type")
-  private String type;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "matchResultType")
   private List<MatchResult> matchResultList;
 
@@ -77,15 +77,6 @@ public class MatchResultType implements Serializable
     this.id = id;
   }
 
-  public String getType()
-  {
-    return type;
-  }
-
-  public void setType(String type)
-  {
-    this.type = type;
-  }
 
   @XmlTransient
   public List<MatchResult> getMatchResultList()
@@ -124,5 +115,15 @@ public class MatchResultType implements Serializable
   {
     return "com.github.javydreamercsw.database.storage.db.MatchResultType[ id="
             + id + " ]";
+  }
+
+  public String getType()
+  {
+    return type;
+  }
+
+  public void setType(String type)
+  {
+    this.type = type;
   }
 }

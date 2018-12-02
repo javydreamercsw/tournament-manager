@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlTransient;
         })
 public class MatchEntry implements Serializable
 {
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 3610712802330920081L;
   @EmbeddedId
   protected MatchEntryPK matchEntryPK;
   @Basic(optional = false)
@@ -66,7 +66,7 @@ public class MatchEntry implements Serializable
 
   public MatchEntry()
   {
-    matchHasTeamList= new ArrayList<>();
+    matchHasTeamList = new ArrayList<>();
   }
 
   public MatchEntry(MatchEntryPK matchEntryPK)
@@ -156,15 +156,15 @@ public class MatchEntry implements Serializable
       return false;
     }
     MatchEntry other = (MatchEntry) object;
-    return !((this.matchEntryPK == null && other.matchEntryPK != null) 
-            || (this.matchEntryPK != null 
+    return !((this.matchEntryPK == null && other.matchEntryPK != null)
+            || (this.matchEntryPK != null
             && !this.matchEntryPK.equals(other.matchEntryPK)));
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.MatchEntry[ matchEntryPK=" 
+    return "com.github.javydreamercsw.database.storage.db.MatchEntry[ matchEntryPK="
             + matchEntryPK + " ]";
   }
 }

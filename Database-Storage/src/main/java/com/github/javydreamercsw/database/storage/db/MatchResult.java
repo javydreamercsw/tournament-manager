@@ -31,6 +31,14 @@ import javax.xml.bind.annotation.XmlTransient;
 })
 public class MatchResult implements Serializable
 {
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "locked")
+  private boolean locked;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "ranked")
+  private boolean ranked;
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected MatchResultPK matchResultPK;
@@ -40,10 +48,6 @@ public class MatchResult implements Serializable
   private MatchResultType matchResultType;
   @OneToMany(mappedBy = "matchResult")
   private List<MatchHasTeam> matchHasTeamList;
-  @Basic(optional = false)
-  @NotNull
-  @Column(name = "locked")
-  private boolean locked;
 
   public MatchResult()
   {
@@ -94,15 +98,6 @@ public class MatchResult implements Serializable
   }
   
   
-  public boolean getLocked()
-  {
-    return locked;
-  }
-
-  public void setLocked(boolean locked)
-  {
-    this.locked = locked;
-  }
 
   @Override
   public int hashCode()
@@ -131,5 +126,25 @@ public class MatchResult implements Serializable
   {
     return "com.github.javydreamercsw.database.storage.db.MatchResult[ matchResultPK=" 
             + matchResultPK + " ]";
+  }
+
+  public boolean getLocked()
+  {
+    return locked;
+  }
+
+  public void setLocked(boolean locked)
+  {
+    this.locked = locked;
+  }
+
+  public boolean getRanked()
+  {
+    return ranked;
+  }
+
+  public void setRanked(boolean ranked)
+  {
+    this.ranked = ranked;
   }
 }

@@ -174,6 +174,35 @@ public class MatchService extends Service<MatchEntry>
     }
 
     match.getMatchHasTeamList().add(mht);
+
+    // Make sure each team member has a record for this game. Add one otherwise.
+    team.getPlayerList().forEach(player ->
+    {
+      boolean found = false;
+      for (Record r : player.getRecordList())
+      {
+        if (Objects.equals(r.getGame().getId(), match.getFormat().getGame().getId()))
+        {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+      {
+        try
+        {
+          Record record = new Record();
+          record.getPlayerList().add(player);
+          record.setGame(match.getFormat().getGame());
+          RecordService.getInstance().saveRecord(record);
+          player.getRecordList().add(record);
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+    });
     return true;
   }
 
@@ -264,10 +293,11 @@ public class MatchService extends Service<MatchEntry>
   }
 
   /**
-   * Lock the match result. This is meant not to be undone as it calculates
+   * Lock the match result.This is meant not to be undone as it calculates
    * experience and update records which is dependent on when it happens.
    *
    * @param mr Match Result to lock.
+   * @throws java.lang.Exception
    */
   public void lockMatchResult(MatchResult mr) throws Exception
   {

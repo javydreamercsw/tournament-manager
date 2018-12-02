@@ -13,6 +13,7 @@ import javax.persistence.criteria.Root;
 
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
+import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.server.AbstractController;
@@ -31,6 +32,10 @@ public class GameJpaController extends AbstractController implements Serializabl
     {
       game.setFormatList(new ArrayList<>());
     }
+    if (game.getRecordList() == null)
+    {
+      game.setRecordList(new ArrayList<>());
+    }
     EntityManager em = null;
     try
     {
@@ -43,6 +48,13 @@ public class GameJpaController extends AbstractController implements Serializabl
         attachedFormatList.add(formatListFormatToAttach);
       }
       game.setFormatList(attachedFormatList);
+      List<Record> attachedRecordList = new ArrayList<>();
+      for (Record recordListRecordToAttach : game.getRecordList())
+      {
+        recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getRecordPK());
+        attachedRecordList.add(recordListRecordToAttach);
+      }
+      game.setRecordList(attachedRecordList);
       em.persist(game);
       for (Format formatListFormat : game.getFormatList())
       {
@@ -53,6 +65,17 @@ public class GameJpaController extends AbstractController implements Serializabl
         {
           oldGameOfFormatListFormat.getFormatList().remove(formatListFormat);
           oldGameOfFormatListFormat = em.merge(oldGameOfFormatListFormat);
+        }
+      }
+      for (Record recordListRecord : game.getRecordList())
+      {
+        Game oldGameOfRecordListRecord = recordListRecord.getGame();
+        recordListRecord.setGame(game);
+        recordListRecord = em.merge(recordListRecord);
+        if (oldGameOfRecordListRecord != null)
+        {
+          oldGameOfRecordListRecord.getRecordList().remove(recordListRecord);
+          oldGameOfRecordListRecord = em.merge(oldGameOfRecordListRecord);
         }
       }
       em.getTransaction().commit();
@@ -76,6 +99,8 @@ public class GameJpaController extends AbstractController implements Serializabl
       Game persistentGame = em.find(Game.class, game.getId());
       List<Format> formatListOld = persistentGame.getFormatList();
       List<Format> formatListNew = game.getFormatList();
+      List<Record> recordListOld = persistentGame.getRecordList();
+      List<Record> recordListNew = game.getRecordList();
       List<String> illegalOrphanMessages = null;
       for (Format formatListOldFormat : formatListOld)
       {
@@ -86,6 +111,17 @@ public class GameJpaController extends AbstractController implements Serializabl
             illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain Format " + formatListOldFormat + " since its game field is not nullable.");
+        }
+      }
+      for (Record recordListOldRecord : recordListOld)
+      {
+        if (!recordListNew.contains(recordListOldRecord))
+        {
+          if (illegalOrphanMessages == null)
+          {
+            illegalOrphanMessages = new ArrayList<>();
+          }
+          illegalOrphanMessages.add("You must retain Record " + recordListOldRecord + " since its game field is not nullable.");
         }
       }
       if (illegalOrphanMessages != null)
@@ -100,6 +136,14 @@ public class GameJpaController extends AbstractController implements Serializabl
       }
       formatListNew = attachedFormatListNew;
       game.setFormatList(formatListNew);
+      List<Record> attachedRecordListNew = new ArrayList<>();
+      for (Record recordListNewRecordToAttach : recordListNew)
+      {
+        recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getRecordPK());
+        attachedRecordListNew.add(recordListNewRecordToAttach);
+      }
+      recordListNew = attachedRecordListNew;
+      game.setRecordList(recordListNew);
       game = em.merge(game);
       for (Format formatListNewFormat : formatListNew)
       {
@@ -112,6 +156,20 @@ public class GameJpaController extends AbstractController implements Serializabl
           {
             oldGameOfFormatListNewFormat.getFormatList().remove(formatListNewFormat);
             oldGameOfFormatListNewFormat = em.merge(oldGameOfFormatListNewFormat);
+          }
+        }
+      }
+      for (Record recordListNewRecord : recordListNew)
+      {
+        if (!recordListOld.contains(recordListNewRecord))
+        {
+          Game oldGameOfRecordListNewRecord = recordListNewRecord.getGame();
+          recordListNewRecord.setGame(game);
+          recordListNewRecord = em.merge(recordListNewRecord);
+          if (oldGameOfRecordListNewRecord != null && !oldGameOfRecordListNewRecord.equals(game))
+          {
+            oldGameOfRecordListNewRecord.getRecordList().remove(recordListNewRecord);
+            oldGameOfRecordListNewRecord = em.merge(oldGameOfRecordListNewRecord);
           }
         }
       }
@@ -165,6 +223,15 @@ public class GameJpaController extends AbstractController implements Serializabl
           illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This Game (" + game + ") cannot be destroyed since the Format " + formatListOrphanCheckFormat + " in its formatList field has a non-nullable game field.");
+      }
+      List<Record> recordListOrphanCheck = game.getRecordList();
+      for (Record recordListOrphanCheckRecord : recordListOrphanCheck)
+      {
+        if (illegalOrphanMessages == null)
+        {
+          illegalOrphanMessages = new ArrayList<>();
+        }
+        illegalOrphanMessages.add("This Game (" + game + ") cannot be destroyed since the Record " + recordListOrphanCheckRecord + " in its recordList field has a non-nullable game field.");
       }
       if (illegalOrphanMessages != null)
       {
