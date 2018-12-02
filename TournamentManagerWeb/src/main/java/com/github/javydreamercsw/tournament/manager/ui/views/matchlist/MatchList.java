@@ -24,11 +24,14 @@ import org.openide.util.Exceptions;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.server.MatchService;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
@@ -140,9 +143,11 @@ public class MatchList extends TMView
         sb.append("TBD");
       }
       return sb.toString();
-    }).setHeader("Matches").setWidth("8em")
+    }).setHeader("Result").setWidth("9em")
             .setResizable(true);
-    grid.addColumn(new ComponentRenderer<>(this::resultButton))
+    grid.addColumn(new ComponentRenderer<>(this::createRankedBox))
+            .setWidth("1em").setHeader("Ranked");
+    grid.addColumn(new ComponentRenderer<>(this::createResultButton))
             .setWidth("4em");
     grid.addColumn(new ComponentRenderer<>(this::createEditButton))
             .setFlexGrow(0);
@@ -150,6 +155,31 @@ public class MatchList extends TMView
 
     container.add(header, grid);
     add(container);
+  }
+  
+  private Checkbox createRankedBox(MatchEntry me){
+    Checkbox ranked = new Checkbox();
+    ranked.setValue(isMatchRanked(me));
+    ranked.setEnabled(false);
+    return ranked;
+  }
+  
+  private boolean isMatchRanked(MatchEntry me)
+  {
+    boolean ranked = false;
+    if (me == null)
+    {
+      return true; // Ranked by default
+    }
+    for (MatchHasTeam mht : me.getMatchHasTeamList())
+    {
+      if (mht.getMatchResult() == null || !mht.getMatchResult().getRanked())
+      {
+        ranked = true;
+        break;
+      }
+    }
+    return ranked;
   }
 
   private Button createEditButton(MatchEntry me)
@@ -163,7 +193,7 @@ public class MatchList extends TMView
     return edit;
   }
 
-  private Button resultButton(MatchEntry me)
+  private Button createResultButton(MatchEntry me)
   {
     Button result = new Button("Results", event ->
     { // List all the teams so results can be seen/set.
@@ -180,7 +210,7 @@ public class MatchList extends TMView
     result.setEnabled(isMatchLocked(me));
     return result;
   }
-
+  
   private boolean isMatchLocked(MatchEntry me)
   {
     boolean enable = false;
@@ -194,7 +224,7 @@ public class MatchList extends TMView
     }
     return enable || me.getMatchHasTeamList().isEmpty();
   }
-
+  
   @Override
   public void updateView()
   {
@@ -280,7 +310,7 @@ public class MatchList extends TMView
               Position.BOTTOM_START);
       updateView();
     }
-    catch (Exception ex)
+    catch (IllegalOrphanException | NonexistentEntityException ex)
     {
       Exceptions.printStackTrace(ex);
     }

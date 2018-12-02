@@ -36,7 +36,6 @@ import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDial
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeListener;
-import com.vaadin.flow.component.ItemLabelGenerator;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -48,20 +47,22 @@ import com.vaadin.flow.server.VaadinService;
 /**
  * A dialog for editing {@link Format} objects.
  */
-public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
+public final class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
 {
   private static final long serialVersionUID = 2349638969280300323L;
   private final Grid<Team> grid = new Grid<>();
   private final ComboBox<Format> cb = new ComboBox<>();
   private final DatePicker datePicker = new DatePicker();
+  private final Checkbox ranked = new Checkbox("Ranked");
 
   public MatchEditorDialog(BiConsumer<MatchEntry, Operation> itemSaver,
           Consumer<MatchEntry> itemDeleter)
   {
     super("match", itemSaver, itemDeleter);
-    addTeams();
     addFormat();
+    addTeams();
     addDate();
+    addRanked();
     validate();
   }
 
@@ -179,6 +180,60 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
             && getCurrentItem().getMatchHasTeamList().size() >= 2;
   }
 
+  @Override
+  protected void validate()
+  {
+    if (getCurrentItem() != null)
+    {
+      getCurrentItem().setFormat(cb.getValue());
+    }
+    grid.setVisible(cb.getValue() != null);
+    ranked.setVisible(cb.getValue() != null);
+    super.validate();
+  }
+
+  private void addRanked()
+  {
+    ranked.addClickListener(listener ->
+    {
+      getCurrentItem().getMatchHasTeamList().forEach((mht) ->
+      {
+        try
+        {
+          if (mht.getMatchResult() != null)
+          {
+            mht.getMatchResult().setRanked(ranked.getValue());
+            MatchService.getInstance().updateResult(mht.getMatchResult());
+          }
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      });
+    });
+    ranked.setValue(isMatchRanked());
+    getFormLayout().add(ranked);
+  }
+
+  private boolean isMatchRanked()
+  {
+    boolean isRanked = false;
+    if (getCurrentItem() == null)
+    {
+      return true; // Ranked by default
+    }
+    for (MatchHasTeam mht : getCurrentItem().getMatchHasTeamList())
+    {
+      if (mht.getMatchResult() == null || !mht.getMatchResult().getRanked())
+      {
+        isRanked = true;
+        break;
+      }
+    }
+    return isRanked;
+  }
+
   private class TeamSelectionListener implements
           ValueChangeListener<ComponentValueChangeEvent<Checkbox, Boolean>>
   {
@@ -227,16 +282,5 @@ public class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
     List<Team> teams = TeamService.getInstance().getAll();
     grid.setItems(teams);
     super.open();
-  }
-
-  private class FormatLabelGenerator implements ItemLabelGenerator<Format>
-  {
-    private static final long serialVersionUID = -738603579674658479L;
-
-    @Override
-    public String apply(Format f)
-    {
-      return f.getName();
-    }
   }
 }

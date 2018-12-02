@@ -181,7 +181,8 @@ public class MatchService extends Service<MatchEntry>
       boolean found = false;
       for (Record r : player.getRecordList())
       {
-        if (Objects.equals(r.getGame().getId(), match.getFormat().getGame().getId()))
+        if (Objects.equals(r.getGame().getId(), 
+                match.getFormat().getGame().getId()))
         {
           found = true;
           break;
@@ -337,5 +338,23 @@ public class MatchService extends Service<MatchEntry>
       });
     });
     mrc.edit(mr);
+  }
+
+  /**
+   * Update a match result.
+   * 
+   * @param mr Match result to update.
+   * @throws Exception If result doesn't exist.
+   */
+  public void updateResult(MatchResult mr) throws Exception
+  {
+    if (mr.getMatchResultPK() != null)
+    {
+      mrc.edit(mr);
+    }
+    else
+    {
+      throw new Exception("Trying to update non existing result!");
+    }
   }
 }
