@@ -551,10 +551,20 @@ public class DataBaseManager
       MatchService.getInstance().setResult(match.getMatchHasTeamList().get(1),
               MatchService.getInstance().getResultType(win
                       ? "result.loss" : "result.win").get());
-      
+
       //Lock the results so records are updated.
       match.getMatchHasTeamList().forEach(mht
-              -> MatchService.getInstance().lockMatchResult(mht.getMatchResult()));
+              ->
+      {
+        try
+        {
+          MatchService.getInstance().lockMatchResult(mht.getMatchResult());
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      });
     }
   }
 }

@@ -114,16 +114,16 @@
             <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
+         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>MTG</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!--Vaadin plugins-->
         <dependency>
             <groupId>org.vaadin.maxime</groupId>
             <artifactId>markdown-area</artifactId>
             <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>MTG</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <!-- Run dependencies -->
         <dependency>

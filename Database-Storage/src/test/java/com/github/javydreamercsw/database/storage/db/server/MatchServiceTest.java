@@ -52,7 +52,7 @@ public class MatchServiceTest extends AbstractServerTest
     MatchService.getInstance().saveMatch(me);
 
     MatchEntry match
-            = MatchService.getInstance().findMatch(me.getMatchEntryPK()).get(0);
+            = MatchService.getInstance().findMatch(me.getMatchEntryPK());
     assertNotNull(me.getFormat());
     assertNotNull(match.getFormat());
 
@@ -76,7 +76,7 @@ public class MatchServiceTest extends AbstractServerTest
       }
     });
 
-    match = MatchService.getInstance().findMatch(me.getMatchEntryPK()).get(0);
+    match = MatchService.getInstance().findMatch(me.getMatchEntryPK());
     assertEquals(match.getMatchHasTeamList().size(), 2);
     assertNotNull(match.getFormat());
 

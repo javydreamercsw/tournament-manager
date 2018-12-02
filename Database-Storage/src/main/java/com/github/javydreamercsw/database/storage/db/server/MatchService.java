@@ -135,15 +135,9 @@ public class MatchService extends Service<MatchEntry>
    * @param key Key for the match.
    * @return Match or null if not found.
    */
-  public List<MatchEntry> findMatch(MatchEntryPK key)
+  public MatchEntry findMatch(MatchEntryPK key)
   {
-    List<MatchEntry> results = new ArrayList<>();
-    MatchEntry match = mc.findMatchEntry(key);
-    if (match != null)
-    {
-      results.add(match);
-    }
-    return results;
+    return mc.findMatchEntry(key);
   }
 
   /**
@@ -166,10 +160,13 @@ public class MatchService extends Service<MatchEntry>
     MatchHasTeam mht = new MatchHasTeam();
     mht.setTeam(team);
     mht.setMatchEntry(match);
-    mht.setMatchHasTeamPK(new MatchHasTeamPK(team.getId(),
-            match.getMatchEntryPK().getId(),
-            match.getMatchEntryPK().getFormatId(),
-            match.getFormat().getGame().getId()));
+    if (match.getMatchEntryPK() != null)
+    {
+      mht.setMatchHasTeamPK(new MatchHasTeamPK(team.getId(),
+              match.getMatchEntryPK().getId(),
+              match.getMatchEntryPK().getFormatId(),
+              match.getFormat().getGame().getId()));
+    }
 
     if (match.getMatchEntryPK() != null)
     {
@@ -177,6 +174,36 @@ public class MatchService extends Service<MatchEntry>
     }
 
     match.getMatchHasTeamList().add(mht);
+
+    // Make sure each team member has a record for this game. Add one otherwise.
+    team.getPlayerList().forEach(player ->
+    {
+      boolean found = false;
+      for (Record r : player.getRecordList())
+      {
+        if (Objects.equals(r.getGame().getId(), 
+                match.getFormat().getGame().getId()))
+        {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+      {
+        try
+        {
+          Record record = new Record();
+          record.getPlayerList().add(player);
+          record.setGame(match.getFormat().getGame());
+          RecordService.getInstance().saveRecord(record);
+          player.getRecordList().add(record);
+        }
+        catch (Exception ex)
+        {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+    });
     return true;
   }
 
@@ -267,12 +294,13 @@ public class MatchService extends Service<MatchEntry>
   }
 
   /**
-   * Lock the match result. This is meant not to be undone as it calculates
+   * Lock the match result.This is meant not to be undone as it calculates
    * experience and update records which is dependent on when it happens.
    *
    * @param mr Match Result to lock.
+   * @throws java.lang.Exception
    */
-  public void lockMatchResult(MatchResult mr)
+  public void lockMatchResult(MatchResult mr) throws Exception
   {
     mr.setLocked(true);
 
@@ -290,7 +318,7 @@ public class MatchService extends Service<MatchEntry>
           case "result.draw":
             record.setDraws(record.getDraws() + 1);
             break;
-            //Various reasons leading to a win.
+          //Various reasons leading to a win.
           case "result.win":
           //Fall thru
           case "result.forfeit":
@@ -309,5 +337,24 @@ public class MatchService extends Service<MatchEntry>
         }
       });
     });
+    mrc.edit(mr);
+  }
+
+  /**
+   * Update a match result.
+   * 
+   * @param mr Match result to update.
+   * @throws Exception If result doesn't exist.
+   */
+  public void updateResult(MatchResult mr) throws Exception
+  {
+    if (mr.getMatchResultPK() != null)
+    {
+      mrc.edit(mr);
+    }
+    else
+    {
+      throw new Exception("Trying to update non existing result!");
+    }
   }
 }

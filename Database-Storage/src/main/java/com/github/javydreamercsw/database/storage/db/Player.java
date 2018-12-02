@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlTransient;
         })
 public class Player implements Serializable
 {
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 3254339194105024707L;
   @Id
   @Basic(optional = false)
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "PlayerGen")
@@ -66,7 +66,8 @@ public class Player implements Serializable
     @JoinColumn(name = "player_id", referencedColumnName = "id")
   }, inverseJoinColumns =
   {
-    @JoinColumn(name = "record_id", referencedColumnName = "id")
+    @JoinColumn(name = "record_id", referencedColumnName = "id"),
+    @JoinColumn(name = "record_game_id", referencedColumnName = "game_id")
   })
   @ManyToMany
   private List<Record> recordList;

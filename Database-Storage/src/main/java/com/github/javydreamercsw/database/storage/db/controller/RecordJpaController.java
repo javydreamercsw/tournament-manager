@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.github.javydreamercsw.database.storage.db.controller;
 
 import java.io.Serializable;
@@ -11,23 +16,38 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Record;
+import com.github.javydreamercsw.database.storage.db.RecordPK;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
-import com.github.javydreamercsw.database.storage.db.server.AbstractController;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 
-public class RecordJpaController extends AbstractController implements Serializable
+/**
+ *
+ * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
+ */
+public class RecordJpaController implements Serializable
 {
-  private static final long serialVersionUID = -5982649688889824490L;
-
+  private static final long serialVersionUID = 7601923040598485026L;
   public RecordJpaController(EntityManagerFactory emf)
   {
-    super(emf);
+    this.emf = emf;
+  }
+  private EntityManagerFactory emf = null;
+
+  public EntityManager getEntityManager()
+  {
+    return emf.createEntityManager();
   }
 
-  public void create(Record record)
+  public void create(Record record) throws PreexistingEntityException, Exception
   {
+    if (record.getRecordPK() == null)
+    {
+      record.setRecordPK(new RecordPK());
+    }
     if (record.getPlayerList() == null)
     {
       record.setPlayerList(new ArrayList<>());
@@ -36,11 +56,18 @@ public class RecordJpaController extends AbstractController implements Serializa
     {
       record.setTournamentHasTeamList(new ArrayList<>());
     }
+    record.getRecordPK().setGameId(record.getGame().getId());
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
+      Game game = record.getGame();
+      if (game != null)
+      {
+        game = em.getReference(game.getClass(), game.getId());
+        record.setGame(game);
+      }
       List<Player> attachedPlayerList = new ArrayList<>();
       for (Player playerListPlayerToAttach : record.getPlayerList())
       {
@@ -56,6 +83,11 @@ public class RecordJpaController extends AbstractController implements Serializa
       }
       record.setTournamentHasTeamList(attachedTournamentHasTeamList);
       em.persist(record);
+      if (game != null)
+      {
+        game.getRecordList().add(record);
+        game = em.merge(game);
+      }
       for (Player playerListPlayer : record.getPlayerList())
       {
         playerListPlayer.getRecordList().add(record);
@@ -68,6 +100,14 @@ public class RecordJpaController extends AbstractController implements Serializa
       }
       em.getTransaction().commit();
     }
+    catch (Exception ex)
+    {
+      if (findRecord(record.getRecordPK()) != null)
+      {
+        throw new PreexistingEntityException("Record " + record + " already exists.", ex);
+      }
+      throw ex;
+    }
     finally
     {
       if (em != null)
@@ -79,16 +119,24 @@ public class RecordJpaController extends AbstractController implements Serializa
 
   public void edit(Record record) throws NonexistentEntityException, Exception
   {
+    record.getRecordPK().setGameId(record.getGame().getId());
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      Record persistentRecord = em.find(Record.class, record.getId());
+      Record persistentRecord = em.find(Record.class, record.getRecordPK());
+      Game gameOld = persistentRecord.getGame();
+      Game gameNew = record.getGame();
       List<Player> playerListOld = persistentRecord.getPlayerList();
       List<Player> playerListNew = record.getPlayerList();
       List<TournamentHasTeam> tournamentHasTeamListOld = persistentRecord.getTournamentHasTeamList();
       List<TournamentHasTeam> tournamentHasTeamListNew = record.getTournamentHasTeamList();
+      if (gameNew != null)
+      {
+        gameNew = em.getReference(gameNew.getClass(), gameNew.getId());
+        record.setGame(gameNew);
+      }
       List<Player> attachedPlayerListNew = new ArrayList<>();
       for (Player playerListNewPlayerToAttach : playerListNew)
       {
@@ -106,6 +154,16 @@ public class RecordJpaController extends AbstractController implements Serializa
       tournamentHasTeamListNew = attachedTournamentHasTeamListNew;
       record.setTournamentHasTeamList(tournamentHasTeamListNew);
       record = em.merge(record);
+      if (gameOld != null && !gameOld.equals(gameNew))
+      {
+        gameOld.getRecordList().remove(record);
+        gameOld = em.merge(gameOld);
+      }
+      if (gameNew != null && !gameNew.equals(gameOld))
+      {
+        gameNew.getRecordList().add(record);
+        gameNew = em.merge(gameNew);
+      }
       for (Player playerListOldPlayer : playerListOld)
       {
         if (!playerListNew.contains(playerListOldPlayer))
@@ -145,7 +203,7 @@ public class RecordJpaController extends AbstractController implements Serializa
       String msg = ex.getLocalizedMessage();
       if (msg == null || msg.length() == 0)
       {
-        Integer id = record.getId();
+        RecordPK id = record.getRecordPK();
         if (findRecord(id) == null)
         {
           throw new NonexistentEntityException("The record with id " + id + " no longer exists.");
@@ -162,7 +220,7 @@ public class RecordJpaController extends AbstractController implements Serializa
     }
   }
 
-  public void destroy(Integer id) throws NonexistentEntityException
+  public void destroy(RecordPK id) throws NonexistentEntityException
   {
     EntityManager em = null;
     try
@@ -173,11 +231,17 @@ public class RecordJpaController extends AbstractController implements Serializa
       try
       {
         record = em.getReference(Record.class, id);
-        record.getId();
+        record.getRecordPK();
       }
       catch (EntityNotFoundException enfe)
       {
         throw new NonexistentEntityException("The record with id " + id + " no longer exists.", enfe);
+      }
+      Game game = record.getGame();
+      if (game != null)
+      {
+        game.getRecordList().remove(record);
+        game = em.merge(game);
       }
       List<Player> playerList = record.getPlayerList();
       for (Player playerListPlayer : playerList)
@@ -234,7 +298,7 @@ public class RecordJpaController extends AbstractController implements Serializa
     }
   }
 
-  public Record findRecord(Integer id)
+  public Record findRecord(RecordPK id)
   {
     EntityManager em = getEntityManager();
     try

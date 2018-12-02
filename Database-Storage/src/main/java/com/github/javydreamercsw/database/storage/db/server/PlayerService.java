@@ -159,7 +159,7 @@ public class PlayerService extends Service<Player>
       });
       for (Record r : player.getRecordList())
       {
-        rc.destroy(r.getId());
+        rc.destroy(r.getRecordPK());
       }
       pc.destroy(player.getId());
     }
@@ -196,11 +196,6 @@ public class PlayerService extends Service<Player>
     else
     {
       pc.create(player);
-
-      Record record = new Record();
-      record.getPlayerList().add(player);
-      RecordService.getInstance().saveRecord(record);
-      player.getRecordList().add(record);
 
       //Create the single player's team
       Team alone = new Team();

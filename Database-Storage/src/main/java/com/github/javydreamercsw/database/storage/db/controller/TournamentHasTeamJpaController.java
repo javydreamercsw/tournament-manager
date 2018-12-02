@@ -61,7 +61,7 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       List<Record> attachedRecordList = new ArrayList<>();
       for (Record recordListRecordToAttach : tournamentHasTeam.getRecordList())
       {
-        recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getId());
+        recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getRecordPK());
         attachedRecordList.add(recordListRecordToAttach);
       }
       tournamentHasTeam.setRecordList(attachedRecordList);
@@ -129,7 +129,7 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       List<Record> attachedRecordListNew = new ArrayList<>();
       for (Record recordListNewRecordToAttach : recordListNew)
       {
-        recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getId());
+        recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getRecordPK());
         attachedRecordListNew.add(recordListNewRecordToAttach);
       }
       recordListNew = attachedRecordListNew;

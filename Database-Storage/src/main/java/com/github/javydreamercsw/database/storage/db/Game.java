@@ -24,18 +24,18 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "game")
 @XmlRootElement
 @NamedQueries(
-{
-  @NamedQuery(name = "Game.findAll", query = "SELECT g FROM Game g"),
-  @NamedQuery(name = "Game.findById", 
-          query = "SELECT g FROM Game g WHERE g.id = :id"),
-  @NamedQuery(name = "Game.findByName", 
-          query = "SELECT g FROM Game g WHERE g.name = :name"),
-  @NamedQuery(name = "Game.findByDescription", 
-          query = "SELECT g FROM Game g WHERE g.description = :description")
-})
+        {
+          @NamedQuery(name = "Game.findAll", query = "SELECT g FROM Game g"),
+          @NamedQuery(name = "Game.findById",
+                  query = "SELECT g FROM Game g WHERE g.id = :id"),
+          @NamedQuery(name = "Game.findByName",
+                  query = "SELECT g FROM Game g WHERE g.name = :name"),
+          @NamedQuery(name = "Game.findByDescription",
+                  query = "SELECT g FROM Game g WHERE g.description = :description")
+        })
 public class Game implements Serializable
 {
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -6267533299417173163L;
   @Id
   @Basic(optional = false)
   @NotNull
@@ -58,6 +58,8 @@ public class Game implements Serializable
   private String description;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
   private List<Format> formatList;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
+  private List<Record> recordList;
 
   public Game()
   {
@@ -126,7 +128,7 @@ public class Game implements Serializable
       return false;
     }
     Game other = (Game) object;
-    return !((this.id == null && other.id != null) 
+    return !((this.id == null && other.id != null)
             || (this.id != null && !this.id.equals(other.id)));
   }
 
@@ -134,5 +136,16 @@ public class Game implements Serializable
   public String toString()
   {
     return "com.github.javydreamercsw.database.storage.db.Game[ id=" + id + " ]";
+  }
+
+  @XmlTransient
+  public List<Record> getRecordList()
+  {
+    return recordList;
+  }
+
+  public void setRecordList(List<Record> recordList)
+  {
+    this.recordList = recordList;
   }
 }

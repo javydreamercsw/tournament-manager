@@ -40,18 +40,6 @@ import javax.xml.bind.annotation.XmlTransient;
         })
 public class Tournament implements Serializable
 {
-  private static final long serialVersionUID = 1L;
-  @Id
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "TournamentGen")
-  @TableGenerator(name = "TournamentGen", table = "tm_id",
-          pkColumnName = "table_name",
-          valueColumnName = "last_id",
-          pkColumnValue = "tournament",
-          allocationSize = 1,
-          initialValue = 1)
-  @Basic(optional = false)
-  @Column(name = "id")
-  private Integer id;
   @Basic(optional = false)
   @NotNull
   @Size(min = 1, max = 245)
@@ -69,6 +57,18 @@ public class Tournament implements Serializable
   @NotNull
   @Column(name = "lossPoints")
   private int lossPoints;
+  private static final long serialVersionUID = 1L;
+  @Id
+  @GeneratedValue(strategy = GenerationType.TABLE, generator = "TournamentGen")
+  @TableGenerator(name = "TournamentGen", table = "tm_id",
+          pkColumnName = "table_name",
+          valueColumnName = "last_id",
+          pkColumnValue = "tournament",
+          allocationSize = 1,
+          initialValue = 1)
+  @Basic(optional = false)
+  @Column(name = "id")
+  private Integer id;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
   private List<Round> roundList;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
@@ -104,45 +104,6 @@ public class Tournament implements Serializable
     this.id = id;
   }
 
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public int getWinPoints()
-  {
-    return winPoints;
-  }
-
-  public void setWinPoints(int winPoints)
-  {
-    this.winPoints = winPoints;
-  }
-
-  public int getDrawPoints()
-  {
-    return drawPoints;
-  }
-
-  public void setDrawPoints(int drawPoints)
-  {
-    this.drawPoints = drawPoints;
-  }
-
-  public int getLossPoints()
-  {
-    return lossPoints;
-  }
-
-  public void setLossPoints(int lossPoints)
-  {
-    this.lossPoints = lossPoints;
-  }
 
   @XmlTransient
   public List<Round> getRoundList()
@@ -192,5 +153,45 @@ public class Tournament implements Serializable
   {
     return "com.github.javydreamercsw.database.storage.db.Tournament[ id="
             + id + " ]";
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public int getWinPoints()
+  {
+    return winPoints;
+  }
+
+  public void setWinPoints(int winPoints)
+  {
+    this.winPoints = winPoints;
+  }
+
+  public int getDrawPoints()
+  {
+    return drawPoints;
+  }
+
+  public void setDrawPoints(int drawPoints)
+  {
+    this.drawPoints = drawPoints;
+  }
+
+  public int getLossPoints()
+  {
+    return lossPoints;
+  }
+
+  public void setLossPoints(int lossPoints)
+  {
+    this.lossPoints = lossPoints;
   }
 }

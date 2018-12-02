@@ -34,6 +34,9 @@ import javax.xml.bind.annotation.XmlTransient;
         })
 public class Team implements Serializable
 {
+  @Size(max = 245)
+  @Column(name = "name")
+  private String name;
   private static final long serialVersionUID = 1L;
   @Id
   @Basic(optional = false)
@@ -46,9 +49,6 @@ public class Team implements Serializable
           initialValue = 1)
   @Column(name = "id")
   private Integer id;
-  @Size(max = 245)
-  @Column(name = "name")
-  private String name;
   @ManyToMany(mappedBy = "teamList")
   private List<Player> playerList;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "team")
@@ -79,15 +79,6 @@ public class Team implements Serializable
     this.id = id;
   }
 
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
 
   @XmlTransient
   public List<Player> getPlayerList()
@@ -147,5 +138,15 @@ public class Team implements Serializable
   public String toString()
   {
     return "com.github.javydreamercsw.database.storage.db.Team[ id=" + id + " ]";
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
   }
 }

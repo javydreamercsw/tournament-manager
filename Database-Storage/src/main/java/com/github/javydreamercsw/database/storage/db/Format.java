@@ -36,9 +36,6 @@ import javax.xml.bind.annotation.XmlTransient;
 })
 public class Format implements Serializable
 {
-  private static final long serialVersionUID = 1L;
-  @EmbeddedId
-  protected FormatPK formatPK;
   @Basic(optional = false)
   @NotNull
   @Size(min = 1, max = 45)
@@ -47,6 +44,9 @@ public class Format implements Serializable
   @Size(max = 255)
   @Column(name = "description")
   private String description;
+  private static final long serialVersionUID = 1L;
+  @EmbeddedId
+  protected FormatPK formatPK;
   @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false, 
           updatable = false)
   @ManyToOne(optional = false)
@@ -83,25 +83,6 @@ public class Format implements Serializable
     this.formatPK = formatPK;
   }
 
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public String getDescription()
-  {
-    return description;
-  }
-
-  public void setDescription(String description)
-  {
-    this.description = description;
-  }
 
   public Game getGame()
   {
@@ -150,5 +131,25 @@ public class Format implements Serializable
   {
     return "com.github.javydreamercsw.database.storage.db.Format[ formatPK=" + 
             formatPK + " ]";
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public void setDescription(String description)
+  {
+    this.description = description;
   }
 }
