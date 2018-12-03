@@ -59,14 +59,9 @@ public class DataBaseManager
   private static final Logger LOG
           = Logger.getLogger(DataBaseManager.class.getSimpleName());
   private static boolean dbError = false;
-  private static DBState state;
+  private static DBState state = DBState.START_UP;
   public static final String JNDI_DATASOURCE_NAME
           = "java:comp/env/jdbc/TMDB";
-
-  public DataBaseManager()
-  {
-    state = DBState.START_UP;
-  }
 
   public static EntityManagerFactory getEntityManagerFactory()
   {
@@ -372,18 +367,6 @@ public class DataBaseManager
   }
 
   /**
-   * Named query that will modify the database
-   *
-   * @param query query to execute
-   * @param parameters query parameters
-   */
-  public static void namedUpdateQuery(String query,
-          Map<String, Object> parameters)
-  {
-    namedQuery(query, parameters, true);
-  }
-
-  /**
    * Named query (not for updates)
    *
    * @param query query to execute
@@ -425,23 +408,22 @@ public class DataBaseManager
 
   public static void close()
   {
-    getEntityManager().close();
-    getEntityManagerFactory().close();
+    if (em != null)
+    {
+      em.close();
+    }
+    if (emf != null)
+    {
+      emf.close();
+    }
+    //Set it to null so it's recreated with new Persistence Unit next time is requested.
+    emf = null;
+    em = null;
   }
 
   public static EntityTransaction getTransaction()
   {
     return getEntityManager().getTransaction();
-  }
-
-  /**
-   * Named query that will modify the database
-   *
-   * @param query query to execute
-   */
-  public static void namedUpdateQuery(String query)
-  {
-    namedQuery(query, null, true);
   }
 
   public static List<Object> nativeQuery(String query)
@@ -553,8 +535,7 @@ public class DataBaseManager
                       ? "result.loss" : "result.win").get());
 
       //Lock the results so records are updated.
-      match.getMatchHasTeamList().forEach(mht
-              ->
+      match.getMatchHasTeamList().forEach(mht ->
       {
         try
         {
@@ -566,5 +547,54 @@ public class DataBaseManager
         }
       });
     }
+  }
+
+  /**
+   * Load stuff from the Lookup
+   */
+  public static void load()
+  {
+    Lookup.getDefault().lookupAll(IGame.class).forEach(gameAPI ->
+    {
+      // Add game to DB if not there
+      Optional<Game> result
+              = GameService.getInstance().findGameByName(gameAPI.getName());
+
+      Game game;
+      if (result.isPresent())
+      {
+        game = result.get();
+      }
+      else
+      {
+        game = new Game(gameAPI.getName());
+        GameService.getInstance().saveGame(game);
+      }
+
+      //Load formats
+      gameAPI.gameFormats().forEach(format ->
+      {
+        // Check if it exists in the databse
+        Optional<Format> f
+                = FormatService.getInstance()
+                        .findFormatForGame(gameAPI.getName(), format.getName());
+        if (!f.isPresent())
+        {
+          try
+          {
+            // Let's create it.
+            Format newFormat = new Format();
+            newFormat.setName(format.getName());
+            newFormat.setDescription(format.getDescription());
+            newFormat.setGame(game);
+            FormatService.getInstance().saveFormat(newFormat);
+          }
+          catch (Exception ex)
+          {
+            Exceptions.printStackTrace(ex);
+          }
+        }
+      });
+    });
   }
 }

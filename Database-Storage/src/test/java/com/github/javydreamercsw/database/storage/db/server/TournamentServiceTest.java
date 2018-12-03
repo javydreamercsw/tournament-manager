@@ -1,13 +1,23 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openide.util.Exceptions;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 
 /**
  *
@@ -15,17 +25,28 @@ import com.github.javydreamercsw.database.storage.db.Tournament;
  */
 public class TournamentServiceTest extends AbstractServerTest
 {
-  /**
-   * Test of write2DB method, of class TournamentHasTeamServer.
-   *
-   * @throws java.lang.Exception
-   */
-  @Test
-  public void testWrite2DB() throws Exception
-  {
-    Tournament t = new Tournament("Test");
-    TournamentService.getInstance().saveTournament(t);
+  private Tournament t;
 
+  @BeforeClass
+  @Override
+  public void setup() throws NonexistentEntityException, IllegalOrphanException
+  {
+    try
+    {
+      super.setup();
+      t = new Tournament("Test");
+      TournamentService.getInstance().saveTournament(t);
+    }
+    catch (Exception ex)
+    {
+      Exceptions.printStackTrace(ex);
+      fail();
+    }
+  }
+
+  @Test
+  public void testAddTeam() throws Exception
+  {
     Player player = new Player("Player 1");
     PlayerService.getInstance().savePlayer(player);
 
@@ -40,5 +61,80 @@ public class TournamentServiceTest extends AbstractServerTest
     TournamentService.getInstance().addTeam(t, team);
 
     assertEquals(t.getTournamentHasTeamList().size(), 1);
+
+    TournamentService.getInstance().deleteTeamFromTournament(t
+            .getTournamentHasTeamList().get(0));
+  }
+
+  @Test
+  public void testFindTournament()
+  {
+    assertNotNull(TournamentService.getInstance().findTournament(t.getId()));
+    assertNull(TournamentService.getInstance().findTournament(2_000));
+  }
+
+  @Test
+  public void testFindTournaments()
+  {
+    assertEquals(TournamentService.getInstance().findTournaments(t.getName())
+            .size(), 1);
+    assertEquals(TournamentService.getInstance().findTournaments(t.getName()
+            + "x").size(), 0);
+  }
+
+  @Test
+  public void testSaveAndDelete() throws IllegalOrphanException, 
+          NonexistentEntityException, Exception
+  {
+    Tournament t2 = new Tournament("Test 2");
+    assertEquals(TournamentService.getInstance().findTournaments(t2.getName())
+            .size(), 0);
+
+    TournamentService.getInstance().saveTournament(t2);
+
+    assertEquals(TournamentService.getInstance().findTournaments(t2.getName())
+            .size(), 1);
+
+    TournamentService.getInstance().deleteTournament(t2);
+
+    assertEquals(TournamentService.getInstance().findTournaments(t2.getName())
+            .size(), 0);
+  }
+
+  @Test
+  public void testAddTeams() throws Exception
+  {
+    Tournament tournament = new Tournament("Add Team");
+    TournamentService.getInstance().saveTournament(tournament);
+    
+    Player player3 = new Player("Player 3");
+    PlayerService.getInstance().savePlayer(player3);
+
+    Player player4 = new Player("Player 4");
+    PlayerService.getInstance().savePlayer(player4);
+
+    Team team2 = new Team("Test Team 2");
+    team2.getPlayerList().add(player3);
+    team2.getPlayerList().add(player4);
+    TeamService.getInstance().saveTeam(team2);
+    Player player5 = new Player("Player 5");
+    PlayerService.getInstance().savePlayer(player5);
+
+    Player player6 = new Player("Player 6");
+    PlayerService.getInstance().savePlayer(player6);
+
+    Team team3 = new Team("Test Team");
+    team3.getPlayerList().add(player3);
+    team3.getPlayerList().add(player5);
+    TeamService.getInstance().saveTeam(team3);
+    
+    List<Team> teams= new ArrayList<>();
+    teams.add(team3);
+    teams.add(team2);
+
+    TournamentService.getInstance().addTeams(tournament, teams);
+
+    assertEquals(TournamentService.getInstance().findTournament(tournament.getId())
+            .getTournamentHasTeamList().size(), 2);
   }
 }

@@ -5,12 +5,16 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.openide.util.Lookup;
 import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.tournament.manager.api.IGame;
 
 public class DataBaseManagerTest extends AbstractServerTest
 {
@@ -36,7 +40,7 @@ public class DataBaseManagerTest extends AbstractServerTest
       assertEquals(me.getMatchHasTeamList().size(), 2);
       assertNotNull(me.getFormat());
     });
-    
+
     List<Object> results = DataBaseManager.namedQuery("MatchEntry.findAll");
     assertTrue(results.size() > 0);
 
@@ -46,5 +50,14 @@ public class DataBaseManagerTest extends AbstractServerTest
       assertEquals(m.getMatchHasTeamList().size(), 2);
       assertNotNull(m.getFormat());
     });
+  }
+
+  @Test
+  public void testNamedQuery()
+  {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("name", Lookup.getDefault().lookup(IGame.class).getName());
+    
+    assertFalse(DataBaseManager.namedQuery("Game.findByName", parameters).isEmpty());
   }
 }

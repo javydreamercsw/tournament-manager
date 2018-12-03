@@ -24,7 +24,7 @@ public class TeamService extends Service<Team>
   private TeamService()
   {
   }
-  
+
   /**
    * Helper class to initialize the singleton Service in a thread-safe way and
    * to keep the initialization ordering clear between the two services. See
@@ -64,7 +64,7 @@ public class TeamService extends Service<Team>
 
     if (value.trim().isEmpty())
     {
-      result.addAll(tc.findTeamEntities());
+      result.addAll(getAll());
     }
     else
     {
@@ -149,7 +149,7 @@ public class TeamService extends Service<Team>
   {
     for (Player p : players)
     {
-      addMember(team, p, false);
+      addMember(team, p);
     }
     saveTeam(team);
   }
@@ -159,18 +159,14 @@ public class TeamService extends Service<Team>
    *
    * @param team Team to add players to.
    * @param player Player to add.
-   * @param save Save team as part of this transaction.
    */
-  public void addMember(Team team, Player player, boolean save)
+  public void addMember(Team team, Player player)
   {
     team.getPlayerList().add(player);
     player.getTeamList().add(team);
-    if (save)
-    {
-      saveTeam(team);
-    }
+    saveTeam(team);
   }
-  
+
   @Override
   public List<Team> getAll()
   {

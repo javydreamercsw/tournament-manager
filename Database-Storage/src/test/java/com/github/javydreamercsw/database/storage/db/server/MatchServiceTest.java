@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Random;
 
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
-import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
@@ -17,6 +18,9 @@ import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.tournament.manager.api.IGame;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 
 /**
@@ -25,6 +29,30 @@ import com.github.javydreamercsw.tournament.manager.api.TournamentException;
  */
 public class MatchServiceTest extends AbstractServerTest
 {
+  private Game game;
+  private MatchEntry me;
+
+  @BeforeClass
+  @Override
+  public void setup() throws NonexistentEntityException, IllegalOrphanException,
+          Exception
+  {
+    super.setup();
+    game = GameService.getInstance().findGameByName(Lookup.getDefault()
+            .lookup(IGame.class).getName()).get();
+    Tournament t = new Tournament("Test 1");
+    TournamentService.getInstance().saveTournament(t);
+    TournamentService.getInstance().addRound(t);
+
+    GameService.getInstance().saveGame(game);
+
+    me = new MatchEntry();
+    me.setFormat(game.getFormatList().get(0));
+    me.setRound(t.getRoundList().get(0));
+
+    MatchService.getInstance().saveMatch(me);
+  }
+
   /**
    * Test of write2DB method, of class MatchServer.
    *
@@ -37,19 +65,6 @@ public class MatchServiceTest extends AbstractServerTest
     Tournament t = new Tournament("Test 1");
     TournamentService.getInstance().saveTournament(t);
     TournamentService.getInstance().addRound(t);
-
-    Game game = new Game("Test Game");
-    GameService.getInstance().saveGame(game);
-
-    Format format = new Format("Default");
-    format.setGame(game);
-    FormatService.getInstance().saveFormat(format);
-
-    MatchEntry me = new MatchEntry();
-    me.setFormat(format);
-    me.setRound(t.getRoundList().get(0));
-
-    MatchService.getInstance().saveMatch(me);
 
     MatchEntry match
             = MatchService.getInstance().findMatch(me.getMatchEntryPK());
@@ -143,5 +158,45 @@ public class MatchServiceTest extends AbstractServerTest
               + p.getRecordList().get(0).getLoses()
               + p.getRecordList().get(0).getWins() > 0);
     });
+
+    MatchService.getInstance().saveMatch(me);
+
+    for(MatchHasTeam mht:me.getMatchHasTeamList())
+    {
+      MatchResult mr = mht.getMatchResult();
+      assertNotNull(mr);
+      mr.setLocked(true);
+      MatchService.getInstance().updateResult(mr);
+    }
+
+    TeamService.getInstance().getAll().forEach(team ->
+    {
+      try
+      {
+        MatchService.getInstance().removeTeam(me, team);
+      }
+      catch (NonexistentEntityException ex)
+      {
+        Exceptions.printStackTrace(ex);
+        fail();
+      }
+    });
+
+    assertTrue(MatchService.getInstance().findMatch(me.getMatchEntryPK())
+            .getMatchHasTeamList().isEmpty());
+  }
+
+  @Test
+  public void testFindMatchesWithFormat()
+  {
+    assertEquals(MatchService.getInstance().findMatchesWithFormat("").size(),
+            game.getFormatList().size());
+
+    assertEquals(MatchService.getInstance()
+            .findMatchesWithFormat(game.getFormatList().get(0).getName()).size(), 1);
+
+    assertTrue(MatchService.getInstance()
+            .findMatchesWithFormat(game.getFormatList().get(0).getName() + "x")
+            .isEmpty());
   }
 }

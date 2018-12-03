@@ -1,6 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,9 +57,6 @@ public class GameService extends Service<Game>
 
   public Optional<Game> findGameByName(String name)
   {
-    HashMap<String, Object> parameters = new HashMap<>();
-    parameters.put("name", name);
-
     Game game = null;
     for (Game g : gc.findGameEntities())
     {
@@ -97,13 +93,13 @@ public class GameService extends Service<Game>
       Exceptions.printStackTrace(ex);
     }
   }
-  
+
   @Override
   public List<Game> getAll()
   {
     return gc.findGameEntities();
   }
-  
+
   public void deleteGame(Game game)
   {
     try

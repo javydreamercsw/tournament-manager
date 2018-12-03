@@ -2,7 +2,11 @@ package com.github.javydreamercsw.database.storage.db.server;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.openide.util.Exceptions;
 import org.testng.annotations.BeforeClass;
@@ -43,9 +47,9 @@ public class TeamServiceTest extends AbstractServerTest
   @Test
   public void testFindTeams()
   {
-    System.out.println("findTeams");
     assertEquals(TeamService.getInstance().findTeams("Player 1").size(), 1);
     assertEquals(TeamService.getInstance().findTeams("Player 3").size(), 0);
+    assertEquals(TeamService.getInstance().findTeams("").size(), 2);
   }
 
   /**
@@ -54,7 +58,6 @@ public class TeamServiceTest extends AbstractServerTest
   @Test
   public void testFindTeam()
   {
-    System.out.println("findTeam");
     assertNotNull(TeamService.getInstance().findTeam(TeamService.getInstance()
             .findTeams("Player 1").get(0).getId()));
   }
@@ -65,14 +68,25 @@ public class TeamServiceTest extends AbstractServerTest
   @Test
   public void testSaveTeam()
   {
-    System.out.println("saveTeam");
     Team team = new Team();
     team.setName("The Players");
     TeamService.getInstance().saveTeam(team);
     assertNotNull(team.getId());
 
-    TeamService.getInstance().addMembers(team,
-            PlayerService.getInstance().findPlayerByName("Player 1").get(),
-            PlayerService.getInstance().findPlayerByName("Player 2").get());
+    assertEquals(TeamService.getInstance().findTeam(team.getId())
+            .getPlayerList().size(), 0);
+    List<Player> players = new ArrayList<>();
+    
+    players.add(PlayerService.getInstance().findPlayerByName("Player 1").get());
+    players.add(PlayerService.getInstance().findPlayerByName("Player 2").get());
+
+    TeamService.getInstance().addMembers(team,players);
+
+    assertEquals(TeamService.getInstance().findTeam(team.getId())
+            .getPlayerList().size(), 2);
+    
+    TeamService.getInstance().deleteTeam(team);
+    
+    assertNull(TeamService.getInstance().findTeam(team.getId()));
   }
 }

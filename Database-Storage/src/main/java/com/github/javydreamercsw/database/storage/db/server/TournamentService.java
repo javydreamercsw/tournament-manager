@@ -3,8 +3,6 @@ package com.github.javydreamercsw.database.storage.db.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openide.util.Exceptions;
-
 import com.github.javydreamercsw.database.storage.db.Round;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
@@ -67,7 +65,7 @@ public class TournamentService extends Service<Tournament>
     List<Tournament> result = new ArrayList<>();
     tc.findTournamentEntities().forEach(tournament ->
     {
-      if (tournament.getName().toLowerCase().contains(value))
+      if (tournament.getName().toLowerCase().contains(value.toLowerCase()))
       {
         result.add(tournament);
       }
@@ -75,22 +73,12 @@ public class TournamentService extends Service<Tournament>
     return result;
   }
 
-  public void saveTournament(Tournament t)
+  public void saveTournament(Tournament t) throws NonexistentEntityException, 
+          IllegalOrphanException, Exception
   {
     if (t.getId() != null && tc.findTournament(t.getId()) != null)
     {
-      try
-      {
         tc.edit(t);
-      }
-      catch (NonexistentEntityException ex)
-      {
-        Exceptions.printStackTrace(ex);
-      }
-      catch (Exception ex)
-      {
-        Exceptions.printStackTrace(ex);
-      }
     }
     else
     {
@@ -98,27 +86,24 @@ public class TournamentService extends Service<Tournament>
     }
   }
 
-  public void deleteTournament(Tournament t)
+  public void deleteTournament(Tournament t) throws IllegalOrphanException,
+          NonexistentEntityException
   {
-    try
+    for (Round round : t.getRoundList())
     {
-      tc.destroy(t.getId());
+      deleteRound(round);
     }
-    catch (IllegalOrphanException | NonexistentEntityException ex)
+
+    for (TournamentHasTeam tht : t.getTournamentHasTeamList())
     {
-      Exceptions.printStackTrace(ex);
+      deleteTeamFromTournament(tht);
     }
+    tc.destroy(t.getId());
   }
 
-  public List<Tournament> findTournament(Integer id)
+  public Tournament findTournament(Integer id)
   {
-    List<Tournament> results = new ArrayList<>();
-    Tournament t = tc.findTournament(id);
-    if (t != null)
-    {
-      results.add(t);
-    }
-    return results;
+    return tc.findTournament(id);
   }
 
   /**
@@ -140,13 +125,12 @@ public class TournamentService extends Service<Tournament>
    * @param teams Teams to add
    * @throws Exception if there's an error adding teams.
    */
-  public void addTeams(Tournament t, Team... teams) throws Exception
+  public void addTeams(Tournament t, Team... teams) throws Exception 
   {
     for (Team team : teams)
     {
-      addTeam(t, team, false);
+      addTeam(t, team);
     }
-    saveTournament(t);
   }
 
   /**
@@ -154,32 +138,18 @@ public class TournamentService extends Service<Tournament>
    *
    * @param t Tournament
    * @param team Team to add
+   * @throws IllegalOrphanException if an orphan is left
    * @throws Exception if there's an error adding team.
    */
-  public void addTeam(Tournament t, Team team) throws Exception
-  {
-    addTeam(t, team, true);
-  }
-
-  /**
-   * Add team to the tournament.
-   *
-   * @param t Tournament
-   * @param team Team to add
-   * @param save Save the tournament as part of this transaction.
-   * @throws Exception if there's an error adding team.
-   */
-  public void addTeam(Tournament t, Team team, boolean save) throws Exception
+  public void addTeam(Tournament t, Team team) throws IllegalOrphanException, 
+          Exception
   {
     TournamentHasTeam tht = new TournamentHasTeam();
     tht.setTeam(team);
     tht.setTournament(t);
-    t.getTournamentHasTeamList().add(tht);
     thtc.create(tht);
-    if (save)
-    {
-      saveTournament(t);
-    }
+    t.getTournamentHasTeamList().add(tht);
+    saveTournament(t);
   }
 
   /**
@@ -228,5 +198,11 @@ public class TournamentService extends Service<Tournament>
   public List<Tournament> getAll()
   {
     return tc.findTournamentEntities();
+  }
+
+  public void deleteRound(Round round) throws IllegalOrphanException,
+          NonexistentEntityException
+  {
+    rc.destroy(round.getRoundPK());
   }
 }
