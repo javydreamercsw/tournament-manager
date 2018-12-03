@@ -2,7 +2,6 @@ package com.github.javydreamercsw.tournament.manager.ui.views.welcome;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -11,11 +10,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.vaadin.maxime.MarkdownArea;
 
-import com.github.javydreamercsw.database.storage.db.Format;
-import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
-import com.github.javydreamercsw.database.storage.db.server.FormatService;
-import com.github.javydreamercsw.database.storage.db.server.GameService;
 import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.tournament.manager.api.IGame;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
@@ -49,6 +44,8 @@ public class Welcome extends TMView
       DataBaseManager.setPersistenceUnitName(JNDIDB);
       demo = (Boolean) context
               .lookup("java:comp/env/tm/demo");
+      
+      DataBaseManager.load();
     }
     catch (NamingException ex)
     {
@@ -75,47 +72,6 @@ public class Welcome extends TMView
       public void valueChanged(ValueChangeEvent e)
       {
         IGame gameAPI = cb.getValue();
-        // Update everything to the new game.
-
-        // Add game to DB if not there
-        Optional<Game> result
-                = GameService.getInstance().findGameByName(gameAPI.getName());
-
-        Game game;
-        if (result.isPresent())
-        {
-          game = result.get();
-        }
-        else
-        {
-          game = new Game(gameAPI.getName());
-          GameService.getInstance().saveGame(game);
-        }
-
-        //Load formats
-        gameAPI.gameFormats().forEach(format ->
-        {
-          // Check if it exists in the databse
-          Optional<Format> f
-                  = FormatService.getInstance()
-                          .findFormatForGame(gameAPI.getName(), format.getName());
-          if (!f.isPresent())
-          {
-            try
-            {
-              // Let's create it.
-              Format newFormat = new Format();
-              newFormat.setName(format.getName());
-              newFormat.setDescription(format.getDescription());
-              newFormat.setGame(game);
-              FormatService.getInstance().saveFormat(newFormat);
-            }
-            catch (Exception ex)
-            {
-              Exceptions.printStackTrace(ex);
-            }
-          }
-        });
         saveValue(CURRENT_GAME, gameAPI.getName());
 
         // Check if it's configured for demo

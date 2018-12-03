@@ -20,6 +20,8 @@ import java.util.List;
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.server.TournamentService;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
@@ -89,12 +91,12 @@ public class TournamentList extends TMView
     viewToolbar.add(searchField, newButton);
     add(viewToolbar);
   }
-  
+
   private String getRoundCount(Tournament t)
   {
     return Integer.toString(t.getRoundList().size());
   }
-  
+
   private String getTeamCount(Tournament t)
   {
     return Integer.toString(t.getTournamentHasTeamList().size());
@@ -153,7 +155,7 @@ public class TournamentList extends TMView
     try
     {
       TournamentService.getInstance().saveTournament(t);
-      
+
       Notification.show(
               "Tournament successfully " + operation.getNameInText() + "ed.",
               3000, Position.BOTTOM_START);
@@ -167,10 +169,7 @@ public class TournamentList extends TMView
 
   private void deleteTournament(Tournament t)
   {
-    List<Tournament> matchesInCategory = TournamentService.getInstance()
-            .findTournament(t.getId());
-
-    if (matchesInCategory.isEmpty())
+    if (TournamentService.getInstance().findTournament(t.getId()) != null)
     {
       try
       {
@@ -180,7 +179,7 @@ public class TournamentList extends TMView
                 Position.BOTTOM_START);
         updateView();
       }
-      catch (Exception ex)
+      catch (IllegalOrphanException | NonexistentEntityException ex)
       {
         Exceptions.printStackTrace(ex);
       }
