@@ -39,8 +39,8 @@ public class TournamentHasTeamJpaController extends AbstractController implement
     {
       tournamentHasTeam.setRecordList(new ArrayList<>());
     }
-    tournamentHasTeam.getTournamentHasTeamPK().setTournamentId(tournamentHasTeam.getTournament().getId());
     tournamentHasTeam.getTournamentHasTeamPK().setTeamId(tournamentHasTeam.getTeam().getId());
+    tournamentHasTeam.getTournamentHasTeamPK().setTournamentId(tournamentHasTeam.getTournament().getTournamentPK().getId());
     EntityManager em = null;
     try
     {
@@ -55,7 +55,7 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       Tournament tournament = tournamentHasTeam.getTournament();
       if (tournament != null)
       {
-        tournament = em.getReference(tournament.getClass(), tournament.getId());
+        tournament = em.getReference(tournament.getClass(), tournament.getTournamentPK());
         tournamentHasTeam.setTournament(tournament);
       }
       List<Record> attachedRecordList = new ArrayList<>();
@@ -102,8 +102,8 @@ public class TournamentHasTeamJpaController extends AbstractController implement
 
   public void edit(TournamentHasTeam tournamentHasTeam) throws NonexistentEntityException, Exception
   {
-    tournamentHasTeam.getTournamentHasTeamPK().setTournamentId(tournamentHasTeam.getTournament().getId());
     tournamentHasTeam.getTournamentHasTeamPK().setTeamId(tournamentHasTeam.getTeam().getId());
+    tournamentHasTeam.getTournamentHasTeamPK().setTournamentId(tournamentHasTeam.getTournament().getTournamentPK().getId());
     EntityManager em = null;
     try
     {
@@ -123,7 +123,7 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       }
       if (tournamentNew != null)
       {
-        tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getId());
+        tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getTournamentPK());
         tournamentHasTeam.setTournament(tournamentNew);
       }
       List<Record> attachedRecordListNew = new ArrayList<>();
@@ -302,5 +302,5 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       em.close();
     }
   }
-
+  
 }

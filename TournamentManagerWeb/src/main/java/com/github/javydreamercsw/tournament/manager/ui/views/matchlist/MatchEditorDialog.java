@@ -131,16 +131,7 @@ public final class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
     cb.setRequired(true);
     cb.setPreventInvalidInput(true);
     cb.setAllowCustomValue(false);
-    cb.addValueChangeListener(new ValueChangeListener()
-    {
-      private static final long serialVersionUID = 5377566605252849942L;
-
-      @Override
-      public void valueChanged(ValueChangeEvent e)
-      {
-        validate();
-      }
-    });
+    cb.addValueChangeListener(listener -> validate());
 
     getBinder().forField(cb).bind(MatchEntry::getFormat, MatchEntry::setFormat);
 

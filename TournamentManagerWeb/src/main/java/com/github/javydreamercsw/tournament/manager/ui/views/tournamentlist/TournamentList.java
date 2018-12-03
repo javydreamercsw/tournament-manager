@@ -101,6 +101,11 @@ public class TournamentList extends TMView
   {
     return Integer.toString(t.getTournamentHasTeamList().size());
   }
+  
+  private String getFormat(Tournament t)
+  {
+    return t.getTournamentFormat().getFormatName();
+  }
 
   private void addContent()
   {
@@ -113,6 +118,8 @@ public class TournamentList extends TMView
     grid.addColumn(this::getRoundCount).setHeader("Rounds")
             .setWidth("6em");
     grid.addColumn(this::getTeamCount).setHeader("Teams")
+            .setWidth("6em");
+    grid.addColumn(this::getFormat).setHeader("Format")
             .setWidth("6em");
     grid.addColumn(new ComponentRenderer<>(this::createEditButton))
             .setFlexGrow(0);
@@ -169,7 +176,7 @@ public class TournamentList extends TMView
 
   private void deleteTournament(Tournament t)
   {
-    if (TournamentService.getInstance().findTournament(t.getId()) != null)
+    if (TournamentService.getInstance().findTournament(t.getTournamentPK()) != null)
     {
       try
       {

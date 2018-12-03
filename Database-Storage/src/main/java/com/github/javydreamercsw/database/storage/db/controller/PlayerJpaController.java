@@ -30,25 +30,25 @@ public class PlayerJpaController extends AbstractController implements Serializa
   {
     if (player.getTeamList() == null)
     {
-      player.setTeamList(new ArrayList<Team>());
+      player.setTeamList(new ArrayList<>());
     }
     if (player.getRecordList() == null)
     {
-      player.setRecordList(new ArrayList<Record>());
+      player.setRecordList(new ArrayList<>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<Team> attachedTeamList = new ArrayList<Team>();
+      List<Team> attachedTeamList = new ArrayList<>();
       for (Team teamListTeamToAttach : player.getTeamList())
       {
         teamListTeamToAttach = em.getReference(teamListTeamToAttach.getClass(), teamListTeamToAttach.getId());
         attachedTeamList.add(teamListTeamToAttach);
       }
       player.setTeamList(attachedTeamList);
-      List<Record> attachedRecordList = new ArrayList<Record>();
+      List<Record> attachedRecordList = new ArrayList<>();
       for (Record recordListRecordToAttach : player.getRecordList())
       {
         recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getRecordPK());
@@ -89,7 +89,7 @@ public class PlayerJpaController extends AbstractController implements Serializa
       List<Team> teamListNew = player.getTeamList();
       List<Record> recordListOld = persistentPlayer.getRecordList();
       List<Record> recordListNew = player.getRecordList();
-      List<Team> attachedTeamListNew = new ArrayList<Team>();
+      List<Team> attachedTeamListNew = new ArrayList<>();
       for (Team teamListNewTeamToAttach : teamListNew)
       {
         teamListNewTeamToAttach = em.getReference(teamListNewTeamToAttach.getClass(), teamListNewTeamToAttach.getId());
@@ -97,7 +97,7 @@ public class PlayerJpaController extends AbstractController implements Serializa
       }
       teamListNew = attachedTeamListNew;
       player.setTeamList(teamListNew);
-      List<Record> attachedRecordListNew = new ArrayList<Record>();
+      List<Record> attachedRecordListNew = new ArrayList<>();
       for (Record recordListNewRecordToAttach : recordListNew)
       {
         recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getRecordPK());

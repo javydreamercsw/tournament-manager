@@ -6,8 +6,11 @@ import java.util.List;
 import com.github.javydreamercsw.database.storage.db.Round;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.TournamentFormat;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
+import com.github.javydreamercsw.database.storage.db.TournamentPK;
 import com.github.javydreamercsw.database.storage.db.controller.RoundJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.TournamentFormatJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.TournamentHasTeamJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.TournamentJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
@@ -21,6 +24,8 @@ public class TournamentService extends Service<Tournament>
           = new TournamentHasTeamJpaController(DataBaseManager.getEntityManagerFactory());
   private RoundJpaController rc
           = new RoundJpaController(DataBaseManager.getEntityManagerFactory());
+  private TournamentFormatJpaController tfc
+          = new TournamentFormatJpaController(DataBaseManager.getEntityManagerFactory());
 
   private TournamentService()
   {
@@ -73,12 +78,12 @@ public class TournamentService extends Service<Tournament>
     return result;
   }
 
-  public void saveTournament(Tournament t) throws NonexistentEntityException, 
+  public void saveTournament(Tournament t) throws NonexistentEntityException,
           IllegalOrphanException, Exception
   {
-    if (t.getId() != null && tc.findTournament(t.getId()) != null)
+    if (t.getTournamentPK() != null && tc.findTournament(t.getTournamentPK()) != null)
     {
-        tc.edit(t);
+      tc.edit(t);
     }
     else
     {
@@ -98,10 +103,10 @@ public class TournamentService extends Service<Tournament>
     {
       deleteTeamFromTournament(tht);
     }
-    tc.destroy(t.getId());
+    tc.destroy(t.getTournamentPK());
   }
 
-  public Tournament findTournament(Integer id)
+  public Tournament findTournament(TournamentPK id)
   {
     return tc.findTournament(id);
   }
@@ -125,7 +130,7 @@ public class TournamentService extends Service<Tournament>
    * @param teams Teams to add
    * @throws Exception if there's an error adding teams.
    */
-  public void addTeams(Tournament t, Team... teams) throws Exception 
+  public void addTeams(Tournament t, Team... teams) throws Exception
   {
     for (Team team : teams)
     {
@@ -141,7 +146,7 @@ public class TournamentService extends Service<Tournament>
    * @throws IllegalOrphanException if an orphan is left
    * @throws Exception if there's an error adding team.
    */
-  public void addTeam(Tournament t, Team team) throws IllegalOrphanException, 
+  public void addTeam(Tournament t, Team team) throws IllegalOrphanException,
           Exception
   {
     TournamentHasTeam tht = new TournamentHasTeam();
@@ -204,5 +209,27 @@ public class TournamentService extends Service<Tournament>
           NonexistentEntityException
   {
     rc.destroy(round.getRoundPK());
+  }
+
+  public TournamentFormat findFormat(String name)
+  {
+    for (TournamentFormat tf : tfc.findTournamentFormatEntities())
+    {
+      if (tf.getFormatName().equals(name))
+      {
+        return tf;
+      }
+    }
+    return null;
+  }
+
+  public void addFormat(TournamentFormat tf) throws Exception
+  {
+    tfc.create(tf);
+  }
+  
+  public List<TournamentFormat> getFormats()
+  {
+    return tfc.findTournamentFormatEntities();
   }
 }

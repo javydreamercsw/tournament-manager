@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -16,8 +17,10 @@ import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.TournamentPK;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 
 /**
  *
@@ -35,6 +38,9 @@ public class TournamentServiceTest extends AbstractServerTest
     {
       super.setup();
       t = new Tournament("Test");
+      t.setTournamentFormat(TournamentService.getInstance()
+              .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
+                      .getName()));
       TournamentService.getInstance().saveTournament(t);
     }
     catch (Exception ex)
@@ -69,8 +75,8 @@ public class TournamentServiceTest extends AbstractServerTest
   @Test
   public void testFindTournament()
   {
-    assertNotNull(TournamentService.getInstance().findTournament(t.getId()));
-    assertNull(TournamentService.getInstance().findTournament(2_000));
+    assertNotNull(TournamentService.getInstance().findTournament(t.getTournamentPK()));
+    assertNull(TournamentService.getInstance().findTournament(new TournamentPK(2_000)));
   }
 
   @Test
@@ -83,10 +89,13 @@ public class TournamentServiceTest extends AbstractServerTest
   }
 
   @Test
-  public void testSaveAndDelete() throws IllegalOrphanException, 
+  public void testSaveAndDelete() throws IllegalOrphanException,
           NonexistentEntityException, Exception
   {
     Tournament t2 = new Tournament("Test 2");
+    t2.setTournamentFormat(TournamentService.getInstance()
+              .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
+                      .getName()));
     assertEquals(TournamentService.getInstance().findTournaments(t2.getName())
             .size(), 0);
 
@@ -105,8 +114,11 @@ public class TournamentServiceTest extends AbstractServerTest
   public void testAddTeams() throws Exception
   {
     Tournament tournament = new Tournament("Add Team");
+    tournament.setTournamentFormat(TournamentService.getInstance()
+              .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
+                      .getName()));
     TournamentService.getInstance().saveTournament(tournament);
-    
+
     Player player3 = new Player("Player 3");
     PlayerService.getInstance().savePlayer(player3);
 
@@ -127,14 +139,14 @@ public class TournamentServiceTest extends AbstractServerTest
     team3.getPlayerList().add(player3);
     team3.getPlayerList().add(player5);
     TeamService.getInstance().saveTeam(team3);
-    
-    List<Team> teams= new ArrayList<>();
+
+    List<Team> teams = new ArrayList<>();
     teams.add(team3);
     teams.add(team2);
 
     TournamentService.getInstance().addTeams(tournament, teams);
 
-    assertEquals(TournamentService.getInstance().findTournament(tournament.getId())
-            .getTournamentHasTeamList().size(), 2);
+    assertEquals(TournamentService.getInstance().findTournament(tournament
+            .getTournamentPK()).getTournamentHasTeamList().size(), 2);
   }
 }

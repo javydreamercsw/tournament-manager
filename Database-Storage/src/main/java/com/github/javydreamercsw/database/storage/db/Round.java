@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -33,8 +34,14 @@ public class Round implements Serializable
   private static final long serialVersionUID = 1L;
   @EmbeddedId
   protected RoundPK roundPK;
-  @JoinColumn(name = "tournament_id", referencedColumnName = "id",
-          insertable = false, updatable = false)
+  @JoinColumns(
+  {
+    @JoinColumn(name = "tournament_id", referencedColumnName = "id",
+            insertable = false, updatable = false),
+    @JoinColumn(name = "tournament_tournament_format_id",
+            referencedColumnName = "tournament_format_id",
+            insertable = false, updatable = false)
+  })
   @ManyToOne(optional = false)
   private Tournament tournament;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "round")
@@ -103,7 +110,7 @@ public class Round implements Serializable
       return false;
     }
     Round other = (Round) object;
-    return !((this.roundPK == null && other.roundPK != null) 
+    return !((this.roundPK == null && other.roundPK != null)
             || (this.roundPK != null && !this.roundPK.equals(other.roundPK)));
   }
 

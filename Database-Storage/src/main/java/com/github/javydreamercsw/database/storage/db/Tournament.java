@@ -7,15 +7,14 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,21 +24,26 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "tournament")
 @XmlRootElement
 @NamedQueries(
-        {
-          @NamedQuery(name = "Tournament.findAll", query = "SELECT t FROM Tournament t"),
-          @NamedQuery(name = "Tournament.findById",
-                  query = "SELECT t FROM Tournament t WHERE t.id = :id"),
-          @NamedQuery(name = "Tournament.findByName",
-                  query = "SELECT t FROM Tournament t WHERE t.name = :name"),
-          @NamedQuery(name = "Tournament.findByWinPoints",
-                  query = "SELECT t FROM Tournament t WHERE t.winPoints = :winPoints"),
-          @NamedQuery(name = "Tournament.findByDrawPoints",
-                  query = "SELECT t FROM Tournament t WHERE t.drawPoints = :drawPoints"),
-          @NamedQuery(name = "Tournament.findByLossPoints",
-                  query = "SELECT t FROM Tournament t WHERE t.lossPoints = :lossPoints")
-        })
+{
+  @NamedQuery(name = "Tournament.findAll", query = "SELECT t FROM Tournament t"),
+  @NamedQuery(name = "Tournament.findById", 
+          query = "SELECT t FROM Tournament t WHERE t.tournamentPK.id = :id"),
+  @NamedQuery(name = "Tournament.findByTournamentFormatId", 
+          query = "SELECT t FROM Tournament t WHERE t.tournamentPK.tournamentFormatId = :tournamentFormatId"),
+  @NamedQuery(name = "Tournament.findByName", 
+          query = "SELECT t FROM Tournament t WHERE t.name = :name"),
+  @NamedQuery(name = "Tournament.findByWinPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.winPoints = :winPoints"),
+  @NamedQuery(name = "Tournament.findByDrawPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.drawPoints = :drawPoints"),
+  @NamedQuery(name = "Tournament.findByLossPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.lossPoints = :lossPoints")
+})
 public class Tournament implements Serializable
 {
+  private static final long serialVersionUID = 1L;
+  @EmbeddedId
+  protected TournamentPK tournamentPK;
   @Basic(optional = false)
   @NotNull
   @Size(min = 1, max = 245)
@@ -57,22 +61,14 @@ public class Tournament implements Serializable
   @NotNull
   @Column(name = "lossPoints")
   private int lossPoints;
-  private static final long serialVersionUID = 1L;
-  @Id
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "TournamentGen")
-  @TableGenerator(name = "TournamentGen", table = "tm_id",
-          pkColumnName = "table_name",
-          valueColumnName = "last_id",
-          pkColumnValue = "tournament",
-          allocationSize = 1,
-          initialValue = 1)
-  @Basic(optional = false)
-  @Column(name = "id")
-  private Integer id;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
-  private List<Round> roundList;
+  @JoinColumn(name = "tournament_format_id", referencedColumnName = "id", 
+          insertable = false, updatable = false)
+  @ManyToOne(optional = false)
+  private TournamentFormat tournamentFormat;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
   private List<TournamentHasTeam> tournamentHasTeamList;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
+  private List<Round> roundList;
 
   public Tournament()
   {
@@ -94,65 +90,19 @@ public class Tournament implements Serializable
     tournamentHasTeamList = new ArrayList<>();
   }
 
-  public Integer getId()
+  public Tournament(int tournamentFormatId)
   {
-    return id;
+    this.tournamentPK = new TournamentPK(tournamentFormatId);
   }
 
-  public void setId(Integer id)
+  public TournamentPK getTournamentPK()
   {
-    this.id = id;
+    return tournamentPK;
   }
 
-
-  @XmlTransient
-  public List<Round> getRoundList()
+  public void setTournamentPK(TournamentPK tournamentPK)
   {
-    return roundList;
-  }
-
-  public void setRoundList(List<Round> roundList)
-  {
-    this.roundList = roundList;
-  }
-
-  @XmlTransient
-  public List<TournamentHasTeam> getTournamentHasTeamList()
-  {
-    return tournamentHasTeamList;
-  }
-
-  public void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
-  {
-    this.tournamentHasTeamList = tournamentHasTeamList;
-  }
-
-  @Override
-  public int hashCode()
-  {
-    int hash = 0;
-    hash += (id != null ? id.hashCode() : 0);
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object object)
-  {
-    // TODO: Warning - this method won't work in the case the id fields are not set
-    if (!(object instanceof Tournament))
-    {
-      return false;
-    }
-    Tournament other = (Tournament) object;
-    return !((this.id == null && other.id != null) 
-            || (this.id != null && !this.id.equals(other.id)));
-  }
-
-  @Override
-  public String toString()
-  {
-    return "com.github.javydreamercsw.database.storage.db.Tournament[ id="
-            + id + " ]";
+    this.tournamentPK = tournamentPK;
   }
 
   public String getName()
@@ -193,5 +143,66 @@ public class Tournament implements Serializable
   public void setLossPoints(int lossPoints)
   {
     this.lossPoints = lossPoints;
+  }
+
+  public TournamentFormat getTournamentFormat()
+  {
+    return tournamentFormat;
+  }
+
+  public void setTournamentFormat(TournamentFormat tournamentFormat)
+  {
+    this.tournamentFormat = tournamentFormat;
+  }
+
+  @XmlTransient
+  public List<TournamentHasTeam> getTournamentHasTeamList()
+  {
+    return tournamentHasTeamList;
+  }
+
+  public void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
+  {
+    this.tournamentHasTeamList = tournamentHasTeamList;
+  }
+
+  @XmlTransient
+  public List<Round> getRoundList()
+  {
+    return roundList;
+  }
+
+  public void setRoundList(List<Round> roundList)
+  {
+    this.roundList = roundList;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 0;
+    hash += (tournamentPK != null ? tournamentPK.hashCode() : 0);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object object)
+  {
+    // TODO: Warning - this method won't work in the case the id fields are not set
+    if (!(object instanceof Tournament))
+    {
+      return false;
+    }
+    Tournament other = (Tournament) object;
+    return !((this.tournamentPK == null && other.tournamentPK != null) 
+            || (this.tournamentPK != null 
+            && !this.tournamentPK.equals(other.tournamentPK)));
+  }
+
+  @Override
+  public String toString()
+  {
+    return "com.github.javydreamercsw.database.storage.db.Tournament[ tournamentPK=" 
+            + tournamentPK + " ]";
   }
 }

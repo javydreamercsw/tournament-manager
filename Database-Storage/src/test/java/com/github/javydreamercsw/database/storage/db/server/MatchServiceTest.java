@@ -22,6 +22,7 @@ import com.github.javydreamercsw.database.storage.db.controller.exceptions.Illeg
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.tournament.manager.api.IGame;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
+import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 
 /**
  *
@@ -41,6 +42,9 @@ public class MatchServiceTest extends AbstractServerTest
     game = GameService.getInstance().findGameByName(Lookup.getDefault()
             .lookup(IGame.class).getName()).get();
     Tournament t = new Tournament("Test 1");
+    t.setTournamentFormat(TournamentService.getInstance()
+              .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
+                      .getName()));
     TournamentService.getInstance().saveTournament(t);
     TournamentService.getInstance().addRound(t);
 
@@ -63,6 +67,9 @@ public class MatchServiceTest extends AbstractServerTest
   public void testMatchService() throws TournamentException, Exception
   {
     Tournament t = new Tournament("Test 1");
+    t.setTournamentFormat(TournamentService.getInstance()
+              .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
+                      .getName()));
     TournamentService.getInstance().saveTournament(t);
     TournamentService.getInstance().addRound(t);
 

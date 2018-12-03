@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +34,10 @@ import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.TournamentFormat;
 import com.github.javydreamercsw.tournament.manager.api.GameFormat;
 import com.github.javydreamercsw.tournament.manager.api.IGame;
+import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 import com.github.javydreamercsw.tournament.manager.api.storage.StorageException;
 import com.googlecode.flyway.core.Flyway;
 import com.googlecode.flyway.core.api.MigrationInfo;
@@ -455,6 +458,8 @@ public class DataBaseManager
   @SuppressWarnings("empty-statement")
   public static void loadDemoData() throws Exception
   {
+    Random r = new Random();
+    
     // Add players
     for (int i = 0; i < 10; i++)
     {
@@ -469,12 +474,16 @@ public class DataBaseManager
     }
 
     // Add a tournaments
+    List<TournamentInterface> formats = new ArrayList<>();
+    formats.addAll(Lookup.getDefault().lookupAll(TournamentInterface.class));
     for (int i = 0; i < 10; i++)
     {
       Tournament t = new Tournament("Tournament " + (i + 1));
       t.setWinPoints(3);
       t.setLossPoints(0);
       t.setDrawPoints(1);
+      t.setTournamentFormat(TournamentService.getInstance()
+              .findFormat(formats.get(r.nextInt(formats.size())).getName()));
       TournamentService.getInstance().saveTournament(t);
     }
 
@@ -510,7 +519,7 @@ public class DataBaseManager
     }
     List<Format> formatList = FormatService.getInstance()
             .findFormatByGame(gameAPI.getName());
-    Random r = new Random();
+    
     // Add matches
     for (int i = 0; i < 10; i++)
     {
@@ -554,6 +563,21 @@ public class DataBaseManager
    */
   public static void load()
   {
+    Lookup.getDefault().lookupAll(TournamentInterface.class).forEach(format ->
+    {
+      // Register the tournament formats
+      if (TournamentService.getInstance().findFormat(format.getName()) == null)
+      {
+        try {
+          TournamentFormat tf = new TournamentFormat(format.getName(),
+                  format.getClass().getCanonicalName());
+          TournamentService.getInstance().addFormat(tf);
+        }
+        catch (Exception ex) {
+          Exceptions.printStackTrace(ex);
+        }
+      }
+    });
     Lookup.getDefault().lookupAll(IGame.class).forEach(gameAPI ->
     {
       // Add game to DB if not there

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -19,7 +20,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries(
 {
-  @NamedQuery(name = "TournamentHasTeam.findAll", query = "SELECT t FROM TournamentHasTeam t"),
+  @NamedQuery(name = "TournamentHasTeam.findAll", 
+          query = "SELECT t FROM TournamentHasTeam t"),
   @NamedQuery(name = "TournamentHasTeam.findByTournamentId", 
           query = "SELECT t FROM TournamentHasTeam t WHERE t.tournamentHasTeamPK.tournamentId = :tournamentId"),
   @NamedQuery(name = "TournamentHasTeam.findByTeamId", 
@@ -36,8 +38,14 @@ public class TournamentHasTeam implements Serializable
           updatable = false)
   @ManyToOne(optional = false)
   private Team team;
-  @JoinColumn(name = "tournament_id", referencedColumnName = "id", 
-          insertable = false, updatable = false)
+  @JoinColumns(
+  {
+    @JoinColumn(name = "tournament_id", referencedColumnName = "id",
+            insertable = false, updatable = false),
+    @JoinColumn(name = "tournament_tournament_format_id",
+            referencedColumnName = "tournament_format_id",
+            insertable = false, updatable = false)
+  })
   @ManyToOne(optional = false)
   private Tournament tournament;
 
