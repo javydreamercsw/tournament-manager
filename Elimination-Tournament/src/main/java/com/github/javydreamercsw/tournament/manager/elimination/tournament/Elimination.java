@@ -116,7 +116,7 @@ public abstract class Elimination extends AbstractTournament
           {
             try
             {
-              LOG.log(Level.FINE, "Removing player: {0}", t.toString());
+              LOG.log(Level.FINE, "Player: {0} is eliminated!", t.toString());
               removeTeam(t);
             }
             catch (TournamentException ex)
@@ -186,7 +186,7 @@ public abstract class Elimination extends AbstractTournament
               pending = players.get(lucky);
               //Exclude the lucky one from the rest of processing
               exclude = ArrayUtils.add(exclude, lucky);
-              LOG.log(Level.INFO, "Pairing {0} with lower level", pending);
+              LOG.log(Level.FINE, "Pairing {0} with lower level", pending);
             }
             //We have an even number, pair them together
             while (players.size() - exclude.length >= 2)
