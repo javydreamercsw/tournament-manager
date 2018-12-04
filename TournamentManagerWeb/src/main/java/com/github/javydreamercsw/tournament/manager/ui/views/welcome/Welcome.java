@@ -31,20 +31,20 @@ public class Welcome extends TMView
 {
   private static final long serialVersionUID = 1252548231807630022L;
   private static boolean demo = false;
-  
+
   static
   {
     try
     {
       InitialContext context = new InitialContext();
-      
+
       String JNDIDB = (String) context
               .lookup("java:comp/env/tm/JNDIDB");
-      
+
       DataBaseManager.setPersistenceUnitName(JNDIDB);
       demo = (Boolean) context
               .lookup("java:comp/env/tm/demo");
-      
+
       DataBaseManager.load();
     }
     catch (NamingException ex)
@@ -96,6 +96,13 @@ public class Welcome extends TMView
                     3000, Position.MIDDLE);
             Exceptions.printStackTrace(ex);
           }
+        }
+        else
+        {
+          DataBaseManager.load();
+          Notification.show(
+                  "Loading data done!",
+                  3000, Position.MIDDLE);
         }
       }
     });
