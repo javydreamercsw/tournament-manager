@@ -193,8 +193,8 @@ public final class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
         {
           if (mht.getMatchResult() != null)
           {
-            mht.getMatchResult().setRanked(ranked.getValue());
-            MatchService.getInstance().updateResult(mht.getMatchResult());
+            MatchService.getInstance().setRanked(getCurrentItem(), 
+                    ranked.getValue());
           }
         }
         catch (Exception ex)
