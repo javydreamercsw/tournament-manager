@@ -536,12 +536,14 @@ public class DataBaseManager
 
       //Add a result
       boolean win = r.nextBoolean();
+      boolean ranked = r.nextBoolean();
       MatchService.getInstance().setResult(match.getMatchHasTeamList().get(0),
               MatchService.getInstance().getResultType(win
                       ? "result.win" : "result.loss").get());
       MatchService.getInstance().setResult(match.getMatchHasTeamList().get(1),
               MatchService.getInstance().getResultType(win
                       ? "result.loss" : "result.win").get());
+      MatchService.getInstance().setRanked(match, ranked);
 
       //Lock the results so records are updated.
       match.getMatchHasTeamList().forEach(mht ->
