@@ -3,6 +3,7 @@ package com.github.javydreamercsw.tournament.manager;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -354,9 +355,4 @@ public abstract class AbstractTournamentTester
    * @return
    */
   public abstract TournamentInterface generateRandomTournament();
-
-  private void fail()
-  {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
 }
