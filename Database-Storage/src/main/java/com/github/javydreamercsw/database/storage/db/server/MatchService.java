@@ -21,6 +21,7 @@ import com.github.javydreamercsw.database.storage.db.controller.MatchResultJpaCo
 import com.github.javydreamercsw.database.storage.db.controller.MatchResultTypeJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 
 public class MatchService extends Service<MatchEntry>
 {
@@ -181,7 +182,7 @@ public class MatchService extends Service<MatchEntry>
       boolean found = false;
       for (Record r : player.getRecordList())
       {
-        if (Objects.equals(r.getGame().getId(), 
+        if (Objects.equals(r.getGame().getId(),
                 match.getFormat().getGame().getId()))
         {
           found = true;
@@ -342,7 +343,7 @@ public class MatchService extends Service<MatchEntry>
 
   /**
    * Update a match result.
-   * 
+   *
    * @param mr Match result to update.
    * @throws Exception If result doesn't exist.
    */
@@ -355,6 +356,31 @@ public class MatchService extends Service<MatchEntry>
     else
     {
       throw new Exception("Trying to update non existing result!");
+    }
+  }
+
+  /**
+   * Set match results ranked or unranked.
+   *
+   * @param match Match to update.
+   * @param ranked true for ranked, false for unranked.
+   * @throws TournamentException if results are already locked.
+   * @throws Exception If there's an error updating the result.
+   */
+  public void setRanked(MatchEntry match, boolean ranked)
+          throws TournamentException, Exception
+  {
+    for (MatchHasTeam mht : match.getMatchHasTeamList())
+    {
+      if (!mht.getMatchResult().getLocked())
+      {
+        mht.getMatchResult().setRanked(ranked);
+        MatchService.getInstance().updateResult(mht.getMatchResult());
+      }
+      else
+      {
+        throw new TournamentException("Rsults already locked!");
+      }
     }
   }
 }
