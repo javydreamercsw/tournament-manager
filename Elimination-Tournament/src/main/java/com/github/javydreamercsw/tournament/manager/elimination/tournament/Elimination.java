@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.openide.util.lookup.ServiceProvider;
 
 import com.github.javydreamercsw.tournament.manager.AbstractTournament;
 import com.github.javydreamercsw.tournament.manager.api.Encounter;
@@ -23,8 +22,7 @@ import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterfac
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-@ServiceProvider(service = TournamentInterface.class)
-public class Elimination extends AbstractTournament
+public abstract class Elimination extends AbstractTournament
         implements TournamentInterface
 {
 
@@ -68,12 +66,6 @@ public class Elimination extends AbstractTournament
   {
     super(winPoints, lossPoints, drawPoints, pairAlikeRecords);
     this.eliminations = eliminations;
-  }
-
-  @Override
-  public String getName()
-  {
-    return "Single Elimination";
   }
 
   @Override
@@ -256,14 +248,5 @@ public class Elimination extends AbstractTournament
      * will get a bye.
      */
     return log(teams.size(), 2);
-  }
-
-  @Override
-  public TournamentInterface createTournament(List<TeamInterface> teams,
-          int winPoints, int lossPoints, int drawPoints)
-  {
-    Elimination swiss = new Elimination(1, winPoints, lossPoints, drawPoints, true);
-    swiss.teams.addAll(teams);
-    return swiss;
   }
 }
