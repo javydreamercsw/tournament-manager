@@ -30,7 +30,6 @@ import com.vaadin.flow.router.Route;
 public class Welcome extends TMView
 {
   private static final long serialVersionUID = 1252548231807630022L;
-  private static boolean demo = false;
 
   static
   {
@@ -42,10 +41,39 @@ public class Welcome extends TMView
               .lookup("java:comp/env/tm/JNDIDB");
 
       DataBaseManager.setPersistenceUnitName(JNDIDB);
-      demo = (Boolean) context
+      boolean demo = (Boolean) context
               .lookup("java:comp/env/tm/demo");
 
-      DataBaseManager.load();
+      // Check if it's configured for demo
+      if (demo && PlayerService.getInstance().getAll().isEmpty())
+      {
+        try
+        {
+          Notification.show(
+                  "Loading demo data...",
+                  3000, Position.MIDDLE);
+
+          DataBaseManager.loadDemoData();
+
+          Notification.show(
+                  "Loading demo data done!",
+                  3000, Position.MIDDLE);
+        }
+        catch (Exception ex)
+        {
+          Notification.show(
+                  "Error loading demo data!",
+                  3000, Position.MIDDLE);
+          Exceptions.printStackTrace(ex);
+        }
+      }
+      else
+      {
+        DataBaseManager.load();
+        Notification.show(
+                "Loading data done!",
+                3000, Position.MIDDLE);
+      }
     }
     catch (NamingException ex)
     {
@@ -73,37 +101,6 @@ public class Welcome extends TMView
       {
         IGame gameAPI = cb.getValue();
         saveValue(CURRENT_GAME, gameAPI.getName());
-
-        // Check if it's configured for demo
-        if (demo && PlayerService.getInstance().getAll().isEmpty())
-        {
-          try
-          {
-            Notification.show(
-                    "Loading demo data...",
-                    3000, Position.MIDDLE);
-
-            DataBaseManager.loadDemoData();
-
-            Notification.show(
-                    "Loading demo data done!",
-                    3000, Position.MIDDLE);
-          }
-          catch (Exception ex)
-          {
-            Notification.show(
-                    "Error loading demo data!",
-                    3000, Position.MIDDLE);
-            Exceptions.printStackTrace(ex);
-          }
-        }
-        else
-        {
-          DataBaseManager.load();
-          Notification.show(
-                  "Loading data done!",
-                  3000, Position.MIDDLE);
-        }
       }
     });
     cb.setEnabled(games.size() > 1);

@@ -482,6 +482,7 @@ public class DataBaseManager
       t.setWinPoints(3);
       t.setLossPoints(0);
       t.setDrawPoints(1);
+      t.setFormat(FormatService.getInstance().getAll().get(0));
       t.setTournamentFormat(TournamentService.getInstance()
               .findFormat(formats.get(r.nextInt(formats.size())).getName()));
       TournamentService.getInstance().saveTournament(t);

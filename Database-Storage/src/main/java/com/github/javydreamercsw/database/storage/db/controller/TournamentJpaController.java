@@ -11,6 +11,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Round;
 import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.TournamentFormat;
@@ -49,6 +50,12 @@ public class TournamentJpaController extends AbstractController implements Seria
     {
       em = getEntityManager();
       em.getTransaction().begin();
+      Format format = tournament.getFormat();
+      if (format != null)
+      {
+        format = em.getReference(format.getClass(), format.getFormatPK());
+        tournament.setFormat(format);
+      }
       TournamentFormat tournamentFormat = tournament.getTournamentFormat();
       if (tournamentFormat != null)
       {
@@ -70,6 +77,11 @@ public class TournamentJpaController extends AbstractController implements Seria
       }
       tournament.setRoundList(attachedRoundList);
       em.persist(tournament);
+      if (format != null)
+      {
+        format.getTournamentList().add(tournament);
+        format = em.merge(format);
+      }
       if (tournamentFormat != null)
       {
         tournamentFormat.getTournamentList().add(tournament);
@@ -125,6 +137,8 @@ public class TournamentJpaController extends AbstractController implements Seria
       em = getEntityManager();
       em.getTransaction().begin();
       Tournament persistentTournament = em.find(Tournament.class, tournament.getTournamentPK());
+      Format formatOld = persistentTournament.getFormat();
+      Format formatNew = tournament.getFormat();
       TournamentFormat tournamentFormatOld = persistentTournament.getTournamentFormat();
       TournamentFormat tournamentFormatNew = tournament.getTournamentFormat();
       List<TournamentHasTeam> tournamentHasTeamListOld = persistentTournament.getTournamentHasTeamList();
@@ -158,6 +172,11 @@ public class TournamentJpaController extends AbstractController implements Seria
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
+      if (formatNew != null)
+      {
+        formatNew = em.getReference(formatNew.getClass(), formatNew.getFormatPK());
+        tournament.setFormat(formatNew);
+      }
       if (tournamentFormatNew != null)
       {
         tournamentFormatNew = em.getReference(tournamentFormatNew.getClass(), tournamentFormatNew.getId());
@@ -180,6 +199,16 @@ public class TournamentJpaController extends AbstractController implements Seria
       roundListNew = attachedRoundListNew;
       tournament.setRoundList(roundListNew);
       tournament = em.merge(tournament);
+      if (formatOld != null && !formatOld.equals(formatNew))
+      {
+        formatOld.getTournamentList().remove(tournament);
+        formatOld = em.merge(formatOld);
+      }
+      if (formatNew != null && !formatNew.equals(formatOld))
+      {
+        formatNew.getTournamentList().add(tournament);
+        formatNew = em.merge(formatNew);
+      }
       if (tournamentFormatOld != null && !tournamentFormatOld.equals(tournamentFormatNew))
       {
         tournamentFormatOld.getTournamentList().remove(tournament);
@@ -281,6 +310,12 @@ public class TournamentJpaController extends AbstractController implements Seria
       if (illegalOrphanMessages != null)
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
+      }
+      Format format = tournament.getFormat();
+      if (format != null)
+      {
+        format.getTournamentList().remove(tournament);
+        format = em.merge(format);
       }
       TournamentFormat tournamentFormat = tournament.getTournamentFormat();
       if (tournamentFormat != null)

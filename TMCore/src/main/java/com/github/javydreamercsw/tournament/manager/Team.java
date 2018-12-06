@@ -7,12 +7,11 @@ import java.util.List;
 
 import org.openide.util.Lookup;
 
-import de.gesundkrank.jskills.Rating;
-
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
-
 import com.github.javydreamercsw.tournament.manager.api.standing.RecordInterface;
+
+import de.gesundkrank.jskills.Rating;
 
 /**
  *
@@ -23,13 +22,14 @@ public class Team extends de.gesundkrank.jskills.Team implements TeamInterface
   private static final long serialVersionUID = 8398904493889254598L;
   private final String name;
   private RecordInterface record = null;
+  private final int teamId;
 
-  public Team(List<TournamentPlayerInterface> teamMembers)
+  public Team(int id, List<TournamentPlayerInterface> teamMembers)
   {
-    this("", teamMembers);
+    this(id, "", teamMembers);
   }
 
-  public Team(String name, List<TournamentPlayerInterface> teamMembers)
+  public Team(int id, String name, List<TournamentPlayerInterface> teamMembers)
   {
     this.name = name;
     teamMembers.forEach(member ->
@@ -37,11 +37,12 @@ public class Team extends de.gesundkrank.jskills.Team implements TeamInterface
       put(member, new Rating(0, 0));
     });
     record = Lookup.getDefault().lookup(RecordInterface.class).getNewInstance();
+    this.teamId = id;
   }
 
-  public Team(TournamentPlayerInterface p1)
+  public Team(int id, TournamentPlayerInterface p1)
   {
-    this("", Arrays.asList(p1));
+    this(id, "", Arrays.asList(p1));
   }
 
   /**
@@ -91,16 +92,7 @@ public class Team extends de.gesundkrank.jskills.Team implements TeamInterface
   @Override
   public boolean hasMember(TournamentPlayerInterface member)
   {
-    boolean found = false;
-    for (TournamentPlayerInterface player : getTeamMembers())
-    {
-      if (player.getName().equals(member.getName()))
-      {
-        found = true;
-        break;
-      }
-    }
-    return found;
+    return hasMember(member.getID());
   }
 
   @Override
@@ -110,8 +102,33 @@ public class Team extends de.gesundkrank.jskills.Team implements TeamInterface
   }
 
   @Override
-  public TeamInterface createTeam(String name, List<TournamentPlayerInterface> players)
+  public TeamInterface createTeam(int id, String name,
+          List<TournamentPlayerInterface> players)
   {
-    return new Team(name, players);
+    return new Team(id, name, players);
+  }
+
+  /**
+   * @return the teamId
+   */
+  @Override
+  public int getTeamId()
+  {
+    return teamId;
+  }
+
+  @Override
+  public boolean hasMember(int memberId)
+  {
+    boolean found = false;
+    for (TournamentPlayerInterface player : getTeamMembers())
+    {
+      if (player.getID() == memberId)
+      {
+        found = true;
+        break;
+      }
+    }
+    return found;
   }
 }

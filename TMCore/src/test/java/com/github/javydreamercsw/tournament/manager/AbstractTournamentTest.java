@@ -14,12 +14,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.tournament.manager.api.EncounterResult;
-import com.github.javydreamercsw.tournament.manager.api.NoShowListener;
-import com.github.javydreamercsw.tournament.manager.api.RoundTimeListener;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
+import com.github.javydreamercsw.tournament.manager.api.TournamentListener;
 
 /**
  *
@@ -59,7 +58,7 @@ public class AbstractTournamentTest
   public void testAddPlayer()
   {
     System.out.println("addPlayer");
-    TeamInterface team = new Team(new UIPlayer("Test", 1));
+    TeamInterface team = new Team(1, new UIPlayer("Test", 1));
     AbstractTournament instance = new AbstractTournamentImpl();
     try
     {
@@ -89,7 +88,7 @@ public class AbstractTournamentTest
   public void testRemovePlayer()
   {
     System.out.println("removePlayer");
-    TeamInterface team = new Team(new UIPlayer("Test", 0));
+    TeamInterface team = new Team(2, new UIPlayer("Test", 2));
     AbstractTournament instance = new AbstractTournamentImpl();
     boolean failure = false;
     try
@@ -230,25 +229,13 @@ public class AbstractTournamentTest
     }
 
     @Override
-    public void addNoShowListener(NoShowListener nsl)
+    public void addTournamentListener(TournamentListener rtl)
     {
       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void removeNoShowListener(NoShowListener nsl)
-    {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void addRoundTimeListener(RoundTimeListener rtl)
-    {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void removeRoundTimeListener(RoundTimeListener rtl)
+    public void removeTournamentListener(TournamentListener rtl)
     {
       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

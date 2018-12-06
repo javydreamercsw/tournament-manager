@@ -6,6 +6,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
+import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 @ServiceProvider(service = TournamentInterface.class)
 public class SingleElimination extends Elimination
@@ -31,11 +32,12 @@ public class SingleElimination extends Elimination
 
   @Override
   public TournamentInterface createTournament(List<TeamInterface> teams, 
-          int winPoints, int lossPoints, int drawPoints)
+          int winPoints, int lossPoints, int drawPoints) 
+          throws TournamentSignupException
   {
     SingleElimination se = new SingleElimination(winPoints, lossPoints, 
             drawPoints, true);
-    se.teams.addAll(teams);
+    se.addTeams(teams);
     return se;
   }
 }

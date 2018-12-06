@@ -74,7 +74,7 @@ public abstract class AbstractTournamentTester
     {
       try
       {
-        tournament.addTeam(new Team(new UIPlayer(MessageFormat
+        tournament.addTeam(new Team(i, new UIPlayer(MessageFormat
                 .format("Player #{0}", i), i)));
       }
       catch (TournamentSignupException ex)
@@ -138,7 +138,7 @@ public abstract class AbstractTournamentTester
     {
       try
       {
-        tournament.addTeam(new Team(new UIPlayer(MessageFormat.format("Player #{0}", i), i)));
+        tournament.addTeam(new Team(i, new UIPlayer(MessageFormat.format("Player #{0}", i), i)));
       }
       catch (TournamentSignupException ex)
       {
@@ -221,7 +221,7 @@ public abstract class AbstractTournamentTester
       {
         try
         {
-          tournament.addTeam(new Team(
+          tournament.addTeam(new Team(y,
                   new UIPlayer(MessageFormat.format("Player #{0}", (y + 1)), y)));
         }
         catch (TournamentSignupException ex)
@@ -237,6 +237,28 @@ public abstract class AbstractTournamentTester
       boolean ignore = false;
       while (tournament.getAmountOfTeams() > 1)
       {
+        //Random player drop
+        if (tournament.getActiveTeams().size() > 1 && random.nextBoolean())
+        {
+          TeamInterface toDrop
+                  = tournament.getActiveTeams().get(random
+                          .nextInt(tournament.getAmountOfTeams()));
+          LOG.log(Level.INFO, "Player: {0} dropped!", toDrop.toString());
+          try
+          {
+            tournament.removeTeam(toDrop);
+          }
+          catch (TournamentSignupException ex)
+          {
+            LOG.log(Level.SEVERE, null, ex);
+            fail();
+          }
+          catch (TournamentException ex)
+          {
+            LOG.log(Level.SEVERE, null, ex);
+            fail();
+          }
+        }
         try
         {
           tournament.nextRound();
@@ -270,7 +292,7 @@ public abstract class AbstractTournamentTester
                         EncounterResult.values()[result]);
               }
               if (player1.equals(TournamentInterface.BYE)
-                      || player2.equals(TournamentInterface.BYE) 
+                      || player2.equals(TournamentInterface.BYE)
                       && tournament.getActiveTeams().size() == 1)
               {
                 //Only one player left, we got a winner!
@@ -284,28 +306,6 @@ public abstract class AbstractTournamentTester
         {
           LOG.log(Level.SEVERE, null, ex);
           fail();
-        }
-        //Random player drop
-        if (tournament.getActiveTeams().size() > 1 && random.nextBoolean())
-        {
-          TeamInterface toDrop
-                  = tournament.getActiveTeams().get(random
-                          .nextInt(tournament.getAmountOfTeams()));
-          LOG.log(Level.INFO, "Player: {0} dropped!", toDrop.toString());
-          try
-          {
-            tournament.removeTeam(toDrop);
-          }
-          catch (TournamentSignupException ex)
-          {
-            LOG.log(Level.SEVERE, null, ex);
-            fail();
-          }
-          catch (TournamentException ex)
-          {
-            LOG.log(Level.SEVERE, null, ex);
-            fail();
-          }
         }
       }
       if (!ignore)

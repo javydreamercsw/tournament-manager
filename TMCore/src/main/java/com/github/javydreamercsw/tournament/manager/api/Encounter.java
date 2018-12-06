@@ -7,8 +7,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.github.javydreamercsw.tournament.manager.Team;
-
 /**
  * Where to parties face off
  *
@@ -16,7 +14,6 @@ import com.github.javydreamercsw.tournament.manager.Team;
  */
 public class Encounter
 {
-
   private final Map<TeamInterface, EncounterResult> results
           = new HashMap<>();
   private final int id;
@@ -42,23 +39,6 @@ public class Encounter
     {
       results.put(team, EncounterResult.UNDECIDED);
     }
-    this.id = id;
-    this.format = format;
-  }
-
-  /**
-   * Create an encounter between two players.
-   *
-   * @param id encounter id
-   * @param format encounter format
-   * @param team1 team 1
-   * @param team2 team 2
-   */
-  public Encounter(int id, int format, TournamentPlayerInterface team1,
-          TournamentPlayerInterface team2)
-  {
-    results.put(new Team(team1), EncounterResult.UNDECIDED);
-    results.put(new Team(team2), EncounterResult.UNDECIDED);
     this.id = id;
     this.format = format;
   }
@@ -92,6 +72,7 @@ public class Encounter
             p.getRecord().draw();
             break;
           case NO_SHOW:
+          case FORFEIT:
           //Fall thru
           case LOSS:
             p.getRecord().loss();
@@ -156,11 +137,11 @@ public class Encounter
     StringBuilder sb = new StringBuilder();
     results.keySet().forEach((t) ->
     {
-        if (!sb.toString().isEmpty())
-        {
-          sb.append(" vs. ");
-        }
-        sb.append(t.toString());
+      if (!sb.toString().isEmpty())
+      {
+        sb.append(" vs. ");
+      }
+      sb.append(t.toString());
     });
     return MessageFormat.format("Encounter {0} ({1})", id, sb.toString());
   }

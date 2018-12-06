@@ -14,7 +14,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.github.javydreamercsw.tournament.manager.AbstractTournament;
 import com.github.javydreamercsw.tournament.manager.api.Encounter;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
-import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 
@@ -28,7 +27,6 @@ public abstract class Elimination extends AbstractTournament
 
   private static final Logger LOG
           = Logger.getLogger(Elimination.class.getName());
-  private final int eliminations;
 
   /**
    * Provide eliminations and pairing option. Defaults to 3 points for a win, 0
@@ -39,8 +37,7 @@ public abstract class Elimination extends AbstractTournament
    */
   public Elimination(int eliminations, boolean pairAlikeRecords)
   {
-    super(3, 0, 1, pairAlikeRecords);
-    this.eliminations = eliminations;
+    super(3, 0, 1, eliminations, pairAlikeRecords);
   }
 
   /**
@@ -50,7 +47,6 @@ public abstract class Elimination extends AbstractTournament
   public Elimination()
   {
     super(3, 0, 1, false);
-    this.eliminations = 1;
   }
 
   /**
@@ -64,8 +60,7 @@ public abstract class Elimination extends AbstractTournament
   public Elimination(int eliminations, int winPoints, int lossPoints,
           int drawPoints, boolean pairAlikeRecords)
   {
-    super(winPoints, lossPoints, drawPoints, pairAlikeRecords);
-    this.eliminations = eliminations;
+    super(winPoints, lossPoints, drawPoints, eliminations, pairAlikeRecords);
   }
 
   @Override
@@ -96,36 +91,6 @@ public abstract class Elimination extends AbstractTournament
     {
       if (pairingHistory.get(getRound()) == null)
       {
-        //Remove teams with loses from tournament
-        List<TeamInterface> toRemove
-                = new ArrayList<>();
-        for (TeamInterface team : getActiveTeams())
-        {
-          //Loss or draw gets you eliminated
-          if (team.getTeamMembers().get(0).getRecord().getLosses()
-                  + team.getTeamMembers().get(0).getRecord()
-                          .getDraws() >= eliminations)
-          {
-            toRemove.add(team);
-          }
-        }
-        List<TeamInterface> errors = new ArrayList<>();
-        toRemove.forEach((t) ->
-        {
-          if (!errors.contains(t))
-          {
-            try
-            {
-              LOG.log(Level.FINE, "Player: {0} is eliminated!", t.toString());
-              removeTeam(t);
-            }
-            catch (TournamentException ex)
-            {
-              LOG.log(Level.FINE, null, ex);
-              errors.add(t);
-            }
-          }
-        });
         if (pairAlikeRecords)
         {
           Map<Integer, Encounter> pairings
@@ -247,6 +212,6 @@ public abstract class Elimination extends AbstractTournament
      * will be n= 2^r competitors. In the opening round, 2^r - n competitors
      * will get a bye.
      */
-    return log(teams.size(), 2);
+    return log(getAmountOfTeams(), 2);
   }
 }

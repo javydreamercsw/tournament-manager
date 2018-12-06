@@ -23,6 +23,7 @@ import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.server.TournamentService;
+import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
@@ -101,7 +102,7 @@ public class TournamentList extends TMView
   {
     return Integer.toString(t.getTournamentHasTeamList().size());
   }
-  
+
   private String getFormat(Tournament t)
   {
     return t.getTournamentFormat().getFormatName();
@@ -123,19 +124,58 @@ public class TournamentList extends TMView
             .setWidth("6em");
     grid.addColumn(new ComponentRenderer<>(this::createEditButton))
             .setFlexGrow(0);
+    grid.addColumn(new ComponentRenderer<>(this::createControlButton))
+            .setFlexGrow(0);
     grid.setSelectionMode(SelectionMode.NONE);
 
     container.add(header, grid);
     add(container);
   }
 
-  private Button createEditButton(Tournament category)
+  private Button createControlButton(Tournament tournament)
   {
-    Button edit = new Button("Edit", event -> form.open(category,
+    if (TournamentService.getInstance().hasStarted(tournament))
+    {
+      Button view = new Button("Start", event ->
+      {
+        
+      });
+      view.setIcon(new Icon("lumo", "view"));
+      view.addClassName("tournament__view");
+      view.getElement().setAttribute("theme", "tertiary");
+      return view;
+    }
+    else
+    {
+      Button start = new Button("Start", event ->
+      {
+        try
+        {
+          TournamentService.getInstance().startTournament(tournament);
+        }
+        catch (TournamentException ex)
+        {
+          Exceptions.printStackTrace(ex);
+          Notification.show(
+                  "Unable to start tournament!",
+                  3000, Position.BOTTOM_START);
+        }
+      });
+      start.setIcon(new Icon("lumo", "start"));
+      start.addClassName("tournament__start");
+      start.getElement().setAttribute("theme", "tertiary");
+      return start;
+    }
+  }
+
+  private Button createEditButton(Tournament tournament)
+  {
+    Button edit = new Button("Edit", event -> form.open(tournament,
             AbstractEditorDialog.Operation.EDIT));
     edit.setIcon(new Icon("lumo", "edit"));
     edit.addClassName("tournament__edit");
     edit.getElement().setAttribute("theme", "tertiary");
+    edit.setEnabled(!TournamentService.getInstance().hasStarted(tournament));
     return edit;
   }
 

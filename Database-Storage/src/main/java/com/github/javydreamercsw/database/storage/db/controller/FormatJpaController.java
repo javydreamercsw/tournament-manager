@@ -15,6 +15,7 @@ import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.FormatPK;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
@@ -38,6 +39,10 @@ public class FormatJpaController extends AbstractController implements Serializa
     {
       format.setMatchEntryList(new ArrayList<>());
     }
+    if (format.getTournamentList() == null)
+    {
+      format.setTournamentList(new ArrayList<>());
+    }
     format.getFormatPK().setGameId(format.getGame().getId());
     EntityManager em = null;
     try
@@ -57,6 +62,13 @@ public class FormatJpaController extends AbstractController implements Serializa
         attachedMatchEntryList.add(matchEntryListMatchEntryToAttach);
       }
       format.setMatchEntryList(attachedMatchEntryList);
+      List<Tournament> attachedTournamentList = new ArrayList<>();
+      for (Tournament tournamentListTournamentToAttach : format.getTournamentList())
+      {
+        tournamentListTournamentToAttach = em.getReference(tournamentListTournamentToAttach.getClass(), tournamentListTournamentToAttach.getTournamentPK());
+        attachedTournamentList.add(tournamentListTournamentToAttach);
+      }
+      format.setTournamentList(attachedTournamentList);
       em.persist(format);
       if (game != null)
       {
@@ -72,6 +84,17 @@ public class FormatJpaController extends AbstractController implements Serializa
         {
           oldFormatOfMatchEntryListMatchEntry.getMatchEntryList().remove(matchEntryListMatchEntry);
           oldFormatOfMatchEntryListMatchEntry = em.merge(oldFormatOfMatchEntryListMatchEntry);
+        }
+      }
+      for (Tournament tournamentListTournament : format.getTournamentList())
+      {
+        Format oldFormatOfTournamentListTournament = tournamentListTournament.getFormat();
+        tournamentListTournament.setFormat(format);
+        tournamentListTournament = em.merge(tournamentListTournament);
+        if (oldFormatOfTournamentListTournament != null)
+        {
+          oldFormatOfTournamentListTournament.getTournamentList().remove(tournamentListTournament);
+          oldFormatOfTournamentListTournament = em.merge(oldFormatOfTournamentListTournament);
         }
       }
       em.getTransaction().commit();
@@ -106,6 +129,8 @@ public class FormatJpaController extends AbstractController implements Serializa
       Game gameNew = format.getGame();
       List<MatchEntry> matchEntryListOld = persistentFormat.getMatchEntryList();
       List<MatchEntry> matchEntryListNew = format.getMatchEntryList();
+      List<Tournament> tournamentListOld = persistentFormat.getTournamentList();
+      List<Tournament> tournamentListNew = format.getTournamentList();
       List<String> illegalOrphanMessages = null;
       for (MatchEntry matchEntryListOldMatchEntry : matchEntryListOld)
       {
@@ -116,6 +141,17 @@ public class FormatJpaController extends AbstractController implements Serializa
             illegalOrphanMessages = new ArrayList<>();
           }
           illegalOrphanMessages.add("You must retain MatchEntry " + matchEntryListOldMatchEntry + " since its format field is not nullable.");
+        }
+      }
+      for (Tournament tournamentListOldTournament : tournamentListOld)
+      {
+        if (!tournamentListNew.contains(tournamentListOldTournament))
+        {
+          if (illegalOrphanMessages == null)
+          {
+            illegalOrphanMessages = new ArrayList<>();
+          }
+          illegalOrphanMessages.add("You must retain Tournament " + tournamentListOldTournament + " since its format field is not nullable.");
         }
       }
       if (illegalOrphanMessages != null)
@@ -135,6 +171,14 @@ public class FormatJpaController extends AbstractController implements Serializa
       }
       matchEntryListNew = attachedMatchEntryListNew;
       format.setMatchEntryList(matchEntryListNew);
+      List<Tournament> attachedTournamentListNew = new ArrayList<>();
+      for (Tournament tournamentListNewTournamentToAttach : tournamentListNew)
+      {
+        tournamentListNewTournamentToAttach = em.getReference(tournamentListNewTournamentToAttach.getClass(), tournamentListNewTournamentToAttach.getTournamentPK());
+        attachedTournamentListNew.add(tournamentListNewTournamentToAttach);
+      }
+      tournamentListNew = attachedTournamentListNew;
+      format.setTournamentList(tournamentListNew);
       format = em.merge(format);
       if (gameOld != null && !gameOld.equals(gameNew))
       {
@@ -157,6 +201,20 @@ public class FormatJpaController extends AbstractController implements Serializa
           {
             oldFormatOfMatchEntryListNewMatchEntry.getMatchEntryList().remove(matchEntryListNewMatchEntry);
             oldFormatOfMatchEntryListNewMatchEntry = em.merge(oldFormatOfMatchEntryListNewMatchEntry);
+          }
+        }
+      }
+      for (Tournament tournamentListNewTournament : tournamentListNew)
+      {
+        if (!tournamentListOld.contains(tournamentListNewTournament))
+        {
+          Format oldFormatOfTournamentListNewTournament = tournamentListNewTournament.getFormat();
+          tournamentListNewTournament.setFormat(format);
+          tournamentListNewTournament = em.merge(tournamentListNewTournament);
+          if (oldFormatOfTournamentListNewTournament != null && !oldFormatOfTournamentListNewTournament.equals(format))
+          {
+            oldFormatOfTournamentListNewTournament.getTournamentList().remove(tournamentListNewTournament);
+            oldFormatOfTournamentListNewTournament = em.merge(oldFormatOfTournamentListNewTournament);
           }
         }
       }
@@ -210,6 +268,15 @@ public class FormatJpaController extends AbstractController implements Serializa
           illegalOrphanMessages = new ArrayList<>();
         }
         illegalOrphanMessages.add("This Format (" + format + ") cannot be destroyed since the MatchEntry " + matchEntryListOrphanCheckMatchEntry + " in its matchEntryList field has a non-nullable format field.");
+      }
+      List<Tournament> tournamentListOrphanCheck = format.getTournamentList();
+      for (Tournament tournamentListOrphanCheckTournament : tournamentListOrphanCheck)
+      {
+        if (illegalOrphanMessages == null)
+        {
+          illegalOrphanMessages = new ArrayList<>();
+        }
+        illegalOrphanMessages.add("This Format (" + format + ") cannot be destroyed since the Tournament " + tournamentListOrphanCheckTournament + " in its tournamentList field has a non-nullable format field.");
       }
       if (illegalOrphanMessages != null)
       {

@@ -36,6 +36,9 @@ import javax.xml.bind.annotation.XmlTransient;
 })
 public class Format implements Serializable
 {
+  private static final long serialVersionUID = -6764484082819653225L;
+  @EmbeddedId
+  protected FormatPK formatPK;
   @Basic(optional = false)
   @NotNull
   @Size(min = 1, max = 45)
@@ -44,15 +47,14 @@ public class Format implements Serializable
   @Size(max = 255)
   @Column(name = "description")
   private String description;
-  private static final long serialVersionUID = 1L;
-  @EmbeddedId
-  protected FormatPK formatPK;
   @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false, 
           updatable = false)
   @ManyToOne(optional = false)
   private Game game;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "format")
   private List<MatchEntry> matchEntryList;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "format")
+  private List<Tournament> tournamentList;
 
   public Format()
   {
@@ -83,6 +85,25 @@ public class Format implements Serializable
     this.formatPK = formatPK;
   }
 
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public void setDescription(String description)
+  {
+    this.description = description;
+  }
 
   public Game getGame()
   {
@@ -103,6 +124,17 @@ public class Format implements Serializable
   public void setMatchEntryList(List<MatchEntry> matchEntryList)
   {
     this.matchEntryList = matchEntryList;
+  }
+
+  @XmlTransient
+  public List<Tournament> getTournamentList()
+  {
+    return tournamentList;
+  }
+
+  public void setTournamentList(List<Tournament> tournamentList)
+  {
+    this.tournamentList = tournamentList;
   }
 
   @Override
@@ -129,27 +161,7 @@ public class Format implements Serializable
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.Format[ formatPK=" + 
-            formatPK + " ]";
-  }
-
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public String getDescription()
-  {
-    return description;
-  }
-
-  public void setDescription(String description)
-  {
-    this.description = description;
+    return "com.github.javydreamercsw.database.storage.db.Format[ formatPK=" 
+            + formatPK + " ]";
   }
 }

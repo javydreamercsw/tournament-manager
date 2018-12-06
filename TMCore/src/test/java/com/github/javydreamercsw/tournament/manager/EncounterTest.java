@@ -29,8 +29,8 @@ public class EncounterTest
     try
     {
       System.out.println("updateResult");
-      TeamInterface team1 = new Team(new UIPlayer("Player 1", 1));
-      TeamInterface team2 = new Team(new UIPlayer("Player 2", 2));
+      TeamInterface team1 = new Team(1, new UIPlayer("Player 1", 1));
+      TeamInterface team2 = new Team(2, new UIPlayer("Player 2", 2));
       Encounter instance = new Encounter(1, 1, team1, team2);
       instance.updateResult(team1, EncounterResult.WIN);
       instance.updateResult(team2, EncounterResult.LOSS);

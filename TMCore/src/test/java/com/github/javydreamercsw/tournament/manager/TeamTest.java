@@ -23,10 +23,10 @@ public class TeamTest
   public void testGetTeamMembers()
   {
     System.out.println("getTeamMembers");
-    Team instance = new Team(new UIPlayer("Test", 1));
+    Team instance = new Team(1, new UIPlayer("Test", 1));
     List<TournamentPlayerInterface> result = instance.getTeamMembers();
     assertEquals(1, result.size());
-    instance = new Team(Arrays.asList(new UIPlayer("Test", 1),
+    instance = new Team(2, Arrays.asList(new UIPlayer("Test", 1),
             new UIPlayer("Player 2", 2)));
     result = instance.getTeamMembers();
     assertEquals(2, result.size());

@@ -314,6 +314,10 @@ public class MatchService extends Service<MatchEntry>
         switch (mr.getMatchResultType().getType())
         {
           case "result.loss":
+          //Fall thru
+          case "result.forfeit":
+          //Fall thru
+          case "result.no_show":
             record.setLoses(record.getLoses() + 1);
             break;
           case "result.draw":
@@ -321,10 +325,6 @@ public class MatchService extends Service<MatchEntry>
             break;
           //Various reasons leading to a win.
           case "result.win":
-          //Fall thru
-          case "result.forfeit":
-          //Fall thru
-          case "result.no_show":
             record.setWins(record.getWins() + 1);
             break;
         }

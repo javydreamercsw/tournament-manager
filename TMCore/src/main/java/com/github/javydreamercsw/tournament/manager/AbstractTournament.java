@@ -6,6 +6,7 @@ package com.github.javydreamercsw.tournament.manager;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,20 +22,22 @@ import org.openide.util.Lookup;
 
 import com.github.javydreamercsw.tournament.manager.api.Encounter;
 import com.github.javydreamercsw.tournament.manager.api.EncounterResult;
-import com.github.javydreamercsw.tournament.manager.api.NoShowListener;
 import com.github.javydreamercsw.tournament.manager.api.ResultListener;
-import com.github.javydreamercsw.tournament.manager.api.RoundTimeListener;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
+import com.github.javydreamercsw.tournament.manager.api.TournamentListener;
 import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import com.github.javydreamercsw.tournament.manager.api.Variables;
-
 import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 public abstract class AbstractTournament implements TournamentInterface
 {
   private int format = 1;
+  /**
+   * Amount of non-wins to be  eliminated.
+   */
+  private final int eliminations;
   /**
    * Encounter id
    */
@@ -46,7 +49,7 @@ public abstract class AbstractTournament implements TournamentInterface
   /**
    * Teams that registered.
    */
-  protected final List<TeamInterface> teams = new ArrayList<>();
+  private final List<TeamInterface> teams = new ArrayList<>();
   /**
    * Current list of active teams. This is an exact copy of teams before the
    * tournament starts. After it starts, teams that get eliminated or drop out
@@ -79,12 +82,30 @@ public abstract class AbstractTournament implements TournamentInterface
   private final int drawPoints;
   private long no_show_time;
   private long round_time;
-  private final List<NoShowListener> noShowListeners
-          = new ArrayList<>();
-  private final List<RoundTimeListener> roundTimeListeners
+  private final List<TournamentListener> listeners
           = new ArrayList<>();
   protected final boolean pairAlikeRecords;
   private int id = -1;
+  
+  public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
+          int eliminations, boolean pairAlikeRecords)
+  {
+    this.winPoints = winPoints;
+    this.lossPoints = lossPoints;
+    this.drawPoints = drawPoints;
+    this.pairAlikeRecords = pairAlikeRecords;
+    this.eliminations = eliminations;
+  }
+  
+  public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
+          int eliminations)
+  {
+    this.winPoints = winPoints;
+    this.lossPoints = lossPoints;
+    this.drawPoints = drawPoints;
+    this.pairAlikeRecords = false;
+    this.eliminations = eliminations;
+  }
 
   public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
           boolean pairAlikeRecords)
@@ -93,6 +114,7 @@ public abstract class AbstractTournament implements TournamentInterface
     this.lossPoints = lossPoints;
     this.drawPoints = drawPoints;
     this.pairAlikeRecords = pairAlikeRecords;
+    this.eliminations = 1;
   }
 
   public AbstractTournament(int winPoints, int lossPoints, int drawPoints)
@@ -101,6 +123,7 @@ public abstract class AbstractTournament implements TournamentInterface
     this.lossPoints = lossPoints;
     this.drawPoints = drawPoints;
     this.pairAlikeRecords = false;
+    this.eliminations = 1;
   }
 
   @Override
@@ -258,6 +281,7 @@ public abstract class AbstractTournament implements TournamentInterface
   @Override
   public void nextRound() throws TournamentException
   {
+    processRound(round);
     //Increase round
     round++;
     //Calculate pairings
@@ -296,7 +320,7 @@ public abstract class AbstractTournament implements TournamentInterface
   {
     TreeMap<Integer, List<TeamInterface>> rankings
             = new TreeMap<>((Integer o1, Integer o2) -> o2.compareTo(o1));
-    teams.forEach((player) ->
+    getTeams().forEach((player) ->
     {
       int points = getPoints(player);
       if (rankings.get(points) == null)
@@ -345,11 +369,46 @@ public abstract class AbstractTournament implements TournamentInterface
   }
 
   @Override
+  public void processRound(int round)
+  {
+    //Remove teams with loses from tournament
+    List<TeamInterface> toRemove
+            = new ArrayList<>();
+    for (TeamInterface team : getActiveTeams())
+    {
+      //Loss or draw gets you eliminated
+      if (team.getTeamMembers().get(0).getRecord().getLosses()
+              + team.getTeamMembers().get(0).getRecord().getDraws() >= 
+              getEliminations())
+      {
+        toRemove.add(team);
+      }
+    }
+    List<TeamInterface> errors = new ArrayList<>();
+    toRemove.forEach((t) ->
+    {
+      if (!errors.contains(t))
+      {
+        try
+        {
+          LOG.log(Level.FINE, "Player: {0} is eliminated!", t.toString());
+          removeTeam(t);
+        }
+        catch (TournamentException ex)
+        {
+          LOG.log(Level.FINE, null, ex);
+          errors.add(t);
+        }
+      }
+    });
+  }
+
+  @Override
   public Map<Integer, Encounter> getPairings()
   {
     synchronized (getActiveTeams())
     {
-      if (pairingHistory.get(getRound()) == null)
+      if (pairingHistory.get(getRound()) == null && getActiveTeams().size() > 1)
       {
         if (pairAlikeRecords)
         {
@@ -458,7 +517,8 @@ public abstract class AbstractTournament implements TournamentInterface
           {
           };
           Random rnd = new Random();
-          while (exclude.length < getActiveTeams().size() && getActiveTeams().size() > 1)
+          while (exclude.length < getActiveTeams().size()
+                  && getActiveTeams().size() > 1)
           {
             int player1
                     = getRandomWithExclusion(rnd, 0,
@@ -559,38 +619,20 @@ public abstract class AbstractTournament implements TournamentInterface
   }
 
   @Override
-  public void addNoShowListener(NoShowListener nsl)
+  public void addTournamentListener(TournamentListener rtl)
   {
-    if (!noShowListeners.contains(nsl))
+    if (!listeners.contains(rtl))
     {
-      noShowListeners.add(nsl);
+      listeners.add(rtl);
     }
   }
 
   @Override
-  public void removeNoShowListener(NoShowListener nsl)
+  public void removeTournamentListener(TournamentListener rtl)
   {
-    if (noShowListeners.contains(nsl))
+    if (listeners.contains(rtl))
     {
-      noShowListeners.remove(nsl);
-    }
-  }
-
-  @Override
-  public void addRoundTimeListener(RoundTimeListener rtl)
-  {
-    if (!roundTimeListeners.contains(rtl))
-    {
-      roundTimeListeners.add(rtl);
-    }
-  }
-
-  @Override
-  public void removeRoundTimeListener(RoundTimeListener rtl)
-  {
-    if (roundTimeListeners.contains(rtl))
-    {
-      roundTimeListeners.remove(rtl);
+      listeners.remove(rtl);
     }
   }
 
@@ -633,6 +675,7 @@ public abstract class AbstractTournament implements TournamentInterface
                 }
                 break;
               case NO_SHOW:
+              case FORFEIT:
               //Fall thru
               case LOSS:
                 //All others are winners
@@ -765,5 +808,36 @@ public abstract class AbstractTournament implements TournamentInterface
   protected void setFormat(int format)
   {
     this.format = format;
+  }
+
+  @Override
+  public void addTeams(List<TeamInterface> teams)
+          throws TournamentSignupException
+  {
+    for (TeamInterface team : teams)
+    {
+      addTeam(team);
+    }
+  }
+
+  @Override
+  public List<TeamInterface> getTeams()
+  {
+    return Collections.unmodifiableList(teams);
+  }
+
+  @Override
+  public List<TournamentListener> getListeners()
+  {
+    return Collections.unmodifiableList(listeners);
+  }
+
+  /**
+   * @return the eliminations
+   */
+  @Override
+  public int getEliminations()
+  {
+    return eliminations;
   }
 }

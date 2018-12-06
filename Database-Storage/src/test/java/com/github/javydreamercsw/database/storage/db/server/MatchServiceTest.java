@@ -43,8 +43,9 @@ public class MatchServiceTest extends AbstractServerTest
             .lookup(IGame.class).getName()).get();
     Tournament t = new Tournament("Test 1");
     t.setTournamentFormat(TournamentService.getInstance()
-              .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
-                      .getName()));
+            .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
+                    .getName()));
+    t.setFormat(FormatService.getInstance().getAll().get(0));
     TournamentService.getInstance().saveTournament(t);
     TournamentService.getInstance().addRound(t);
 
@@ -68,8 +69,9 @@ public class MatchServiceTest extends AbstractServerTest
   {
     Tournament t = new Tournament("Test 1");
     t.setTournamentFormat(TournamentService.getInstance()
-              .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
-                      .getName()));
+            .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
+                    .getName()));
+    t.setFormat(FormatService.getInstance().getAll().get(0));
     TournamentService.getInstance().saveTournament(t);
     TournamentService.getInstance().addRound(t);
 
@@ -132,7 +134,12 @@ public class MatchServiceTest extends AbstractServerTest
       {
         switch (result.getMatchResultType().getType())
         {
+          //Various reasons leading to a loss.
           case "result.loss":
+          //Fall thru
+          case "result.forfeit":
+          //Fall thru
+          case "result.no_show":
             assertEquals(p.getRecordList().get(0).getWins(), 0);
             assertEquals(p.getRecordList().get(0).getLoses(), 1);
             assertEquals(p.getRecordList().get(0).getDraws(), 0);
@@ -142,12 +149,7 @@ public class MatchServiceTest extends AbstractServerTest
             assertEquals(p.getRecordList().get(0).getLoses(), 0);
             assertEquals(p.getRecordList().get(0).getDraws(), 1);
             break;
-          //Various reasons leading to a win.
           case "result.win":
-          //Fall thru
-          case "result.forfeit":
-          //Fall thru
-          case "result.no_show":
             assertEquals(p.getRecordList().get(0).getWins(), 1);
             assertEquals(p.getRecordList().get(0).getLoses(), 0);
             assertEquals(p.getRecordList().get(0).getDraws(), 0);
@@ -168,7 +170,7 @@ public class MatchServiceTest extends AbstractServerTest
 
     MatchService.getInstance().saveMatch(me);
 
-    for(MatchHasTeam mht:me.getMatchHasTeamList())
+    for (MatchHasTeam mht : me.getMatchHasTeamList())
     {
       MatchResult mr = mht.getMatchResult();
       assertNotNull(mr);

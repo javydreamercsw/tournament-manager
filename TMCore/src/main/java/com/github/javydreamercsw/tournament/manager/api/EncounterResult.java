@@ -6,5 +6,5 @@ package com.github.javydreamercsw.tournament.manager.api;
  */
 public enum EncounterResult {
 
-    WIN, LOSS, DRAW, NO_SHOW, UNDECIDED;
+    WIN, LOSS, DRAW, NO_SHOW, FORFEIT, UNDECIDED;
 }

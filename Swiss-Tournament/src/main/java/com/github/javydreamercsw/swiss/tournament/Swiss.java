@@ -13,6 +13,7 @@ import com.github.javydreamercsw.tournament.manager.AbstractTournament;
 import com.github.javydreamercsw.tournament.manager.api.Encounter;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
+import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 /**
  * Swiss tournament is an elimination tournament without eliminations. Just
@@ -84,14 +85,14 @@ public class Swiss extends AbstractTournament implements TournamentInterface {
          * there will be n= 2^r competitors. In the opening round, 2^r - n
          * competitors will get a bye.
          */
-        return log(teams.size(), 2);
+        return log(getAmountOfTeams(), 2);
     }
 
     @Override
     public TournamentInterface createTournament(List<TeamInterface> teams, 
-            int winPoints, int lossPoints, int drawPoints) {
+            int winPoints, int lossPoints, int drawPoints) throws TournamentSignupException {
         Swiss swiss = new Swiss(winPoints, lossPoints,  drawPoints);
-        swiss.teams.addAll(teams);
+        swiss.addTeams(teams);
         return swiss;
     }
 }

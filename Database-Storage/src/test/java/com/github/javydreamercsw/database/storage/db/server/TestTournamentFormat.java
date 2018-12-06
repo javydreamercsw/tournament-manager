@@ -8,6 +8,7 @@ import org.openide.util.lookup.ServiceProvider;
 import com.github.javydreamercsw.tournament.manager.AbstractTournament;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
+import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 @ServiceProvider(service = TournamentInterface.class)
 public class TestTournamentFormat extends AbstractTournament
@@ -43,11 +44,12 @@ public class TestTournamentFormat extends AbstractTournament
 
   @Override
   public TournamentInterface createTournament(List<TeamInterface> teams, 
-          int winPoints, int lossPoints, int drawPoints)
+          int winPoints, int lossPoints, int drawPoints) 
+          throws TournamentSignupException
   {
     TestTournamentFormat dummy = new TestTournamentFormat(winPoints, lossPoints, 
             drawPoints, true);
-    dummy.teams.addAll(teams);
+    dummy.addTeams(teams);
     return dummy;
   }
 }
