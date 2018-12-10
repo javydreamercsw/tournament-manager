@@ -26,11 +26,13 @@ public class DataBaseManagerTest extends AbstractServerTest
   @Test
   public void testLoadDemoData() throws Exception
   {
+    cleanDB();
     //Load demo data
     DataBaseManager.loadDemoData();
 
     assertFalse(PlayerService.getInstance().getAll().isEmpty());
     assertFalse(TournamentService.getInstance().getAll().isEmpty());
+    assertFalse(TournamentService.getInstance().getAllFormats().isEmpty());
     assertFalse(MatchService.getInstance().getAll().isEmpty());
     assertFalse(TeamService.getInstance().getAll().isEmpty());
     assertFalse(RecordService.getInstance().getAll().isEmpty());
