@@ -33,7 +33,7 @@ public class TestTournamentFormat extends AbstractTournament
   @Override
   public String getName()
   {
-    return "Dummy Tournament";
+    return "Dummy Tournament Format";
   }
 
   @Override

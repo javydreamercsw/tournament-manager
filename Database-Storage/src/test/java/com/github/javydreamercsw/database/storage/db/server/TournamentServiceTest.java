@@ -1,7 +1,10 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -108,6 +111,21 @@ public class TournamentServiceTest extends AbstractServerTest
     assertEquals(TournamentService.getInstance().findTournaments(t2.getName())
             .size(), 1);
 
+    LocalDateTime now = LocalDateTime.now();
+    t2.setStartDate(now);
+    t2.setEndDate(now.plusHours(1));
+    t2.setSignupTimeLimit(10);
+    t2.setRoundTimeLimit(30);
+
+    TournamentService.getInstance().saveTournament(t2);
+
+    Tournament retrieved = TournamentService.getInstance()
+            .findTournament(t2.getTournamentPK());
+    assertThat(t2.getStartDate(), equalTo(retrieved.getStartDate()));
+    assertThat(t2.getEndDate(), equalTo(retrieved.getEndDate()));
+    assertThat(t2.getSignupTimeLimit(), equalTo(retrieved.getSignupTimeLimit()));
+    assertThat(t2.getRoundTimeLimit(), equalTo(retrieved.getRoundTimeLimit()));
+
     TournamentService.getInstance().deleteTournament(t2);
 
     assertEquals(TournamentService.getInstance().findTournaments(t2.getName())
@@ -169,7 +187,7 @@ public class TournamentServiceTest extends AbstractServerTest
       {
         8, 1, 3 // Eight teams of 1 people. Should be done in 3 rounds.
       },
-            {
+      {
         16, 2, 3 // Eight teams of 1 people. Should be done in 3 rounds.
       }
     };

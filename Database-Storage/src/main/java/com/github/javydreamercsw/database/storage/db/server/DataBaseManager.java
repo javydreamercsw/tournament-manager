@@ -459,7 +459,7 @@ public class DataBaseManager
   public static void loadDemoData() throws Exception
   {
     Random r = new Random();
-    
+
     // Add players
     for (int i = 0; i < 10; i++)
     {
@@ -473,23 +473,9 @@ public class DataBaseManager
       }
     }
 
-    // Add a tournaments
-    List<TournamentInterface> formats = new ArrayList<>();
-    formats.addAll(Lookup.getDefault().lookupAll(TournamentInterface.class));
-    for (int i = 0; i < 10; i++)
-    {
-      Tournament t = new Tournament("Tournament " + (i + 1));
-      t.setWinPoints(3);
-      t.setLossPoints(0);
-      t.setDrawPoints(1);
-      t.setFormat(FormatService.getInstance().getAll().get(0));
-      t.setTournamentFormat(TournamentService.getInstance()
-              .findFormat(formats.get(r.nextInt(formats.size())).getName()));
-      TournamentService.getInstance().saveTournament(t);
-    }
-
     IGame gameAPI = Lookup.getDefault().lookup(IGame.class);
-    Optional<Game> fg = GameService.getInstance().findGameByName(gameAPI.getName());
+    Optional<Game> fg
+            = GameService.getInstance().findGameByName(gameAPI.getName());
     Game game;
     if (fg.isPresent())
     {
@@ -518,9 +504,36 @@ public class DataBaseManager
         FormatService.getInstance().saveFormat(newFormat);
       }
     }
+
+    // Add a tournaments
+    List<TournamentInterface> formats = new ArrayList<>();
+    formats.addAll(Lookup.getDefault().lookupAll(TournamentInterface.class));
+
+    for (TournamentInterface format : formats)
+    {
+      TournamentFormat tf = new TournamentFormat(format.getName(),
+              format.getClass().getCanonicalName());
+      TournamentService.getInstance().saveTournamentFormat(tf);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+      // Set a random start date:
+      int startDay = r.nextInt(31);
+      Tournament t = new Tournament("Tournament " + (i + 1));
+      t.setWinPoints(3);
+      t.setLossPoints(0);
+      t.setDrawPoints(1);
+      
+      t.setFormat(FormatService.getInstance().getAll().get(0));
+      t.setTournamentFormat(TournamentService.getInstance()
+              .findFormat(formats.get(r.nextInt(formats.size())).getName()));
+      TournamentService.getInstance().saveTournament(t);
+    }
+
     List<Format> formatList = FormatService.getInstance()
             .findFormatByGame(gameAPI.getName());
-    
+
     // Add matches
     for (int i = 0; i < 10; i++)
     {
@@ -562,26 +575,24 @@ public class DataBaseManager
   }
 
   /**
-   * Load stuff from the Lookup
+   * Load stuff from the Lookup.
+   *
+   * @throws java.lang.Exception
    */
-  public static void load()
+  public static void load() throws Exception
   {
-    Lookup.getDefault().lookupAll(TournamentInterface.class).forEach(format ->
+    for (TournamentInterface format : Lookup.getDefault()
+            .lookupAll(TournamentInterface.class))
     {
       // Register the tournament formats
       if (TournamentService.getInstance().findFormat(format.getName()) == null)
       {
-        try {
-          TournamentFormat tf = new TournamentFormat(format.getName(),
-                  format.getClass().getCanonicalName());
-          TournamentService.getInstance().addFormat(tf);
-        }
-        catch (Exception ex) {
-          Exceptions.printStackTrace(ex);
-        }
+        TournamentFormat tf = new TournamentFormat(format.getName(),
+                format.getClass().getCanonicalName());
+        TournamentService.getInstance().addFormat(tf);
       }
-    });
-    Lookup.getDefault().lookupAll(IGame.class).forEach(gameAPI ->
+    }
+    for (IGame gameAPI : Lookup.getDefault().lookupAll(IGame.class))
     {
       // Add game to DB if not there
       Optional<Game> result
@@ -599,7 +610,7 @@ public class DataBaseManager
       }
 
       //Load formats
-      gameAPI.gameFormats().forEach(format ->
+      for (GameFormat format : gameAPI.gameFormats())
       {
         // Check if it exists in the databse
         Optional<Format> f
@@ -607,21 +618,14 @@ public class DataBaseManager
                         .findFormatForGame(gameAPI.getName(), format.getName());
         if (!f.isPresent())
         {
-          try
-          {
-            // Let's create it.
-            Format newFormat = new Format();
-            newFormat.setName(format.getName());
-            newFormat.setDescription(format.getDescription());
-            newFormat.setGame(game);
-            FormatService.getInstance().saveFormat(newFormat);
-          }
-          catch (Exception ex)
-          {
-            Exceptions.printStackTrace(ex);
-          }
+          // Let's create it.
+          Format newFormat = new Format();
+          newFormat.setName(format.getName());
+          newFormat.setDescription(format.getDescription());
+          newFormat.setGame(game);
+          FormatService.getInstance().saveFormat(newFormat);
         }
-      });
-    });
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -236,7 +236,7 @@ public class TournamentService extends Service<Tournament>
   public void deleteRound(Round round) throws IllegalOrphanException,
           NonexistentEntityException
   {
-    for (MatchEntry me:round.getMatchEntryList())
+    for (MatchEntry me : round.getMatchEntryList())
     {
       MatchService.getInstance().deleteMatch(me);
     }
@@ -361,7 +361,7 @@ public class TournamentService extends Service<Tournament>
       if (tournament.getRoundList().isEmpty())
       {
         // Mark as started.
-        tournament.setStartDate(LocalDate.now());
+        tournament.setStartDate(LocalDateTime.now());
         saveTournament(tournament);
       }
 
@@ -406,7 +406,7 @@ public class TournamentService extends Service<Tournament>
       {
         // Tournament is over!
         // Mark as ended.
-        tournament.setEndDate(LocalDate.now());
+        tournament.setEndDate(LocalDateTime.now());
         saveTournament(tournament);
       }
     }
@@ -581,5 +581,35 @@ public class TournamentService extends Service<Tournament>
   public void checkStatus(Tournament t)
   {
 
+  }
+
+  /**
+   * Save a tournament Format.
+   *
+   * @param tf format to save
+   * @throws NonexistentEntityException If editing and it doesn't exist.
+   * @throws Exception If something goes wrong persisting to database.
+   */
+  public void saveTournamentFormat(TournamentFormat tf)
+          throws NonexistentEntityException, Exception
+  {
+    if (tf.getId() == null)
+    {
+      tfc.create(tf);
+    }
+    else
+    {
+      tfc.edit(tf);
+    }
+  }
+
+  /**
+   * Get all Tournament Formats.
+   *
+   * @return All formats in the database.
+   */
+  public List<TournamentFormat> getAllFormats()
+  {
+    return tfc.findTournamentFormatEntities();
   }
 }

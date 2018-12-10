@@ -2,6 +2,7 @@ package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries(
 {
-  @NamedQuery(name = "Tournament.findAll", query = "SELECT t FROM Tournament t"),
+  @NamedQuery(name = "Tournament.findAll", 
+          query = "SELECT t FROM Tournament t"),
   @NamedQuery(name = "Tournament.findById", 
           query = "SELECT t FROM Tournament t WHERE t.tournamentPK.id = :id"),
   @NamedQuery(name = "Tournament.findByTournamentFormatId", 
@@ -43,11 +45,19 @@ import javax.xml.bind.annotation.XmlTransient;
   @NamedQuery(name = "Tournament.findByStartDate", 
           query = "SELECT t FROM Tournament t WHERE t.startDate = :startDate"),
   @NamedQuery(name = "Tournament.findByEndDate", 
-          query = "SELECT t FROM Tournament t WHERE t.endDate = :endDate")
+          query = "SELECT t FROM Tournament t WHERE t.endDate = :endDate"),
+  @NamedQuery(name = "Tournament.findBySignupDate", 
+          query = "SELECT t FROM Tournament t WHERE t.signupDate = :signupDate"),
+  @NamedQuery(name = "Tournament.findBySignupTimeLimit", 
+          query = "SELECT t FROM Tournament t WHERE t.signupTimeLimit = :signupTimeLimit"),
+  @NamedQuery(name = "Tournament.findByRoundTimeLimit", 
+          query = "SELECT t FROM Tournament t WHERE t.roundTimeLimit = :roundTimeLimit"),
+  @NamedQuery(name = "Tournament.findByNoShowTimeLimit", 
+          query = "SELECT t FROM Tournament t WHERE t.noShowTimeLimit = :noShowTimeLimit")
 })
 public class Tournament implements Serializable
 {
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -6583090940281361773L;
   @EmbeddedId
   protected TournamentPK tournamentPK;
   @Basic(optional = false)
@@ -68,9 +78,17 @@ public class Tournament implements Serializable
   @Column(name = "lossPoints")
   private int lossPoints;
   @Column(name = "startDate")
-  private LocalDate startDate;
+  private LocalDateTime startDate;
   @Column(name = "endDate")
-  private LocalDate endDate;
+  private LocalDateTime endDate;
+  @Column(name = "signupDate")
+  private LocalDate signupDate;
+  @Column(name = "signupTimeLimit")
+  private Integer signupTimeLimit;
+  @Column(name = "roundTimeLimit")
+  private Integer roundTimeLimit;
+  @Column(name = "noShowTimeLimit")
+  private Integer noShowTimeLimit;
   @JoinColumns(
   {
     @JoinColumn(name = "format_id", referencedColumnName = "id"),
@@ -120,66 +138,6 @@ public class Tournament implements Serializable
   public void setTournamentPK(TournamentPK tournamentPK)
   {
     this.tournamentPK = tournamentPK;
-  }
-
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public int getWinPoints()
-  {
-    return winPoints;
-  }
-
-  public void setWinPoints(int winPoints)
-  {
-    this.winPoints = winPoints;
-  }
-
-  public int getDrawPoints()
-  {
-    return drawPoints;
-  }
-
-  public void setDrawPoints(int drawPoints)
-  {
-    this.drawPoints = drawPoints;
-  }
-
-  public int getLossPoints()
-  {
-    return lossPoints;
-  }
-
-  public void setLossPoints(int lossPoints)
-  {
-    this.lossPoints = lossPoints;
-  }
-
-  public LocalDate getStartDate()
-  {
-    return startDate;
-  }
-
-  public void setStartDate(LocalDate startDate)
-  {
-    this.startDate = startDate;
-  }
-
-  public LocalDate getEndDate()
-  {
-    return endDate;
-  }
-
-  public void setEndDate(LocalDate endDate)
-  {
-    this.endDate = endDate;
   }
 
   public Format getFormat()
@@ -251,5 +209,105 @@ public class Tournament implements Serializable
   {
     return "com.github.javydreamercsw.database.storage.db.Tournament[ tournamentPK=" 
             + tournamentPK + " ]";
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public int getWinPoints()
+  {
+    return winPoints;
+  }
+
+  public void setWinPoints(int winPoints)
+  {
+    this.winPoints = winPoints;
+  }
+
+  public int getDrawPoints()
+  {
+    return drawPoints;
+  }
+
+  public void setDrawPoints(int drawPoints)
+  {
+    this.drawPoints = drawPoints;
+  }
+
+  public int getLossPoints()
+  {
+    return lossPoints;
+  }
+
+  public void setLossPoints(int lossPoints)
+  {
+    this.lossPoints = lossPoints;
+  }
+
+  public LocalDateTime getStartDate()
+  {
+    return startDate;
+  }
+
+  public void setStartDate(LocalDateTime startDate)
+  {
+    this.startDate = startDate;
+  }
+
+  public LocalDateTime getEndDate()
+  {
+    return endDate;
+  }
+
+  public void setEndDate(LocalDateTime endDate)
+  {
+    this.endDate = endDate;
+  }
+
+  public LocalDate getSignupDate()
+  {
+    return signupDate;
+  }
+
+  public void setSignupDate(LocalDate signupDate)
+  {
+    this.signupDate = signupDate;
+  }
+
+  public Integer getSignupTimeLimit()
+  {
+    return signupTimeLimit;
+  }
+
+  public void setSignupTimeLimit(Integer signupTimeLimit)
+  {
+    this.signupTimeLimit = signupTimeLimit;
+  }
+
+  public Integer getRoundTimeLimit()
+  {
+    return roundTimeLimit;
+  }
+
+  public void setRoundTimeLimit(Integer roundTimeLimit)
+  {
+    this.roundTimeLimit = roundTimeLimit;
+  }
+
+  public Integer getNoShowTimeLimit()
+  {
+    return noShowTimeLimit;
+  }
+
+  public void setNoShowTimeLimit(Integer noShowTimeLimit)
+  {
+    this.noShowTimeLimit = noShowTimeLimit;
   }
 }

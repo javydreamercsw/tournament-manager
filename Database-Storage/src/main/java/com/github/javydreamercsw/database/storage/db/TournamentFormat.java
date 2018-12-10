@@ -1,6 +1,7 @@
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -63,10 +64,12 @@ public class TournamentFormat implements Serializable
 
   public TournamentFormat()
   {
+    tournamentList = new ArrayList<>();
   }
 
   public TournamentFormat(String formatName, String implementationClass)
   {
+    this();
     this.formatName = formatName;
     this.implementationClass = implementationClass;
   }
