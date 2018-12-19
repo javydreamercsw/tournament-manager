@@ -136,9 +136,10 @@ public class TournamentList extends TMView
   {
     if (TournamentService.getInstance().hasStarted(tournament))
     {
-      Button view = new Button("Start", event ->
+      Button view = new Button("Manage", event ->
       {
-        
+        TournamentManager tm = new TournamentManager(tournament);
+        tm.open();
       });
       view.setIcon(new Icon("lumo", "view"));
       view.addClassName("tournament__view");

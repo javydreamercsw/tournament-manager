@@ -8,7 +8,6 @@ import javax.naming.NamingException;
 
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.vaadin.maxime.MarkdownArea;
 
 import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 import com.github.javydreamercsw.database.storage.db.server.PlayerService;
@@ -21,6 +20,7 @@ import com.vaadin.flow.component.ItemLabelGenerator;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -69,7 +69,17 @@ public class Welcome extends TMView
       }
       else
       {
-        DataBaseManager.load();
+        try
+        {
+          DataBaseManager.load();
+        }
+        catch (Exception ex)
+        {
+          Notification.show(
+                  "Error loading demo data!",
+                  3000, Position.MIDDLE);
+          Exceptions.printStackTrace(ex);
+        }
         Notification.show(
                 "Loading data done!",
                 3000, Position.MIDDLE);
@@ -77,6 +87,9 @@ public class Welcome extends TMView
     }
     catch (NamingException ex)
     {
+      Notification.show(
+              "Error loading demo data!",
+              3000, Position.MIDDLE);
       Exceptions.printStackTrace(ex);
     }
   }
@@ -85,12 +98,12 @@ public class Welcome extends TMView
   {
     addClassName("welcome-list");
     setDefaultHorizontalComponentAlignment(Alignment.STRETCH);
-    MarkdownArea mda = new MarkdownArea("Hello world !");
+    TextArea mda = new TextArea("Hello world !");
     List<IGame> games = new ArrayList<>();
     games.addAll(Lookup.getDefault().lookupAll(IGame.class));
     ComboBox<IGame> cb = new ComboBox<>();
     cb.setLabel("Select a Game: ");
-    cb.setDataProvider(new ListDataProvider(games));
+    cb.setDataProvider(new ListDataProvider<>(games));
     cb.setItemLabelGenerator(new GameLabelGenerator());
     cb.addValueChangeListener(new ValueChangeListener()
     {

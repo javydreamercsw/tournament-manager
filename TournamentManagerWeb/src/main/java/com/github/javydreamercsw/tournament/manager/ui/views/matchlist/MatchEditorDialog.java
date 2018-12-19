@@ -15,6 +15,8 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
+import com.github.javydreamercsw.tournament.manager.ui.common.FormatLabelGenerator;
+
 import static com.github.javydreamercsw.tournament.manager.ui.views.TMView.CURRENT_GAME;
 
 import java.util.List;
@@ -126,7 +128,7 @@ public final class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
                     .getAttribute(CURRENT_GAME));
 
     cb.setLabel("Select a Format: ");
-    cb.setDataProvider(new ListDataProvider(formats));
+    cb.setDataProvider(new ListDataProvider<>(formats));
     cb.setItemLabelGenerator(new FormatLabelGenerator());
     cb.setRequired(true);
     cb.setPreventInvalidInput(true);

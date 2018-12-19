@@ -1,4 +1,4 @@
-package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
+package com.github.javydreamercsw.tournament.manager.ui.common;
 
 import org.openide.util.NbBundle;
 
