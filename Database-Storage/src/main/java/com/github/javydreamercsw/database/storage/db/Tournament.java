@@ -1,7 +1,6 @@
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,9 +56,6 @@ import javax.xml.bind.annotation.XmlTransient;
 })
 public class Tournament implements Serializable
 {
-  private static final long serialVersionUID = -6583090940281361773L;
-  @EmbeddedId
-  protected TournamentPK tournamentPK;
   @Basic(optional = false)
   @NotNull
   @Size(min = 1, max = 245)
@@ -77,18 +73,31 @@ public class Tournament implements Serializable
   @NotNull
   @Column(name = "lossPoints")
   private int lossPoints;
+  @Basic(optional = false)
+  @NotNull
   @Column(name = "startDate")
   private LocalDateTime startDate;
   @Column(name = "endDate")
   private LocalDateTime endDate;
+  @Basic(optional = false)
+  @NotNull
   @Column(name = "signupDate")
-  private LocalDate signupDate;
+  private LocalDateTime signupDate;
+  @Basic(optional = false)
+  @NotNull
   @Column(name = "signupTimeLimit")
-  private Integer signupTimeLimit;
+  private int signupTimeLimit;
+  @Basic(optional = false)
+  @NotNull
   @Column(name = "roundTimeLimit")
-  private Integer roundTimeLimit;
+  private int roundTimeLimit;
+  @Basic(optional = false)
+  @NotNull
   @Column(name = "noShowTimeLimit")
-  private Integer noShowTimeLimit;
+  private int noShowTimeLimit;
+  private static final long serialVersionUID = -6583090940281361773L;
+  @EmbeddedId
+  protected TournamentPK tournamentPK;
   @JoinColumns(
   {
     @JoinColumn(name = "format_id", referencedColumnName = "id"),
@@ -271,42 +280,42 @@ public class Tournament implements Serializable
     this.endDate = endDate;
   }
 
-  public LocalDate getSignupDate()
+  public LocalDateTime getSignupDate()
   {
     return signupDate;
   }
 
-  public void setSignupDate(LocalDate signupDate)
+  public void setSignupDate(LocalDateTime signupDate)
   {
     this.signupDate = signupDate;
   }
 
-  public Integer getSignupTimeLimit()
+  public int getSignupTimeLimit()
   {
     return signupTimeLimit;
   }
 
-  public void setSignupTimeLimit(Integer signupTimeLimit)
+  public void setSignupTimeLimit(int signupTimeLimit)
   {
     this.signupTimeLimit = signupTimeLimit;
   }
 
-  public Integer getRoundTimeLimit()
+  public int getRoundTimeLimit()
   {
     return roundTimeLimit;
   }
 
-  public void setRoundTimeLimit(Integer roundTimeLimit)
+  public void setRoundTimeLimit(int roundTimeLimit)
   {
     this.roundTimeLimit = roundTimeLimit;
   }
 
-  public Integer getNoShowTimeLimit()
+  public int getNoShowTimeLimit()
   {
     return noShowTimeLimit;
   }
 
-  public void setNoShowTimeLimit(Integer noShowTimeLimit)
+  public void setNoShowTimeLimit(int noShowTimeLimit)
   {
     this.noShowTimeLimit = noShowTimeLimit;
   }

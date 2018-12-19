@@ -128,16 +128,6 @@ public class MatchResult implements Serializable
             + matchResultPK + " ]";
   }
 
-  public boolean getLocked()
-  {
-    return locked;
-  }
-
-  public void setLocked(boolean locked)
-  {
-    this.locked = locked;
-  }
-
   public boolean getRanked()
   {
     return ranked;
@@ -146,5 +136,15 @@ public class MatchResult implements Serializable
   public void setRanked(boolean ranked)
   {
     this.ranked = ranked;
+  }
+
+  public boolean getLocked()
+  {
+    return locked;
+  }
+
+  public void setLocked(boolean locked)
+  {
+    this.locked = locked;
   }
 }
