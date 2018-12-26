@@ -27,6 +27,7 @@ import org.openide.util.Exceptions;
 import com.github.javydreamercsw.tournament.manager.ui.views.formatlist.FormatList;
 import com.github.javydreamercsw.tournament.manager.ui.views.matchlist.MatchList;
 import com.github.javydreamercsw.tournament.manager.ui.views.playerlist.PlayerList;
+import com.github.javydreamercsw.tournament.manager.ui.views.rankings.RankingList;
 import com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist.TournamentList;
 import com.github.javydreamercsw.tournament.manager.ui.views.welcome.Welcome;
 import com.vaadin.flow.component.Component;
@@ -82,10 +83,15 @@ public class MainLayout extends Div
     RouterLink players = new RouterLink(null, PlayerList.class);
     players.add(new Icon(VaadinIcon.USERS), new Text("Players"));
     players.addClassName("main-layout__nav-item");
+    
+    RouterLink rankings = new RouterLink(null, RankingList.class);
+    rankings.add(new Icon(VaadinIcon.TABLE), new Text("Rankings"));
+    rankings.addClassName("main-layout__nav-item");
 
     List<Component> components = new ArrayList<>();
     components.add(welcome);
     components.add(players);
+    components.add(rankings);
 
     if (demo)
     {

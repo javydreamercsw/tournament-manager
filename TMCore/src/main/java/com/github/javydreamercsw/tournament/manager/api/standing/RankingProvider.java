@@ -9,11 +9,10 @@ import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 public interface RankingProvider
 {
   /**
-   * Add a match into the rankings.
+   * Add teams into the rankings.
    *
-   * @param title Match title.
    * @param teams Teams participating on the match.
    * @throws java.lang.Exception
    */
-  void addMatch(String title, TeamInterface... teams) throws Exception;
+  void addTeam(TeamInterface... teams) throws Exception;
 }

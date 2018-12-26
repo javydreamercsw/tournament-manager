@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
+import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.tournament.manager.api.IGame;
 
 public class DataBaseManagerTest extends AbstractServerTest
@@ -33,6 +34,7 @@ public class DataBaseManagerTest extends AbstractServerTest
     assertFalse(PlayerService.getInstance().getAll().isEmpty());
     assertFalse(TournamentService.getInstance().getAll().isEmpty());
     assertFalse(TournamentService.getInstance().getAllFormats().isEmpty());
+    assertFalse(FormatService.getInstance().getAll().isEmpty());
     assertFalse(MatchService.getInstance().getAll().isEmpty());
     assertFalse(TeamService.getInstance().getAll().isEmpty());
     assertFalse(RecordService.getInstance().getAll().isEmpty());
@@ -52,6 +54,24 @@ public class DataBaseManagerTest extends AbstractServerTest
       assertEquals(m.getMatchHasTeamList().size(), 2);
       assertNotNull(m.getFormat());
     });
+
+    results = DataBaseManager.namedQuery("TeamHasFormatRecord.findAll");
+    assertTrue(results.size() > 0);
+
+    results.forEach(result ->
+    {
+      TeamHasFormatRecord m = (TeamHasFormatRecord) result;
+      assertNotNull(m.getTeam());
+      assertNotNull(m.getFormat());
+    });
+
+    FormatService.getInstance().getAll().forEach(format ->
+    {
+      if (format.getMatchEntryList().size() > 0)
+      {
+        assertTrue(format.getTeamHasFormatRecordList().size() > 0);
+      }
+    });
   }
 
   @Test
@@ -59,7 +79,7 @@ public class DataBaseManagerTest extends AbstractServerTest
   {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("name", Lookup.getDefault().lookup(IGame.class).getName());
-    
+
     assertFalse(DataBaseManager.namedQuery("Game.findByName", parameters).isEmpty());
   }
 }

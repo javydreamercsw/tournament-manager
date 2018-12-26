@@ -1,11 +1,15 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
@@ -13,15 +17,26 @@ import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeamPK;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
+import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
+import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecordPK;
 import com.github.javydreamercsw.database.storage.db.controller.MatchEntryJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.MatchHasTeamJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.MatchResultJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.MatchResultTypeJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.TeamHasFormatRecordJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.tournament.manager.UIPlayer;
+import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
+import com.github.javydreamercsw.tournament.manager.api.standing.RankingProvider;
+import com.github.javydreamercsw.trueskill.TrueSkillRankingProvider;
+
+import de.gesundkrank.jskills.IPlayer;
+import de.gesundkrank.jskills.Rating;
 
 public class MatchService extends Service<MatchEntry>
 {
@@ -33,6 +48,10 @@ public class MatchService extends Service<MatchEntry>
           = new MatchResultJpaController(DataBaseManager.getEntityManagerFactory());
   private MatchResultTypeJpaController mrtc
           = new MatchResultTypeJpaController(DataBaseManager.getEntityManagerFactory());
+  private final RankingProvider rp
+          = Lookup.getDefault().lookup(RankingProvider.class);
+  private final TeamHasFormatRecordJpaController thfrc
+          = new TeamHasFormatRecordJpaController(DataBaseManager.getEntityManagerFactory());
 
   /**
    * Helper class to initialize the singleton Service in a thread-safe way and
@@ -298,6 +317,35 @@ public class MatchService extends Service<MatchEntry>
    * Lock the match result.This is meant not to be undone as it calculates
    * experience and update records which is dependent on when it happens.
    *
+   * @param me Match Result to lock.
+   * @throws TournamentException
+   */
+  public void lockMatchResult(MatchEntry me) throws TournamentException
+  {
+    for (MatchHasTeam mht : findMatch(me.getMatchEntryPK()).getMatchHasTeamList())
+    {
+      if (mht != null)
+      {
+        try
+        {
+          lockMatchResult(mht.getMatchResult());
+        }
+        catch (Exception ex)
+        {
+          throw new TournamentException(ex);
+        }
+      }
+      else
+      {
+        throw new TournamentException("Missing result!");
+      }
+    }
+  }
+
+  /**
+   * Lock the match result.This is meant not to be undone as it calculates
+   * experience and update records which is dependent on when it happens.
+   *
    * @param mr Match Result to lock.
    * @throws java.lang.Exception
    */
@@ -380,6 +428,143 @@ public class MatchService extends Service<MatchEntry>
       else
       {
         throw new TournamentException("Rsults already locked!");
+      }
+    }
+  }
+
+  /**
+   * Update rankings for the match. This assumes that all losers were eliminated
+   * at the same time.
+   *
+   * @param me Match entry to check.
+   * @throws TournamentException
+   */
+  public void updateRankings(final MatchEntry me) throws TournamentException
+  {
+    updateRankings(me, new HashMap<>());
+  }
+
+  /**
+   * Update rankings for the match. This allows to give extra credits for losing
+   * teams that lasted longer in the match. Use 1 for the key of the winner, 2
+   * for the runner up and so on. Value implemented as a list to handle ties on
+   * each place.
+   *
+   * @param me Match entry to check.
+   * @param order Map indicating the place as key and a list of team id's as
+   * value.
+   * @throws TournamentException
+   */
+  public void updateRankings(final MatchEntry me,
+          Map<Integer, List<Integer>> order) throws TournamentException
+  {
+    TrueSkillRankingProvider p = (TrueSkillRankingProvider) rp;
+    // First make sure that everyone has a result
+    MatchEntry match = findMatch(me.getMatchEntryPK());
+    for (MatchHasTeam mht : match.getMatchHasTeamList())
+    {
+      if (mht.getMatchResult() == null || !mht.getMatchResult().getLocked())
+      {
+        throw new TournamentException("Not all teams have a locked result!");
+      }
+    }
+
+    TeamInterface[] teams = new TeamInterface[match.getMatchHasTeamList().size()];
+    int[] resultOrder = new int[match.getMatchHasTeamList().size()];
+    //Ok, now check the order if any
+    if (order.isEmpty())
+    {
+      order.put(1, new ArrayList<>());
+      order.put(2, new ArrayList<>());
+      // Create an order with the winner as first place and everyone else tied for second.
+      for (MatchHasTeam mht : match.getMatchHasTeamList())
+      {
+        switch (mht.getMatchResult().getMatchResultType().getType())
+        {
+          case "result.win":
+            order.get(1).add(mht.getTeam().getId());
+            break;
+          default:
+            order.get(2).add(mht.getTeam().getId());
+        }
+      }
+    }
+
+    //Convert into the JSkill interface for calculations
+    for (MatchHasTeam mht : match.getMatchHasTeamList())
+    {
+      try
+      {
+        p.addTeam(TeamService.getInstance().convertToTeam(mht.getTeam(),
+                me.getFormat()));
+      }
+      catch (Exception ex)
+      {
+        throw new TournamentException(ex);
+      }
+    }
+
+    int count = 0;
+    for (Entry<Integer, List<Integer>> entry : order.entrySet())
+    {
+      for (Integer t : entry.getValue())
+      {
+        teams[count] = TeamService.getInstance()
+                .convertToTeam(TeamService.getInstance().findTeam(t),
+                        me.getFormat());
+        resultOrder[count++] = entry.getKey();
+      }
+    }
+
+    // Make the calculations
+    Map<IPlayer, Rating> ratings
+            = p.getCalculator().calculateNewRatings(p.getGameInfo(),
+                    de.gesundkrank.jskills.Team.concat(teams),
+                    resultOrder);
+
+    // Now persist to database
+    for (Entry<IPlayer, Rating> entry : ratings.entrySet())
+    {
+      Optional<Player> temp
+              = PlayerService.getInstance()
+                      .findPlayerById(((UIPlayer) entry.getKey()).getID());
+      if (temp.isPresent())
+      {
+        Player player = temp.get();
+
+        //This assumes that the first tema is the team only contaiining the player.
+        Team team = player.getTeamList().get(0);
+        try
+        {
+          if (TeamService.getInstance().hasFormatRecord(team, me.getFormat()))
+          {
+            //Update it
+            TeamHasFormatRecord thfr
+                    = TeamService.getInstance().getFormatRecord(team, me.getFormat());
+            thfr.setMean(entry.getValue().getMean());
+            thfr.setStandardDeviation(entry.getValue().getStandardDeviation());
+            thfrc.edit(thfr);
+          }
+          else
+          {
+            TeamHasFormatRecord thfr
+                    = new TeamHasFormatRecord(new TeamHasFormatRecordPK(
+                            team.getId(),
+                            me.getFormat().getFormatPK().getId(),
+                            me.getFormat().getFormatPK().getGameId()),
+                            entry.getValue().getMean(),
+                            entry.getValue().getStandardDeviation());
+            thfr.setFormat(me.getFormat());
+            thfr.setTeam(team);
+            thfrc.create(thfr);
+            team.getTeamHasFormatRecordList().add(thfr);
+          }
+        }
+        catch (Exception ex)
+        {
+          throw new TournamentException(ex);
+        }
+        TeamService.getInstance().saveTeam(team);
       }
     }
   }

@@ -12,6 +12,7 @@
     <class>com.github.javydreamercsw.database.storage.db.Record</class>
     <class>com.github.javydreamercsw.database.storage.db.Round</class>
     <class>com.github.javydreamercsw.database.storage.db.Team</class>
+    <class>com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord</class>
     <class>com.github.javydreamercsw.database.storage.db.Tournament</class>
     <class>com.github.javydreamercsw.database.storage.db.TournamentFormat</class>
     <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
@@ -39,6 +40,7 @@
     <class>com.github.javydreamercsw.database.storage.db.Record</class>
     <class>com.github.javydreamercsw.database.storage.db.Round</class>
     <class>com.github.javydreamercsw.database.storage.db.Team</class>
+    <class>com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord</class>
     <class>com.github.javydreamercsw.database.storage.db.Tournament</class>
     <class>com.github.javydreamercsw.database.storage.db.TournamentFormat</class>
     <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
@@ -67,6 +69,7 @@
     <class>com.github.javydreamercsw.database.storage.db.Record</class>
     <class>com.github.javydreamercsw.database.storage.db.Round</class>
     <class>com.github.javydreamercsw.database.storage.db.Team</class>
+    <class>com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord</class>
     <class>com.github.javydreamercsw.database.storage.db.Tournament</class>
     <class>com.github.javydreamercsw.database.storage.db.TournamentFormat</class>
     <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>

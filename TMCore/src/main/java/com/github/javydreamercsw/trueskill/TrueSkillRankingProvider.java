@@ -8,6 +8,10 @@ import java.util.Map;
 
 import org.openide.util.lookup.ServiceProvider;
 
+import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
+import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
+import com.github.javydreamercsw.tournament.manager.api.standing.RankingProvider;
+
 import de.gesundkrank.jskills.GameInfo;
 import de.gesundkrank.jskills.Player;
 import de.gesundkrank.jskills.SkillCalculator;
@@ -15,11 +19,6 @@ import de.gesundkrank.jskills.Team;
 import de.gesundkrank.jskills.trueskill.FactorGraphTrueSkillCalculator;
 import de.gesundkrank.jskills.trueskill.TwoPlayerTrueSkillCalculator;
 import de.gesundkrank.jskills.trueskill.TwoTeamTrueSkillCalculator;
-
-import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
-import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
-
-import com.github.javydreamercsw.tournament.manager.api.standing.RankingProvider;
 
 /**
  *
@@ -33,7 +32,7 @@ public class TrueSkillRankingProvider implements RankingProvider
   private SkillCalculator calculator;
 
   @Override
-  public void addMatch(String title, TeamInterface... teams) throws Exception
+  public void addTeam(TeamInterface... teams) throws Exception
   {
     for (TeamInterface team : teams)
     {

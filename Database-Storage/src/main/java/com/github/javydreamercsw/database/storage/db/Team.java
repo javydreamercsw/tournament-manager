@@ -37,11 +37,8 @@ public class Team implements Serializable
   @Size(max = 245)
   @Column(name = "name")
   private String name;
-  // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-  @Column(name = "mean")
-  private Double mean;
-  @Column(name = "sd")
-  private Double sd;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "team")
+  private List<TeamHasFormatRecord> teamHasFormatRecordList;
   private static final long serialVersionUID = 1L;
   @Id
   @Basic(optional = false)
@@ -66,6 +63,7 @@ public class Team implements Serializable
     matchHasTeamList = new ArrayList<>();
     playerList = new ArrayList<>();
     tournamentHasTeamList = new ArrayList<>();
+    teamHasFormatRecordList = new ArrayList<>();
   }
 
   public Team(String name)
@@ -83,7 +81,6 @@ public class Team implements Serializable
   {
     this.id = id;
   }
-
 
   @XmlTransient
   public List<Player> getPlayerList()
@@ -155,23 +152,14 @@ public class Team implements Serializable
     this.name = name;
   }
 
-  public Double getMean()
+  @XmlTransient
+  public List<TeamHasFormatRecord> getTeamHasFormatRecordList()
   {
-    return mean;
+    return teamHasFormatRecordList;
   }
 
-  public void setMean(Double mean)
+  public void setTeamHasFormatRecordList(List<TeamHasFormatRecord> teamHasFormatRecordList)
   {
-    this.mean = mean;
-  }
-
-  public Double getSd()
-  {
-    return sd;
-  }
-
-  public void setSd(Double sd)
-  {
-    this.sd = sd;
+    this.teamHasFormatRecordList = teamHasFormatRecordList;
   }
 }

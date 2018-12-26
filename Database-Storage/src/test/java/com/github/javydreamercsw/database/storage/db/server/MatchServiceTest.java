@@ -17,6 +17,8 @@ import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
@@ -170,13 +172,19 @@ public class MatchServiceTest extends AbstractServerTest
 
     MatchService.getInstance().saveMatch(me);
 
-    for (MatchHasTeam mht : me.getMatchHasTeamList())
+    MatchService.getInstance().lockMatchResult(me);
+
+    MatchService.getInstance().updateRankings(me);
+
+    //Check the stats
+    me.getMatchHasTeamList().forEach(mht ->
     {
-      MatchResult mr = mht.getMatchResult();
-      assertNotNull(mr);
-      mr.setLocked(true);
-      MatchService.getInstance().updateResult(mr);
-    }
+      Team dbTeam = TeamService.getInstance().findTeam(mht.getTeam().getId());
+      TeamHasFormatRecord thfr = 
+              TeamService.getInstance().getFormatRecord(dbTeam, me.getFormat());
+      assertNotNull(thfr);
+      assertTrue(thfr.getMean() + thfr.getStandardDeviation() != 0);
+    });
 
     TeamService.getInstance().getAll().forEach(team ->
     {

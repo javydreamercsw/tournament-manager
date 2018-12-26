@@ -37,7 +37,7 @@ public class TrueSkillRankingProviderNGTest
   }
 
   /**
-   * Test of addMatch method, of class TrueSkillRankingProvider.
+   * Test of addTeam method, of class TrueSkillRankingProvider.
    *
    * @throws java.lang.Exception
    */
@@ -52,7 +52,7 @@ public class TrueSkillRankingProviderNGTest
     {
       new Team(1, p1), new Team(2, p2)
     };
-    instance.addMatch("Test Match", teams);
+    instance.addTeam(teams);
     TrueSkillRankingProvider p = (TrueSkillRankingProvider) instance;
     List<de.gesundkrank.jskills.Team> teamList = p.getTeamList();
     assertEquals(teamList.size(), playerCount);
@@ -82,7 +82,7 @@ public class TrueSkillRankingProviderNGTest
       new Team(3, p3), new Team(4, p4)
     };
 
-    instance.addMatch("Test Match 2", teams);
+    instance.addTeam(teams);
 
     teamList = p.getTeamList();
 
@@ -110,7 +110,7 @@ public class TrueSkillRankingProviderNGTest
       new Team(1, p1), new Team(2, p2), new Team(3, p3), new Team(4, p4)
     };
 
-    instance.addMatch("Test Match 3", teams);
+    instance.addTeam(teams);
 
     teamList = p.getTeamList();
 

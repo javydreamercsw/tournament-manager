@@ -35,6 +35,14 @@ import javax.xml.bind.annotation.XmlTransient;
         })
 public class Game implements Serializable
 {
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1, max = 45)
+  @Column(name = "name")
+  private String name;
+  @Size(max = 255)
+  @Column(name = "description")
+  private String description;
   private static final long serialVersionUID = -6267533299417173163L;
   @Id
   @Basic(optional = false)
@@ -48,14 +56,6 @@ public class Game implements Serializable
           initialValue = 1)
   @Column(name = "id")
   private Integer id;
-  @Basic(optional = false)
-  @NotNull
-  @Size(min = 1, max = 45)
-  @Column(name = "name")
-  private String name;
-  @Size(max = 255)
-  @Column(name = "description")
-  private String description;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
   private List<Format> formatList;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
@@ -80,25 +80,6 @@ public class Game implements Serializable
     this.id = id;
   }
 
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public String getDescription()
-  {
-    return description;
-  }
-
-  public void setDescription(String description)
-  {
-    this.description = description;
-  }
 
   @XmlTransient
   public List<Format> getFormatList()
@@ -147,5 +128,25 @@ public class Game implements Serializable
   public void setRecordList(List<Record> recordList)
   {
     this.recordList = recordList;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public void setDescription(String description)
+  {
+    this.description = description;
   }
 }

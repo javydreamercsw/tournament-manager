@@ -8,7 +8,6 @@ import org.openide.util.Lookup;
 
 import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
 import com.github.javydreamercsw.tournament.manager.api.Variables;
-
 import com.github.javydreamercsw.tournament.manager.api.standing.RecordInterface;
 
 /**
@@ -66,7 +65,7 @@ public class UIPlayer implements TournamentPlayerInterface
   @Override
   public int getID()
   {
-    return getId();
+    return id;
   }
 
   @Override
@@ -97,14 +96,6 @@ public class UIPlayer implements TournamentPlayerInterface
   public TournamentPlayerInterface createInstance(String name, int id)
   {
     return createInstance(name, id, 0, 0, 0);
-  }
-
-  /**
-   * @return the id
-   */
-  public int getId()
-  {
-    return id;
   }
 
   @Override

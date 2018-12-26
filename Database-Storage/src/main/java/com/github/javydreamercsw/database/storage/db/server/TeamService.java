@@ -5,14 +5,19 @@ import java.util.List;
 
 import org.openide.util.Exceptions;
 
+import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.controller.MatchHasTeamJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.TeamHasFormatRecordJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.TeamJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+
+import de.gesundkrank.jskills.Rating;
 
 public class TeamService extends Service<Team>
 {
@@ -20,6 +25,8 @@ public class TeamService extends Service<Team>
           = new TeamJpaController(DataBaseManager.getEntityManagerFactory());
   private MatchHasTeamJpaController mhtc
           = new MatchHasTeamJpaController(DataBaseManager.getEntityManagerFactory());
+  private final TeamHasFormatRecordJpaController thfrc
+          = new TeamHasFormatRecordJpaController(DataBaseManager.getEntityManagerFactory());
 
   private TeamService()
   {
@@ -120,6 +127,10 @@ public class TeamService extends Service<Team>
       {
         TournamentService.getInstance().deleteTeamFromTournament(tht);
       }
+      for (TeamHasFormatRecord thfr : t.getTeamHasFormatRecordList())
+      {
+        thfrc.destroy(thfr.getTeamHasFormatRecordPK());
+      }
       tc.destroy(t.getId());
     }
     catch (IllegalOrphanException | NonexistentEntityException ex)
@@ -171,5 +182,68 @@ public class TeamService extends Service<Team>
   public List<Team> getAll()
   {
     return tc.findTeamEntities();
+  }
+
+  /**
+   * Convert a team form the database representation to the JSKill
+   * representation.
+   *
+   * @param t Team to convert.
+   * @param format Format to get ratings for.
+   * @return converted team.
+   */
+  public com.github.javydreamercsw.tournament.manager.Team convertToTeam(Team t,
+          Format format)
+  {
+    com.github.javydreamercsw.tournament.manager.Team team
+            = new com.github.javydreamercsw.tournament.manager.Team(t.getId(),
+                    new ArrayList<>());
+    t.getPlayerList().forEach(player ->
+    {
+      Rating r;
+      if (hasFormatRecord(t, format))
+      {
+        TeamHasFormatRecord thfr = getFormatRecord(t, format);
+        r = new Rating(thfr.getMean(), thfr.getStandardDeviation());
+      }
+      else
+      {
+        r = new Rating(0.0, 0.0);
+      }
+      team.addPlayer(PlayerService.getInstance().convertToUIPlayer(player), r);
+    });
+    return team;
+  }
+
+  /**
+   * Check if this team has a record entry in the database for this format.
+   *
+   * @param team Team to check.
+   * @param format Format to check
+   * @return true if exists, false otherwise.
+   */
+  public boolean hasFormatRecord(Team team, Format format)
+  {
+    return getFormatRecord(team, format) != null;
+  }
+
+  /**
+   * Get the teams record for the specified format.
+   *
+   * @param team Team to check.
+   * @param format Format to check.
+   * @return Record or null if not found.
+   */
+  public TeamHasFormatRecord getFormatRecord(Team team, Format format)
+  {
+    for (TeamHasFormatRecord thfr
+            : findTeam(team.getId()).getTeamHasFormatRecordList())
+    {
+      if (thfr.getFormat().getFormatPK().equals(format.getFormatPK()))
+      {
+        return thfr;
+      }
+    }
+    return null;
   }
 }

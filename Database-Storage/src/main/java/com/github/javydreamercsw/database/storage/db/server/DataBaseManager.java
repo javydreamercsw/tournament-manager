@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -524,6 +525,7 @@ public class DataBaseManager
       t.setWinPoints(3);
       t.setLossPoints(0);
       t.setDrawPoints(1);
+      t.setStartDate(LocalDateTime.now().minusDays(startDay));
       
       t.setFormat(FormatService.getInstance().getAll().get(0));
       t.setTournamentFormat(TournamentService.getInstance()
@@ -559,18 +561,11 @@ public class DataBaseManager
                       ? "result.loss" : "result.win").get());
       MatchService.getInstance().setRanked(match, ranked);
 
-      //Lock the results so records are updated.
-      match.getMatchHasTeamList().forEach(mht ->
-      {
-        try
-        {
-          MatchService.getInstance().lockMatchResult(mht.getMatchResult());
-        }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
-      });
+      // Lock the results so records are updated.
+      MatchService.getInstance().lockMatchResult(match);
+      
+      // Update rankings
+      MatchService.getInstance().updateRankings(match);
     }
   }
 
