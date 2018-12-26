@@ -37,6 +37,11 @@ public class Team implements Serializable
   @Size(max = 245)
   @Column(name = "name")
   private String name;
+  // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+  @Column(name = "mean")
+  private Double mean;
+  @Column(name = "sd")
+  private Double sd;
   private static final long serialVersionUID = 1L;
   @Id
   @Basic(optional = false)
@@ -148,5 +153,25 @@ public class Team implements Serializable
   public void setName(String name)
   {
     this.name = name;
+  }
+
+  public Double getMean()
+  {
+    return mean;
+  }
+
+  public void setMean(Double mean)
+  {
+    this.mean = mean;
+  }
+
+  public Double getSd()
+  {
+    return sd;
+  }
+
+  public void setSd(Double sd)
+  {
+    this.sd = sd;
   }
 }
