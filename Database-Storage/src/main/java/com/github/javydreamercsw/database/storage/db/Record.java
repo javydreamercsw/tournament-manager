@@ -38,6 +38,9 @@ import javax.xml.bind.annotation.XmlTransient;
 })
 public class Record implements Serializable
 {
+  private static final long serialVersionUID = -893880954416960217L;
+  @EmbeddedId
+  protected RecordPK recordPK;
   @Basic(optional = false)
   @NotNull
   @Column(name = "wins")
@@ -65,9 +68,6 @@ public class Record implements Serializable
   })
   @ManyToMany
   private List<TournamentHasTeam> tournamentHasTeamList;
-  private static final long serialVersionUID = 1L;
-  @EmbeddedId
-  protected RecordPK recordPK;
   @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false, 
           updatable = false)
   @ManyToOne(optional = false)

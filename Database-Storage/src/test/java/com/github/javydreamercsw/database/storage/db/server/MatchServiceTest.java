@@ -3,21 +3,31 @@ package com.github.javydreamercsw.database.storage.db.server;
 import static org.testng.Assert.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
-import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Team;
+import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.tournament.manager.api.IGame;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
+import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 
 /**
  *
@@ -25,6 +35,54 @@ import com.github.javydreamercsw.tournament.manager.api.TournamentException;
  */
 public class MatchServiceTest extends AbstractServerTest
 {
+  private Game game;
+  private MatchEntry me;
+  private Tournament t = new Tournament("Test 1");
+
+  @BeforeClass
+  @Override
+  public void setup() throws NonexistentEntityException, IllegalOrphanException,
+          Exception
+  {
+    super.setup();
+    game = GameService.getInstance().findGameByName(Lookup.getDefault()
+            .lookup(IGame.class).getName()).get();
+    t.setTournamentFormat(TournamentService.getInstance()
+            .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
+                    .getName()));
+    t.setFormat(FormatService.getInstance().getAll().get(0));
+    TournamentService.getInstance().saveTournament(t);
+    TournamentService.getInstance().addRound(t);
+
+    GameService.getInstance().saveGame(game);
+
+    me = new MatchEntry();
+    me.setFormat(game.getFormatList().get(0));
+    me.setRound(t.getRoundList().get(0));
+
+    MatchService.getInstance().saveMatch(me);
+  }
+
+  @AfterMethod
+  public void reset()
+  {
+    TeamService.getInstance().getAll().forEach(team ->
+    {
+      try
+      {
+        MatchService.getInstance().removeTeam(me, team);
+      }
+      catch (NonexistentEntityException ex)
+      {
+        Exceptions.printStackTrace(ex);
+        fail();
+      }
+    });
+
+    assertTrue(MatchService.getInstance().findMatch(me.getMatchEntryPK())
+            .getMatchHasTeamList().isEmpty());
+  }
+
   /**
    * Test of write2DB method, of class MatchServer.
    *
@@ -34,23 +92,6 @@ public class MatchServiceTest extends AbstractServerTest
   @Test
   public void testMatchService() throws TournamentException, Exception
   {
-    Tournament t = new Tournament("Test 1");
-    TournamentService.getInstance().saveTournament(t);
-    TournamentService.getInstance().addRound(t);
-
-    Game game = new Game("Test Game");
-    GameService.getInstance().saveGame(game);
-
-    Format format = new Format("Default");
-    format.setGame(game);
-    FormatService.getInstance().saveFormat(format);
-
-    MatchEntry me = new MatchEntry();
-    me.setFormat(format);
-    me.setRound(t.getRoundList().get(0));
-
-    MatchService.getInstance().saveMatch(me);
-
     MatchEntry match
             = MatchService.getInstance().findMatch(me.getMatchEntryPK());
     assertNotNull(me.getFormat());
@@ -110,7 +151,12 @@ public class MatchServiceTest extends AbstractServerTest
       {
         switch (result.getMatchResultType().getType())
         {
+          //Various reasons leading to a loss.
           case "result.loss":
+          //Fall thru
+          case "result.forfeit":
+          //Fall thru
+          case "result.no_show":
             assertEquals(p.getRecordList().get(0).getWins(), 0);
             assertEquals(p.getRecordList().get(0).getLoses(), 1);
             assertEquals(p.getRecordList().get(0).getDraws(), 0);
@@ -120,12 +166,7 @@ public class MatchServiceTest extends AbstractServerTest
             assertEquals(p.getRecordList().get(0).getLoses(), 0);
             assertEquals(p.getRecordList().get(0).getDraws(), 1);
             break;
-          //Various reasons leading to a win.
           case "result.win":
-          //Fall thru
-          case "result.forfeit":
-          //Fall thru
-          case "result.no_show":
             assertEquals(p.getRecordList().get(0).getWins(), 1);
             assertEquals(p.getRecordList().get(0).getLoses(), 0);
             assertEquals(p.getRecordList().get(0).getDraws(), 0);
@@ -142,6 +183,131 @@ public class MatchServiceTest extends AbstractServerTest
       assertTrue(p.getRecordList().get(0).getDraws()
               + p.getRecordList().get(0).getLoses()
               + p.getRecordList().get(0).getWins() > 0);
+    });
+
+    MatchService.getInstance().saveMatch(me);
+
+    MatchService.getInstance().lockMatchResult(me);
+
+    MatchService.getInstance().updateRankings(me);
+
+    //Check the stats
+    me.getMatchHasTeamList().forEach(mht ->
+    {
+      Team dbTeam = TeamService.getInstance().findTeam(mht.getTeam().getId());
+      TeamHasFormatRecord thfr
+              = TeamService.getInstance().getFormatRecord(dbTeam, me.getFormat());
+      assertNotNull(thfr);
+      assertTrue(thfr.getMean() + thfr.getStandardDeviation() != 0);
+    });
+  }
+
+  @Test
+  public void testFindMatchesWithFormat()
+  {
+    assertEquals(MatchService.getInstance().findMatchesWithFormat("").size(),
+            game.getFormatList().size());
+
+    assertEquals(MatchService.getInstance()
+            .findMatchesWithFormat(game.getFormatList().get(0).getName()).size(), 1);
+
+    assertTrue(MatchService.getInstance()
+            .findMatchesWithFormat(game.getFormatList().get(0).getName() + "x")
+            .isEmpty());
+  }
+
+  @DataProvider
+  public Object[][] getQualityToTest()
+  {
+    Object[][] data = new Object[10][];
+    for (int i = 10; i >0; i--)
+    {
+      data[10-i] = new Object[]
+      {
+        i * 10.0
+      };
+    }
+    return data;
+  }
+
+  @Test(dataProvider = "getQualityToTest")
+  public void testcalculateBasePoints(double quality) throws Exception
+  {
+    // Add teams
+    Optional<Player> p1 = PlayerService.getInstance().findPlayerByName("Player 1");
+    Optional<Player> p2 = PlayerService.getInstance().findPlayerByName("Player 2");
+    Player player = p1.isPresent() ? p1.get() : new Player("Player 1");
+    PlayerService.getInstance().savePlayer(player);
+
+    Player player2 = p2.isPresent() ? p2.get() : new Player("Player 2");
+    PlayerService.getInstance().savePlayer(player2);
+
+    TeamService.getInstance().getAll().forEach(team ->
+    {
+      try
+      {
+        MatchService.getInstance().addTeam(me, team);
+      }
+      catch (Exception ex)
+      {
+        Exceptions.printStackTrace(ex);
+        fail();
+      }
+    });
+
+    double calculatedQuality;
+    do
+    {
+      int count = 0;
+      for (MatchHasTeam mht : me.getMatchHasTeamList())
+      {
+        MatchService.getInstance().setResult(mht,
+                count == 0 ? MatchService.getInstance().getResultType("result.win").get()
+                        : MatchService.getInstance().getResultType("result.loss").get());
+        count++;
+      }
+      TeamHasFormatRecord thfr1 = TeamService.getInstance().getFormatRecord(
+              MatchService.getInstance().findMatch(me.getMatchEntryPK())
+                      .getMatchHasTeamList().get(0).getTeam(),
+              game.getFormatList().get(0));
+
+      double player1Points = thfr1 == null ? 0.0 : thfr1.getPoints();
+
+      MatchService.getInstance().lockMatchResult(me);
+      MatchService.getInstance().updateRankings(me);
+
+      // Check results
+      MatchService.getInstance().findMatch(me.getMatchEntryPK())
+              .getMatchHasTeamList().forEach((mht) ->
+              {
+                if (mht.getMatchResult().getMatchResultType().getType().equals("result.win"))
+                {
+                  assertEquals(TeamService.getInstance().getFormatRecord(mht.getTeam(),
+                          game.getFormatList().get(0)).getPoints() - player1Points, 
+                          10.0 * MatchService.getInstance().calculateModifier(quality));
+                }
+                else
+                {
+                  assertEquals(TeamService.getInstance().getFormatRecord(mht.getTeam(),
+                          game.getFormatList().get(0)).getPoints(), 0);
+                }
+              });
+
+      calculatedQuality = MatchService.getInstance().getMatchQuality(me);
+    }
+    while (calculatedQuality > quality);
+
+    TeamService.getInstance().getAll().forEach(team ->
+    {
+      try
+      {
+        MatchService.getInstance().removeTeam(me, team);
+      }
+      catch (NonexistentEntityException ex)
+      {
+        Exceptions.printStackTrace(ex);
+        fail();
+      }
     });
   }
 }

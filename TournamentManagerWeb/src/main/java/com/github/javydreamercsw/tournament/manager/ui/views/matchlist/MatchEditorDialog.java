@@ -15,6 +15,8 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
+import com.github.javydreamercsw.tournament.manager.ui.common.FormatLabelGenerator;
+
 import static com.github.javydreamercsw.tournament.manager.ui.views.TMView.CURRENT_GAME;
 
 import java.util.List;
@@ -126,21 +128,12 @@ public final class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
                     .getAttribute(CURRENT_GAME));
 
     cb.setLabel("Select a Format: ");
-    cb.setDataProvider(new ListDataProvider(formats));
+    cb.setDataProvider(new ListDataProvider<>(formats));
     cb.setItemLabelGenerator(new FormatLabelGenerator());
     cb.setRequired(true);
     cb.setPreventInvalidInput(true);
     cb.setAllowCustomValue(false);
-    cb.addValueChangeListener(new ValueChangeListener()
-    {
-      private static final long serialVersionUID = 5377566605252849942L;
-
-      @Override
-      public void valueChanged(ValueChangeEvent e)
-      {
-        validate();
-      }
-    });
+    cb.addValueChangeListener(listener -> validate());
 
     getBinder().forField(cb).bind(MatchEntry::getFormat, MatchEntry::setFormat);
 
@@ -202,8 +195,8 @@ public final class MatchEditorDialog extends AbstractEditorDialog<MatchEntry>
         {
           if (mht.getMatchResult() != null)
           {
-            mht.getMatchResult().setRanked(ranked.getValue());
-            MatchService.getInstance().updateResult(mht.getMatchResult());
+            MatchService.getInstance().setRanked(getCurrentItem(), 
+                    ranked.getValue());
           }
         }
         catch (Exception ex)

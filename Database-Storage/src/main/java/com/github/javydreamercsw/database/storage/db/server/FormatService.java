@@ -197,7 +197,11 @@ public class FormatService extends Service<Format>
     {
       fc.destroy(format.getFormatPK());
     }
-    catch (NonexistentEntityException | IllegalOrphanException ex)
+    catch (IllegalOrphanException ex)
+    {
+      Exceptions.printStackTrace(ex);
+    }
+    catch (NonexistentEntityException ex)
     {
       Exceptions.printStackTrace(ex);
     }

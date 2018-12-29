@@ -11,44 +11,57 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Round;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.TournamentFormat;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
+import com.github.javydreamercsw.database.storage.db.TournamentPK;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.PreexistingEntityException;
 import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 
 public class TournamentJpaController extends AbstractController implements Serializable
 {
-  private static final long serialVersionUID = -3241408395907726172L;
-
+  private static final long serialVersionUID = 2285164831364920828L;
   public TournamentJpaController(EntityManagerFactory emf)
   {
     super(emf);
   }
 
-  public void create(Tournament tournament)
+  public void create(Tournament tournament) throws PreexistingEntityException, Exception
   {
-    if (tournament.getRoundList() == null)
+    if (tournament.getTournamentPK() == null)
     {
-      tournament.setRoundList(new ArrayList<>());
+      tournament.setTournamentPK(new TournamentPK());
     }
     if (tournament.getTournamentHasTeamList() == null)
     {
       tournament.setTournamentHasTeamList(new ArrayList<>());
     }
+    if (tournament.getRoundList() == null)
+    {
+      tournament.setRoundList(new ArrayList<>());
+    }
+    tournament.getTournamentPK().setTournamentFormatId(tournament.getTournamentFormat().getId());
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<Round> attachedRoundList = new ArrayList<>();
-      for (Round roundListRoundToAttach : tournament.getRoundList())
+      Format format = tournament.getFormat();
+      if (format != null)
       {
-        roundListRoundToAttach = em.getReference(roundListRoundToAttach.getClass(), roundListRoundToAttach.getRoundPK());
-        attachedRoundList.add(roundListRoundToAttach);
+        format = em.getReference(format.getClass(), format.getFormatPK());
+        tournament.setFormat(format);
       }
-      tournament.setRoundList(attachedRoundList);
+      TournamentFormat tournamentFormat = tournament.getTournamentFormat();
+      if (tournamentFormat != null)
+      {
+        tournamentFormat = em.getReference(tournamentFormat.getClass(), tournamentFormat.getId());
+        tournament.setTournamentFormat(tournamentFormat);
+      }
       List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<>();
       for (TournamentHasTeam tournamentHasTeamListTournamentHasTeamToAttach : tournament.getTournamentHasTeamList())
       {
@@ -56,17 +69,23 @@ public class TournamentJpaController extends AbstractController implements Seria
         attachedTournamentHasTeamList.add(tournamentHasTeamListTournamentHasTeamToAttach);
       }
       tournament.setTournamentHasTeamList(attachedTournamentHasTeamList);
-      em.persist(tournament);
-      for (Round roundListRound : tournament.getRoundList())
+      List<Round> attachedRoundList = new ArrayList<>();
+      for (Round roundListRoundToAttach : tournament.getRoundList())
       {
-        Tournament oldTournamentOfRoundListRound = roundListRound.getTournament();
-        roundListRound.setTournament(tournament);
-        roundListRound = em.merge(roundListRound);
-        if (oldTournamentOfRoundListRound != null)
-        {
-          oldTournamentOfRoundListRound.getRoundList().remove(roundListRound);
-          oldTournamentOfRoundListRound = em.merge(oldTournamentOfRoundListRound);
-        }
+        roundListRoundToAttach = em.getReference(roundListRoundToAttach.getClass(), roundListRoundToAttach.getRoundPK());
+        attachedRoundList.add(roundListRoundToAttach);
+      }
+      tournament.setRoundList(attachedRoundList);
+      em.persist(tournament);
+      if (format != null)
+      {
+        format.getTournamentList().add(tournament);
+        format = em.merge(format);
+      }
+      if (tournamentFormat != null)
+      {
+        tournamentFormat.getTournamentList().add(tournament);
+        tournamentFormat = em.merge(tournamentFormat);
       }
       for (TournamentHasTeam tournamentHasTeamListTournamentHasTeam : tournament.getTournamentHasTeamList())
       {
@@ -79,7 +98,26 @@ public class TournamentJpaController extends AbstractController implements Seria
           oldTournamentOfTournamentHasTeamListTournamentHasTeam = em.merge(oldTournamentOfTournamentHasTeamListTournamentHasTeam);
         }
       }
+      for (Round roundListRound : tournament.getRoundList())
+      {
+        Tournament oldTournamentOfRoundListRound = roundListRound.getTournament();
+        roundListRound.setTournament(tournament);
+        roundListRound = em.merge(roundListRound);
+        if (oldTournamentOfRoundListRound != null)
+        {
+          oldTournamentOfRoundListRound.getRoundList().remove(roundListRound);
+          oldTournamentOfRoundListRound = em.merge(oldTournamentOfRoundListRound);
+        }
+      }
       em.getTransaction().commit();
+    }
+    catch (Exception ex)
+    {
+      if (findTournament(tournament.getTournamentPK()) != null)
+      {
+        throw new PreexistingEntityException("Tournament " + tournament + " already exists.", ex);
+      }
+      throw ex;
     }
     finally
     {
@@ -92,28 +130,22 @@ public class TournamentJpaController extends AbstractController implements Seria
 
   public void edit(Tournament tournament) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
+    tournament.getTournamentPK().setTournamentFormatId(tournament.getTournamentFormat().getId());
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      Tournament persistentTournament = em.find(Tournament.class, tournament.getId());
-      List<Round> roundListOld = persistentTournament.getRoundList();
-      List<Round> roundListNew = tournament.getRoundList();
+      Tournament persistentTournament = em.find(Tournament.class, tournament.getTournamentPK());
+      Format formatOld = persistentTournament.getFormat();
+      Format formatNew = tournament.getFormat();
+      TournamentFormat tournamentFormatOld = persistentTournament.getTournamentFormat();
+      TournamentFormat tournamentFormatNew = tournament.getTournamentFormat();
       List<TournamentHasTeam> tournamentHasTeamListOld = persistentTournament.getTournamentHasTeamList();
       List<TournamentHasTeam> tournamentHasTeamListNew = tournament.getTournamentHasTeamList();
+      List<Round> roundListOld = persistentTournament.getRoundList();
+      List<Round> roundListNew = tournament.getRoundList();
       List<String> illegalOrphanMessages = null;
-      for (Round roundListOldRound : roundListOld)
-      {
-        if (!roundListNew.contains(roundListOldRound))
-        {
-          if (illegalOrphanMessages == null)
-          {
-            illegalOrphanMessages = new ArrayList<>();
-          }
-          illegalOrphanMessages.add("You must retain Round " + roundListOldRound + " since its tournament field is not nullable.");
-        }
-      }
       for (TournamentHasTeam tournamentHasTeamListOldTournamentHasTeam : tournamentHasTeamListOld)
       {
         if (!tournamentHasTeamListNew.contains(tournamentHasTeamListOldTournamentHasTeam))
@@ -125,18 +157,31 @@ public class TournamentJpaController extends AbstractController implements Seria
           illegalOrphanMessages.add("You must retain TournamentHasTeam " + tournamentHasTeamListOldTournamentHasTeam + " since its tournament field is not nullable.");
         }
       }
+      for (Round roundListOldRound : roundListOld)
+      {
+        if (!roundListNew.contains(roundListOldRound))
+        {
+          if (illegalOrphanMessages == null)
+          {
+            illegalOrphanMessages = new ArrayList<>();
+          }
+          illegalOrphanMessages.add("You must retain Round " + roundListOldRound + " since its tournament field is not nullable.");
+        }
+      }
       if (illegalOrphanMessages != null)
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
       }
-      List<Round> attachedRoundListNew = new ArrayList<>();
-      for (Round roundListNewRoundToAttach : roundListNew)
+      if (formatNew != null)
       {
-        roundListNewRoundToAttach = em.getReference(roundListNewRoundToAttach.getClass(), roundListNewRoundToAttach.getRoundPK());
-        attachedRoundListNew.add(roundListNewRoundToAttach);
+        formatNew = em.getReference(formatNew.getClass(), formatNew.getFormatPK());
+        tournament.setFormat(formatNew);
       }
-      roundListNew = attachedRoundListNew;
-      tournament.setRoundList(roundListNew);
+      if (tournamentFormatNew != null)
+      {
+        tournamentFormatNew = em.getReference(tournamentFormatNew.getClass(), tournamentFormatNew.getId());
+        tournament.setTournamentFormat(tournamentFormatNew);
+      }
       List<TournamentHasTeam> attachedTournamentHasTeamListNew = new ArrayList<>();
       for (TournamentHasTeam tournamentHasTeamListNewTournamentHasTeamToAttach : tournamentHasTeamListNew)
       {
@@ -145,20 +190,34 @@ public class TournamentJpaController extends AbstractController implements Seria
       }
       tournamentHasTeamListNew = attachedTournamentHasTeamListNew;
       tournament.setTournamentHasTeamList(tournamentHasTeamListNew);
-      tournament = em.merge(tournament);
-      for (Round roundListNewRound : roundListNew)
+      List<Round> attachedRoundListNew = new ArrayList<>();
+      for (Round roundListNewRoundToAttach : roundListNew)
       {
-        if (!roundListOld.contains(roundListNewRound))
-        {
-          Tournament oldTournamentOfRoundListNewRound = roundListNewRound.getTournament();
-          roundListNewRound.setTournament(tournament);
-          roundListNewRound = em.merge(roundListNewRound);
-          if (oldTournamentOfRoundListNewRound != null && !oldTournamentOfRoundListNewRound.equals(tournament))
-          {
-            oldTournamentOfRoundListNewRound.getRoundList().remove(roundListNewRound);
-            oldTournamentOfRoundListNewRound = em.merge(oldTournamentOfRoundListNewRound);
-          }
-        }
+        roundListNewRoundToAttach = em.getReference(roundListNewRoundToAttach.getClass(), roundListNewRoundToAttach.getRoundPK());
+        attachedRoundListNew.add(roundListNewRoundToAttach);
+      }
+      roundListNew = attachedRoundListNew;
+      tournament.setRoundList(roundListNew);
+      tournament = em.merge(tournament);
+      if (formatOld != null && !formatOld.equals(formatNew))
+      {
+        formatOld.getTournamentList().remove(tournament);
+        formatOld = em.merge(formatOld);
+      }
+      if (formatNew != null && !formatNew.equals(formatOld))
+      {
+        formatNew.getTournamentList().add(tournament);
+        formatNew = em.merge(formatNew);
+      }
+      if (tournamentFormatOld != null && !tournamentFormatOld.equals(tournamentFormatNew))
+      {
+        tournamentFormatOld.getTournamentList().remove(tournament);
+        tournamentFormatOld = em.merge(tournamentFormatOld);
+      }
+      if (tournamentFormatNew != null && !tournamentFormatNew.equals(tournamentFormatOld))
+      {
+        tournamentFormatNew.getTournamentList().add(tournament);
+        tournamentFormatNew = em.merge(tournamentFormatNew);
       }
       for (TournamentHasTeam tournamentHasTeamListNewTournamentHasTeam : tournamentHasTeamListNew)
       {
@@ -174,6 +233,20 @@ public class TournamentJpaController extends AbstractController implements Seria
           }
         }
       }
+      for (Round roundListNewRound : roundListNew)
+      {
+        if (!roundListOld.contains(roundListNewRound))
+        {
+          Tournament oldTournamentOfRoundListNewRound = roundListNewRound.getTournament();
+          roundListNewRound.setTournament(tournament);
+          roundListNewRound = em.merge(roundListNewRound);
+          if (oldTournamentOfRoundListNewRound != null && !oldTournamentOfRoundListNewRound.equals(tournament))
+          {
+            oldTournamentOfRoundListNewRound.getRoundList().remove(roundListNewRound);
+            oldTournamentOfRoundListNewRound = em.merge(oldTournamentOfRoundListNewRound);
+          }
+        }
+      }
       em.getTransaction().commit();
     }
     catch (Exception ex)
@@ -181,7 +254,7 @@ public class TournamentJpaController extends AbstractController implements Seria
       String msg = ex.getLocalizedMessage();
       if (msg == null || msg.length() == 0)
       {
-        Integer id = tournament.getId();
+        TournamentPK id = tournament.getTournamentPK();
         if (findTournament(id) == null)
         {
           throw new NonexistentEntityException("The tournament with id " + id + " no longer exists.");
@@ -198,7 +271,7 @@ public class TournamentJpaController extends AbstractController implements Seria
     }
   }
 
-  public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException
+  public void destroy(TournamentPK id) throws IllegalOrphanException, NonexistentEntityException
   {
     EntityManager em = null;
     try
@@ -209,22 +282,13 @@ public class TournamentJpaController extends AbstractController implements Seria
       try
       {
         tournament = em.getReference(Tournament.class, id);
-        tournament.getId();
+        tournament.getTournamentPK();
       }
       catch (EntityNotFoundException enfe)
       {
         throw new NonexistentEntityException("The tournament with id " + id + " no longer exists.", enfe);
       }
       List<String> illegalOrphanMessages = null;
-      List<Round> roundListOrphanCheck = tournament.getRoundList();
-      for (Round roundListOrphanCheckRound : roundListOrphanCheck)
-      {
-        if (illegalOrphanMessages == null)
-        {
-          illegalOrphanMessages = new ArrayList<>();
-        }
-        illegalOrphanMessages.add("This Tournament (" + tournament + ") cannot be destroyed since the Round " + roundListOrphanCheckRound + " in its roundList field has a non-nullable tournament field.");
-      }
       List<TournamentHasTeam> tournamentHasTeamListOrphanCheck = tournament.getTournamentHasTeamList();
       for (TournamentHasTeam tournamentHasTeamListOrphanCheckTournamentHasTeam : tournamentHasTeamListOrphanCheck)
       {
@@ -234,9 +298,30 @@ public class TournamentJpaController extends AbstractController implements Seria
         }
         illegalOrphanMessages.add("This Tournament (" + tournament + ") cannot be destroyed since the TournamentHasTeam " + tournamentHasTeamListOrphanCheckTournamentHasTeam + " in its tournamentHasTeamList field has a non-nullable tournament field.");
       }
+      List<Round> roundListOrphanCheck = tournament.getRoundList();
+      for (Round roundListOrphanCheckRound : roundListOrphanCheck)
+      {
+        if (illegalOrphanMessages == null)
+        {
+          illegalOrphanMessages = new ArrayList<>();
+        }
+        illegalOrphanMessages.add("This Tournament (" + tournament + ") cannot be destroyed since the Round " + roundListOrphanCheckRound + " in its roundList field has a non-nullable tournament field.");
+      }
       if (illegalOrphanMessages != null)
       {
         throw new IllegalOrphanException(illegalOrphanMessages);
+      }
+      Format format = tournament.getFormat();
+      if (format != null)
+      {
+        format.getTournamentList().remove(tournament);
+        format = em.merge(format);
+      }
+      TournamentFormat tournamentFormat = tournament.getTournamentFormat();
+      if (tournamentFormat != null)
+      {
+        tournamentFormat.getTournamentList().remove(tournament);
+        tournamentFormat = em.merge(tournamentFormat);
       }
       em.remove(tournament);
       em.getTransaction().commit();
@@ -281,7 +366,7 @@ public class TournamentJpaController extends AbstractController implements Seria
     }
   }
 
-  public Tournament findTournament(Integer id)
+  public Tournament findTournament(TournamentPK id)
   {
     EntityManager em = getEntityManager();
     try
@@ -310,5 +395,5 @@ public class TournamentJpaController extends AbstractController implements Seria
       em.close();
     }
   }
-
+  
 }

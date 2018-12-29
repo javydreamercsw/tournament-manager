@@ -44,7 +44,9 @@ public class Format implements Serializable
   @Size(max = 255)
   @Column(name = "description")
   private String description;
-  private static final long serialVersionUID = 1L;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "format")
+  private List<TeamHasFormatRecord> teamHasFormatRecordList;
+  private static final long serialVersionUID = -6764484082819653225L;
   @EmbeddedId
   protected FormatPK formatPK;
   @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false, 
@@ -53,6 +55,8 @@ public class Format implements Serializable
   private Game game;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "format")
   private List<MatchEntry> matchEntryList;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "format")
+  private List<Tournament> tournamentList;
 
   public Format()
   {
@@ -105,6 +109,17 @@ public class Format implements Serializable
     this.matchEntryList = matchEntryList;
   }
 
+  @XmlTransient
+  public List<Tournament> getTournamentList()
+  {
+    return tournamentList;
+  }
+
+  public void setTournamentList(List<Tournament> tournamentList)
+  {
+    this.tournamentList = tournamentList;
+  }
+
   @Override
   public int hashCode()
   {
@@ -129,8 +144,40 @@ public class Format implements Serializable
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.Format[ formatPK=" + 
-            formatPK + " ]";
+    return "com.github.javydreamercsw.database.storage.db.Format[ formatPK=" 
+            + formatPK + " ]";
+  }
+
+
+  @XmlTransient
+  public List<TeamHasFormatRecord> getTeamHasFormatRecordList()
+  {
+    return teamHasFormatRecordList;
+  }
+
+  public void setTeamHasFormatRecordList(List<TeamHasFormatRecord> teamHasFormatRecordList)
+  {
+    this.teamHasFormatRecordList = teamHasFormatRecordList;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public void setDescription(String description)
+  {
+    this.description = description;
   }
 
   public String getName()

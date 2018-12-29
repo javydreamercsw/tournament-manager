@@ -39,7 +39,7 @@ public class RoundJpaController extends AbstractController implements Serializab
     {
       round.setMatchEntryList(new ArrayList<>());
     }
-    round.getRoundPK().setTournamentId(round.getTournament().getId());
+    round.getRoundPK().setTournamentId(round.getTournament().getTournamentPK().getId());
     EntityManager em = null;
     try
     {
@@ -48,7 +48,7 @@ public class RoundJpaController extends AbstractController implements Serializab
       Tournament tournament = round.getTournament();
       if (tournament != null)
       {
-        tournament = em.getReference(tournament.getClass(), tournament.getId());
+        tournament = em.getReference(tournament.getClass(), tournament.getTournamentPK());
         round.setTournament(tournament);
       }
       List<MatchEntry> attachedMatchEntryList = new ArrayList<>();
@@ -96,7 +96,7 @@ public class RoundJpaController extends AbstractController implements Serializab
 
   public void edit(Round round) throws IllegalOrphanException, NonexistentEntityException, Exception
   {
-    round.getRoundPK().setTournamentId(round.getTournament().getId());
+    round.getRoundPK().setTournamentId(round.getTournament().getTournamentPK().getId());
     EntityManager em = null;
     try
     {
@@ -125,7 +125,7 @@ public class RoundJpaController extends AbstractController implements Serializab
       }
       if (tournamentNew != null)
       {
-        tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getId());
+        tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getTournamentPK());
         round.setTournament(tournamentNew);
       }
       List<MatchEntry> attachedMatchEntryListNew = new ArrayList<>();
@@ -294,5 +294,5 @@ public class RoundJpaController extends AbstractController implements Serializab
       em.close();
     }
   }
-
+  
 }

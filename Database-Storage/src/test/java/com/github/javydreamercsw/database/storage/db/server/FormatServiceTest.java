@@ -1,14 +1,11 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
+import static org.testng.Assert.*;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.fail;
+import java.util.List;
+import java.util.Optional;
 
-import java.util.stream.Stream;
-
-import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -17,39 +14,20 @@ import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
+import com.github.javydreamercsw.tournament.manager.api.IGame;
 
 public class FormatServiceTest extends AbstractServerTest
 {
-  private Game game = new Game("Test");
+  private Game game;
 
   @BeforeClass
   @Override
-  public void setup() throws NonexistentEntityException, IllegalOrphanException
+  public void setup() throws NonexistentEntityException, IllegalOrphanException, 
+          Exception
   {
     super.setup();
-    GameService.getInstance().saveGame(game);
-    Stream.of("Commander",
-            "Beatdown",
-            "Legacy",
-            "Standard",
-            "Draft")
-            .forEach(name ->
-            {
-              if (!FormatService.getInstance().findFormatByName(name).isPresent())
-              {
-                try
-                {
-                  Format format = new Format(name);
-                  format.setGame(game);
-                  FormatService.getInstance().saveFormat(format);
-                }
-                catch (Exception ex)
-                {
-                  Exceptions.printStackTrace(ex);
-                  fail();
-                }
-              }
-            });
+    game = GameService.getInstance().findGameByName(Lookup.getDefault()
+            .lookup(IGame.class).getName()).get();
   }
 
   /**
@@ -58,8 +36,7 @@ public class FormatServiceTest extends AbstractServerTest
   @Test
   public void testFindFormats()
   {
-    System.out.println("findFormats");
-    assertFalse(FormatService.getInstance().findFormats("").isEmpty());
+    assertFalse(FormatService.getInstance().getAll().isEmpty());
   }
 
   /**
@@ -68,10 +45,10 @@ public class FormatServiceTest extends AbstractServerTest
   @Test
   public void testFindFormatByName()
   {
-    System.out.println("findFormatByName");
-    assertEquals(1, FormatService.getInstance().findFormats("Commander").size());
-
-    assertEquals(0, FormatService.getInstance().findFormats("Commander2").size());
+    assertEquals(1, FormatService.getInstance()
+            .findFormats(game.getFormatList().get(0).getName()).size());
+    assertEquals(0, FormatService.getInstance()
+            .findFormats(game.getFormatList().get(0).getName() + "2").size());
   }
 
   /**
@@ -80,12 +57,12 @@ public class FormatServiceTest extends AbstractServerTest
   @Test
   public void testFindFormatOrThrow()
   {
-    System.out.println("findFormatOrThrow");
-    assertNotNull(FormatService.getInstance().findFormatOrThrow("Commander"));
-
+    assertNotNull(FormatService.getInstance()
+            .findFormatOrThrow(game.getFormatList().get(0).getName()));
     try
     {
-      FormatService.getInstance().findFormatOrThrow("Commander2");
+      FormatService.getInstance()
+              .findFormatOrThrow(game.getFormatList().get(0).getName() + "2");
       fail("Expected exception!");
     }
     catch (IllegalStateException ex)
@@ -100,10 +77,10 @@ public class FormatServiceTest extends AbstractServerTest
   @Test
   public void testFindFormatById()
   {
-    System.out.println("findCategoryById");
     assertNotNull(FormatService.getInstance()
             .findFormatById(FormatService.getInstance()
-                    .findFormatByName("Commander").get().getFormatPK()));
+                    .findFormatByName(game.getFormatList().get(0).getName()).get()
+                    .getFormatPK()));
   }
 
   /**
@@ -114,7 +91,6 @@ public class FormatServiceTest extends AbstractServerTest
   @Test
   public void testDeleteFormat() throws Exception
   {
-    System.out.println("deleteFormat");
     Format format = new Format("test");
     format.setGame(game);
     assertEquals(FormatService.getInstance().findFormats("test").size(), 0);
@@ -123,5 +99,37 @@ public class FormatServiceTest extends AbstractServerTest
     FormatService.getInstance().deleteFormat(FormatService.getInstance()
             .findFormatByName(format.getName()).get());
     assertEquals(FormatService.getInstance().findFormats("test").size(), 0);
+  }
+
+  /**
+   * Test of findFormatForGame method, of class FormatService.
+   */
+  @Test
+  public void testFindFormatForGame()
+  {
+    Optional<Format> result = FormatService.getInstance().findFormatForGame(game.getName(),
+            game.getFormatList().get(0).getName());
+    assertTrue(result.isPresent());
+
+    result = FormatService.getInstance().findFormatForGame(game.getName(),
+            game.getFormatList().get(0).getName() + "x");
+    assertFalse(result.isPresent());
+
+    result = FormatService.getInstance().findFormatForGame(game.getName() + "x",
+            game.getFormatList().get(0).getName());
+    assertFalse(result.isPresent());
+  }
+
+  /**
+   * Test of findFormatByGame method, of class FormatService.
+   */
+  @Test
+  public void testFindFormatByGame()
+  {
+    List<Format> result = FormatService.getInstance().findFormatByGame(game);
+    assertFalse(result.isEmpty());
+
+    result = FormatService.getInstance().findFormatByGame(game.getName() + "2");
+    assertTrue(result.isEmpty());
   }
 }

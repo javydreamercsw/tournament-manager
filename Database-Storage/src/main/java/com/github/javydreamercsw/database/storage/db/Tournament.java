@@ -1,21 +1,22 @@
 package com.github.javydreamercsw.database.storage.db;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,19 +26,34 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "tournament")
 @XmlRootElement
 @NamedQueries(
-        {
-          @NamedQuery(name = "Tournament.findAll", query = "SELECT t FROM Tournament t"),
-          @NamedQuery(name = "Tournament.findById",
-                  query = "SELECT t FROM Tournament t WHERE t.id = :id"),
-          @NamedQuery(name = "Tournament.findByName",
-                  query = "SELECT t FROM Tournament t WHERE t.name = :name"),
-          @NamedQuery(name = "Tournament.findByWinPoints",
-                  query = "SELECT t FROM Tournament t WHERE t.winPoints = :winPoints"),
-          @NamedQuery(name = "Tournament.findByDrawPoints",
-                  query = "SELECT t FROM Tournament t WHERE t.drawPoints = :drawPoints"),
-          @NamedQuery(name = "Tournament.findByLossPoints",
-                  query = "SELECT t FROM Tournament t WHERE t.lossPoints = :lossPoints")
-        })
+{
+  @NamedQuery(name = "Tournament.findAll", 
+          query = "SELECT t FROM Tournament t"),
+  @NamedQuery(name = "Tournament.findById", 
+          query = "SELECT t FROM Tournament t WHERE t.tournamentPK.id = :id"),
+  @NamedQuery(name = "Tournament.findByTournamentFormatId", 
+          query = "SELECT t FROM Tournament t WHERE t.tournamentPK.tournamentFormatId = :tournamentFormatId"),
+  @NamedQuery(name = "Tournament.findByName", 
+          query = "SELECT t FROM Tournament t WHERE t.name = :name"),
+  @NamedQuery(name = "Tournament.findByWinPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.winPoints = :winPoints"),
+  @NamedQuery(name = "Tournament.findByDrawPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.drawPoints = :drawPoints"),
+  @NamedQuery(name = "Tournament.findByLossPoints", 
+          query = "SELECT t FROM Tournament t WHERE t.lossPoints = :lossPoints"),
+  @NamedQuery(name = "Tournament.findByStartDate", 
+          query = "SELECT t FROM Tournament t WHERE t.startDate = :startDate"),
+  @NamedQuery(name = "Tournament.findByEndDate", 
+          query = "SELECT t FROM Tournament t WHERE t.endDate = :endDate"),
+  @NamedQuery(name = "Tournament.findBySignupDate", 
+          query = "SELECT t FROM Tournament t WHERE t.signupDate = :signupDate"),
+  @NamedQuery(name = "Tournament.findBySignupTimeLimit", 
+          query = "SELECT t FROM Tournament t WHERE t.signupTimeLimit = :signupTimeLimit"),
+  @NamedQuery(name = "Tournament.findByRoundTimeLimit", 
+          query = "SELECT t FROM Tournament t WHERE t.roundTimeLimit = :roundTimeLimit"),
+  @NamedQuery(name = "Tournament.findByNoShowTimeLimit", 
+          query = "SELECT t FROM Tournament t WHERE t.noShowTimeLimit = :noShowTimeLimit")
+})
 public class Tournament implements Serializable
 {
   @Basic(optional = false)
@@ -57,22 +73,46 @@ public class Tournament implements Serializable
   @NotNull
   @Column(name = "lossPoints")
   private int lossPoints;
-  private static final long serialVersionUID = 1L;
-  @Id
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "TournamentGen")
-  @TableGenerator(name = "TournamentGen", table = "tm_id",
-          pkColumnName = "table_name",
-          valueColumnName = "last_id",
-          pkColumnValue = "tournament",
-          allocationSize = 1,
-          initialValue = 1)
   @Basic(optional = false)
-  @Column(name = "id")
-  private Integer id;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
-  private List<Round> roundList;
+  @NotNull
+  @Column(name = "startDate")
+  private LocalDateTime startDate;
+  @Column(name = "endDate")
+  private LocalDateTime endDate;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "signupDate")
+  private LocalDateTime signupDate;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "signupTimeLimit")
+  private int signupTimeLimit;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "roundTimeLimit")
+  private int roundTimeLimit;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "noShowTimeLimit")
+  private int noShowTimeLimit;
+  private static final long serialVersionUID = -6583090940281361773L;
+  @EmbeddedId
+  protected TournamentPK tournamentPK;
+  @JoinColumns(
+  {
+    @JoinColumn(name = "format_id", referencedColumnName = "id"),
+    @JoinColumn(name = "format_game_id", referencedColumnName = "game_id")
+  })
+  @ManyToOne(optional = false)
+  private Format format;
+  @JoinColumn(name = "tournament_format_id", referencedColumnName = "id", 
+          insertable = false, updatable = false)
+  @ManyToOne(optional = false)
+  private TournamentFormat tournamentFormat;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
   private List<TournamentHasTeam> tournamentHasTeamList;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "tournament")
+  private List<Round> roundList;
 
   public Tournament()
   {
@@ -94,26 +134,39 @@ public class Tournament implements Serializable
     tournamentHasTeamList = new ArrayList<>();
   }
 
-  public Integer getId()
+  public Tournament(int tournamentFormatId)
   {
-    return id;
+    this.tournamentPK = new TournamentPK(tournamentFormatId);
   }
 
-  public void setId(Integer id)
+  public TournamentPK getTournamentPK()
   {
-    this.id = id;
+    return tournamentPK;
   }
 
-
-  @XmlTransient
-  public List<Round> getRoundList()
+  public void setTournamentPK(TournamentPK tournamentPK)
   {
-    return roundList;
+    this.tournamentPK = tournamentPK;
   }
 
-  public void setRoundList(List<Round> roundList)
+  public Format getFormat()
   {
-    this.roundList = roundList;
+    return format;
+  }
+
+  public void setFormat(Format format)
+  {
+    this.format = format;
+  }
+
+  public TournamentFormat getTournamentFormat()
+  {
+    return tournamentFormat;
+  }
+
+  public void setTournamentFormat(TournamentFormat tournamentFormat)
+  {
+    this.tournamentFormat = tournamentFormat;
   }
 
   @XmlTransient
@@ -127,11 +180,22 @@ public class Tournament implements Serializable
     this.tournamentHasTeamList = tournamentHasTeamList;
   }
 
+  @XmlTransient
+  public List<Round> getRoundList()
+  {
+    return roundList;
+  }
+
+  public void setRoundList(List<Round> roundList)
+  {
+    this.roundList = roundList;
+  }
+
   @Override
   public int hashCode()
   {
     int hash = 0;
-    hash += (id != null ? id.hashCode() : 0);
+    hash += (tournamentPK != null ? tournamentPK.hashCode() : 0);
     return hash;
   }
 
@@ -144,15 +208,77 @@ public class Tournament implements Serializable
       return false;
     }
     Tournament other = (Tournament) object;
-    return !((this.id == null && other.id != null) 
-            || (this.id != null && !this.id.equals(other.id)));
+    return !((this.tournamentPK == null && other.tournamentPK != null) 
+            || (this.tournamentPK != null 
+            && !this.tournamentPK.equals(other.tournamentPK)));
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.Tournament[ id="
-            + id + " ]";
+    return "com.github.javydreamercsw.database.storage.db.Tournament[ tournamentPK=" 
+            + tournamentPK + " ]";
+  }
+
+
+  public LocalDateTime getStartDate()
+  {
+    return startDate;
+  }
+
+  public void setStartDate(LocalDateTime startDate)
+  {
+    this.startDate = startDate;
+  }
+
+  public LocalDateTime getEndDate()
+  {
+    return endDate;
+  }
+
+  public void setEndDate(LocalDateTime endDate)
+  {
+    this.endDate = endDate;
+  }
+
+  public LocalDateTime getSignupDate()
+  {
+    return signupDate;
+  }
+
+  public void setSignupDate(LocalDateTime signupDate)
+  {
+    this.signupDate = signupDate;
+  }
+
+  public int getSignupTimeLimit()
+  {
+    return signupTimeLimit;
+  }
+
+  public void setSignupTimeLimit(int signupTimeLimit)
+  {
+    this.signupTimeLimit = signupTimeLimit;
+  }
+
+  public int getRoundTimeLimit()
+  {
+    return roundTimeLimit;
+  }
+
+  public void setRoundTimeLimit(int roundTimeLimit)
+  {
+    this.roundTimeLimit = roundTimeLimit;
+  }
+
+  public int getNoShowTimeLimit()
+  {
+    return noShowTimeLimit;
+  }
+
+  public void setNoShowTimeLimit(int noShowTimeLimit)
+  {
+    this.noShowTimeLimit = noShowTimeLimit;
   }
 
   public String getName()

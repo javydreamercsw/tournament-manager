@@ -1,5 +1,7 @@
 package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
+import com.github.javydreamercsw.tournament.manager.ui.common.MatchResultTypeLabelGenerator;
+
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
@@ -33,7 +35,7 @@ public class ResultForm extends FormLayout
     resultGrid.addColumn(new ComponentRenderer<>((mht) ->
     {
       ComboBox<MatchResultType> cb = new ComboBox<>();
-      cb.setDataProvider(new ListDataProvider(MatchService.getInstance().getResultTypes()));
+      cb.setDataProvider(new ListDataProvider<>(MatchService.getInstance().getResultTypes()));
       cb.setItemLabelGenerator(new MatchResultTypeLabelGenerator());
       cb.setRequired(true);
       cb.setPreventInvalidInput(true);

@@ -205,9 +205,19 @@ public class PlayerService extends Service<Player>
     }
   }
 
-   @Override
+  @Override
   public List<Player> getAll()
   {
     return pc.findPlayerEntities();
+  }
+
+  /**
+   * Convert a player to a UIPlayer.
+   * @param p Player to transform
+   * @return transformed player.
+   */
+  public UIPlayer convertToUIPlayer(Player p)
+  {
+    return new UIPlayer(p.getName(), p.getId());
   }
 }

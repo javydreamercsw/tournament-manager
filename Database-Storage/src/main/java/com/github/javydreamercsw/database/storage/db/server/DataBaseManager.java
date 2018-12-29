@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +35,10 @@ import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.TournamentFormat;
 import com.github.javydreamercsw.tournament.manager.api.GameFormat;
 import com.github.javydreamercsw.tournament.manager.api.IGame;
+import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 import com.github.javydreamercsw.tournament.manager.api.storage.StorageException;
 import com.googlecode.flyway.core.Flyway;
 import com.googlecode.flyway.core.api.MigrationInfo;
@@ -59,14 +63,9 @@ public class DataBaseManager
   private static final Logger LOG
           = Logger.getLogger(DataBaseManager.class.getSimpleName());
   private static boolean dbError = false;
-  private static DBState state;
+  private static DBState state = DBState.START_UP;
   public static final String JNDI_DATASOURCE_NAME
           = "java:comp/env/jdbc/TMDB";
-
-  public DataBaseManager()
-  {
-    state = DBState.START_UP;
-  }
 
   public static EntityManagerFactory getEntityManagerFactory()
   {
@@ -372,18 +371,6 @@ public class DataBaseManager
   }
 
   /**
-   * Named query that will modify the database
-   *
-   * @param query query to execute
-   * @param parameters query parameters
-   */
-  public static void namedUpdateQuery(String query,
-          Map<String, Object> parameters)
-  {
-    namedQuery(query, parameters, true);
-  }
-
-  /**
    * Named query (not for updates)
    *
    * @param query query to execute
@@ -425,23 +412,22 @@ public class DataBaseManager
 
   public static void close()
   {
-    getEntityManager().close();
-    getEntityManagerFactory().close();
+    if (em != null)
+    {
+      em.close();
+    }
+    if (emf != null)
+    {
+      emf.close();
+    }
+    //Set it to null so it's recreated with new Persistence Unit next time is requested.
+    emf = null;
+    em = null;
   }
 
   public static EntityTransaction getTransaction()
   {
     return getEntityManager().getTransaction();
-  }
-
-  /**
-   * Named query that will modify the database
-   *
-   * @param query query to execute
-   */
-  public static void namedUpdateQuery(String query)
-  {
-    namedQuery(query, null, true);
   }
 
   public static List<Object> nativeQuery(String query)
@@ -473,6 +459,8 @@ public class DataBaseManager
   @SuppressWarnings("empty-statement")
   public static void loadDemoData() throws Exception
   {
+    Random r = new Random();
+
     // Add players
     for (int i = 0; i < 10; i++)
     {
@@ -486,18 +474,9 @@ public class DataBaseManager
       }
     }
 
-    // Add a tournaments
-    for (int i = 0; i < 10; i++)
-    {
-      Tournament t = new Tournament("Tournament " + (i + 1));
-      t.setWinPoints(3);
-      t.setLossPoints(0);
-      t.setDrawPoints(1);
-      TournamentService.getInstance().saveTournament(t);
-    }
-
     IGame gameAPI = Lookup.getDefault().lookup(IGame.class);
-    Optional<Game> fg = GameService.getInstance().findGameByName(gameAPI.getName());
+    Optional<Game> fg
+            = GameService.getInstance().findGameByName(gameAPI.getName());
     Game game;
     if (fg.isPresent())
     {
@@ -526,9 +505,37 @@ public class DataBaseManager
         FormatService.getInstance().saveFormat(newFormat);
       }
     }
+
+    // Add a tournaments
+    List<TournamentInterface> formats = new ArrayList<>();
+    formats.addAll(Lookup.getDefault().lookupAll(TournamentInterface.class));
+
+    for (TournamentInterface format : formats)
+    {
+      TournamentFormat tf = new TournamentFormat(format.getName(),
+              format.getClass().getCanonicalName());
+      TournamentService.getInstance().saveTournamentFormat(tf);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+      // Set a random start date:
+      int startDay = r.nextInt(31);
+      Tournament t = new Tournament("Tournament " + (i + 1));
+      t.setWinPoints(3);
+      t.setLossPoints(0);
+      t.setDrawPoints(1);
+      t.setStartDate(LocalDateTime.now().minusDays(startDay));
+      
+      t.setFormat(FormatService.getInstance().getAll().get(0));
+      t.setTournamentFormat(TournamentService.getInstance()
+              .findFormat(formats.get(r.nextInt(formats.size())).getName()));
+      TournamentService.getInstance().saveTournament(t);
+    }
+
     List<Format> formatList = FormatService.getInstance()
             .findFormatByGame(gameAPI.getName());
-    Random r = new Random();
+
     // Add matches
     for (int i = 0; i < 10; i++)
     {
@@ -545,26 +552,75 @@ public class DataBaseManager
 
       //Add a result
       boolean win = r.nextBoolean();
+      boolean ranked = r.nextBoolean();
       MatchService.getInstance().setResult(match.getMatchHasTeamList().get(0),
               MatchService.getInstance().getResultType(win
                       ? "result.win" : "result.loss").get());
       MatchService.getInstance().setResult(match.getMatchHasTeamList().get(1),
               MatchService.getInstance().getResultType(win
                       ? "result.loss" : "result.win").get());
+      MatchService.getInstance().setRanked(match, ranked);
 
-      //Lock the results so records are updated.
-      match.getMatchHasTeamList().forEach(mht
-              ->
+      // Lock the results so records are updated.
+      MatchService.getInstance().lockMatchResult(match);
+      
+      // Update rankings
+      MatchService.getInstance().updateRankings(match);
+    }
+  }
+
+  /**
+   * Load stuff from the Lookup.
+   *
+   * @throws java.lang.Exception
+   */
+  public static void load() throws Exception
+  {
+    for (TournamentInterface format : Lookup.getDefault()
+            .lookupAll(TournamentInterface.class))
+    {
+      // Register the tournament formats
+      if (TournamentService.getInstance().findFormat(format.getName()) == null)
       {
-        try
+        TournamentFormat tf = new TournamentFormat(format.getName(),
+                format.getClass().getCanonicalName());
+        TournamentService.getInstance().addFormat(tf);
+      }
+    }
+    for (IGame gameAPI : Lookup.getDefault().lookupAll(IGame.class))
+    {
+      // Add game to DB if not there
+      Optional<Game> result
+              = GameService.getInstance().findGameByName(gameAPI.getName());
+
+      Game game;
+      if (result.isPresent())
+      {
+        game = result.get();
+      }
+      else
+      {
+        game = new Game(gameAPI.getName());
+        GameService.getInstance().saveGame(game);
+      }
+
+      //Load formats
+      for (GameFormat format : gameAPI.gameFormats())
+      {
+        // Check if it exists in the databse
+        Optional<Format> f
+                = FormatService.getInstance()
+                        .findFormatForGame(gameAPI.getName(), format.getName());
+        if (!f.isPresent())
         {
-          MatchService.getInstance().lockMatchResult(mht.getMatchResult());
+          // Let's create it.
+          Format newFormat = new Format();
+          newFormat.setName(format.getName());
+          newFormat.setDescription(format.getDescription());
+          newFormat.setGame(game);
+          FormatService.getInstance().saveFormat(newFormat);
         }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
-      });
+      }
     }
   }
 }

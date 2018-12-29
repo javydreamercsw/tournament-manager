@@ -37,6 +37,8 @@ public class Team implements Serializable
   @Size(max = 245)
   @Column(name = "name")
   private String name;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "team")
+  private List<TeamHasFormatRecord> teamHasFormatRecordList;
   private static final long serialVersionUID = 1L;
   @Id
   @Basic(optional = false)
@@ -61,6 +63,7 @@ public class Team implements Serializable
     matchHasTeamList = new ArrayList<>();
     playerList = new ArrayList<>();
     tournamentHasTeamList = new ArrayList<>();
+    teamHasFormatRecordList = new ArrayList<>();
   }
 
   public Team(String name)
@@ -78,7 +81,6 @@ public class Team implements Serializable
   {
     this.id = id;
   }
-
 
   @XmlTransient
   public List<Player> getPlayerList()
@@ -140,6 +142,17 @@ public class Team implements Serializable
     return "com.github.javydreamercsw.database.storage.db.Team[ id=" + id + " ]";
   }
 
+  @XmlTransient
+  public List<TeamHasFormatRecord> getTeamHasFormatRecordList()
+  {
+    return teamHasFormatRecordList;
+  }
+
+  public void setTeamHasFormatRecordList(List<TeamHasFormatRecord> teamHasFormatRecordList)
+  {
+    this.teamHasFormatRecordList = teamHasFormatRecordList;
+  }
+  
   public String getName()
   {
     return name;

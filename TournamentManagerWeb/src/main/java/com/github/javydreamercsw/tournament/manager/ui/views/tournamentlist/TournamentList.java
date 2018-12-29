@@ -20,7 +20,10 @@ import java.util.List;
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.Tournament;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
+import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.server.TournamentService;
+import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
@@ -89,15 +92,20 @@ public class TournamentList extends TMView
     viewToolbar.add(searchField, newButton);
     add(viewToolbar);
   }
-  
+
   private String getRoundCount(Tournament t)
   {
     return Integer.toString(t.getRoundList().size());
   }
-  
+
   private String getTeamCount(Tournament t)
   {
     return Integer.toString(t.getTournamentHasTeamList().size());
+  }
+
+  private String getFormat(Tournament t)
+  {
+    return t.getTournamentFormat().getFormatName();
   }
 
   private void addContent()
@@ -112,7 +120,11 @@ public class TournamentList extends TMView
             .setWidth("6em");
     grid.addColumn(this::getTeamCount).setHeader("Teams")
             .setWidth("6em");
+    grid.addColumn(this::getFormat).setHeader("Format")
+            .setWidth("6em");
     grid.addColumn(new ComponentRenderer<>(this::createEditButton))
+            .setFlexGrow(0);
+    grid.addColumn(new ComponentRenderer<>(this::createControlButton))
             .setFlexGrow(0);
     grid.setSelectionMode(SelectionMode.NONE);
 
@@ -120,13 +132,51 @@ public class TournamentList extends TMView
     add(container);
   }
 
-  private Button createEditButton(Tournament category)
+  private Button createControlButton(Tournament tournament)
   {
-    Button edit = new Button("Edit", event -> form.open(category,
+    if (TournamentService.getInstance().hasStarted(tournament))
+    {
+      Button view = new Button("Manage", event ->
+      {
+        TournamentManager tm = new TournamentManager(tournament);
+        tm.open();
+      });
+      view.setIcon(new Icon("lumo", "view"));
+      view.addClassName("tournament__view");
+      view.getElement().setAttribute("theme", "tertiary");
+      return view;
+    }
+    else
+    {
+      Button start = new Button("Start", event ->
+      {
+        try
+        {
+          TournamentService.getInstance().startTournament(tournament);
+        }
+        catch (TournamentException ex)
+        {
+          Exceptions.printStackTrace(ex);
+          Notification.show(
+                  "Unable to start tournament!",
+                  3000, Position.BOTTOM_START);
+        }
+      });
+      start.setIcon(new Icon("lumo", "start"));
+      start.addClassName("tournament__start");
+      start.getElement().setAttribute("theme", "tertiary");
+      return start;
+    }
+  }
+
+  private Button createEditButton(Tournament tournament)
+  {
+    Button edit = new Button("Edit", event -> form.open(tournament,
             AbstractEditorDialog.Operation.EDIT));
     edit.setIcon(new Icon("lumo", "edit"));
     edit.addClassName("tournament__edit");
     edit.getElement().setAttribute("theme", "tertiary");
+    edit.setEnabled(!TournamentService.getInstance().hasStarted(tournament));
     return edit;
   }
 
@@ -153,7 +203,7 @@ public class TournamentList extends TMView
     try
     {
       TournamentService.getInstance().saveTournament(t);
-      
+
       Notification.show(
               "Tournament successfully " + operation.getNameInText() + "ed.",
               3000, Position.BOTTOM_START);
@@ -167,10 +217,7 @@ public class TournamentList extends TMView
 
   private void deleteTournament(Tournament t)
   {
-    List<Tournament> matchesInCategory = TournamentService.getInstance()
-            .findTournament(t.getId());
-
-    if (matchesInCategory.isEmpty())
+    if (TournamentService.getInstance().findTournament(t.getTournamentPK()) != null)
     {
       try
       {
@@ -180,7 +227,7 @@ public class TournamentList extends TMView
                 Position.BOTTOM_START);
         updateView();
       }
-      catch (Exception ex)
+      catch (IllegalOrphanException | NonexistentEntityException ex)
       {
         Exceptions.printStackTrace(ex);
       }
