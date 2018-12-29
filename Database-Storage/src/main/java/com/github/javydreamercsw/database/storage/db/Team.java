@@ -142,7 +142,6 @@ public class Team implements Serializable
     return "com.github.javydreamercsw.database.storage.db.Team[ id=" + id + " ]";
   }
 
-
   @XmlTransient
   public List<TeamHasFormatRecord> getTeamHasFormatRecordList()
   {
@@ -153,7 +152,7 @@ public class Team implements Serializable
   {
     this.teamHasFormatRecordList = teamHasFormatRecordList;
   }
-
+  
   public String getName()
   {
     return name;

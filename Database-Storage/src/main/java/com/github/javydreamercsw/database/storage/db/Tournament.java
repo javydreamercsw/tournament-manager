@@ -220,45 +220,6 @@ public class Tournament implements Serializable
             + tournamentPK + " ]";
   }
 
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public int getWinPoints()
-  {
-    return winPoints;
-  }
-
-  public void setWinPoints(int winPoints)
-  {
-    this.winPoints = winPoints;
-  }
-
-  public int getDrawPoints()
-  {
-    return drawPoints;
-  }
-
-  public void setDrawPoints(int drawPoints)
-  {
-    this.drawPoints = drawPoints;
-  }
-
-  public int getLossPoints()
-  {
-    return lossPoints;
-  }
-
-  public void setLossPoints(int lossPoints)
-  {
-    this.lossPoints = lossPoints;
-  }
 
   public LocalDateTime getStartDate()
   {
@@ -318,5 +279,45 @@ public class Tournament implements Serializable
   public void setNoShowTimeLimit(int noShowTimeLimit)
   {
     this.noShowTimeLimit = noShowTimeLimit;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public int getWinPoints()
+  {
+    return winPoints;
+  }
+
+  public void setWinPoints(int winPoints)
+  {
+    this.winPoints = winPoints;
+  }
+
+  public int getDrawPoints()
+  {
+    return drawPoints;
+  }
+
+  public void setDrawPoints(int drawPoints)
+  {
+    this.drawPoints = drawPoints;
+  }
+
+  public int getLossPoints()
+  {
+    return lossPoints;
+  }
+
+  public void setLossPoints(int lossPoints)
+  {
+    this.lossPoints = lossPoints;
   }
 }
