@@ -19,25 +19,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "team_has_format_record")
 @XmlRootElement
 @NamedQueries(
-{
-  @NamedQuery(name = "TeamHasFormatRecord.findAll", 
-          query = "SELECT t FROM TeamHasFormatRecord t"),
-  @NamedQuery(name = "TeamHasFormatRecord.findByTeamId", 
-          query = "SELECT t FROM TeamHasFormatRecord t WHERE t.teamHasFormatRecordPK.teamId = :teamId"),
-  @NamedQuery(name = "TeamHasFormatRecord.findByFormatId", 
-          query = "SELECT t FROM TeamHasFormatRecord t WHERE t.teamHasFormatRecordPK.formatId = :formatId"),
-  @NamedQuery(name = "TeamHasFormatRecord.findByFormatGameId", 
-          query = "SELECT t FROM TeamHasFormatRecord t WHERE t.teamHasFormatRecordPK.formatGameId = :formatGameId"),
-  @NamedQuery(name = "TeamHasFormatRecord.findByMean", 
-          query = "SELECT t FROM TeamHasFormatRecord t WHERE t.mean = :mean"),
-  @NamedQuery(name = "TeamHasFormatRecord.findByStandardDeviation", 
-          query = "SELECT t FROM TeamHasFormatRecord t WHERE t.standardDeviation = :standardDeviation")
-})
+        {
+          @NamedQuery(name = "TeamHasFormatRecord.findAll",
+                  query = "SELECT t FROM TeamHasFormatRecord t"),
+          @NamedQuery(name = "TeamHasFormatRecord.findByTeamId",
+                  query = "SELECT t FROM TeamHasFormatRecord t WHERE t.teamHasFormatRecordPK.teamId = :teamId"),
+          @NamedQuery(name = "TeamHasFormatRecord.findByFormatId",
+                  query = "SELECT t FROM TeamHasFormatRecord t WHERE t.teamHasFormatRecordPK.formatId = :formatId"),
+          @NamedQuery(name = "TeamHasFormatRecord.findByFormatGameId",
+                  query = "SELECT t FROM TeamHasFormatRecord t WHERE t.teamHasFormatRecordPK.formatGameId = :formatGameId"),
+          @NamedQuery(name = "TeamHasFormatRecord.findByMean",
+                  query = "SELECT t FROM TeamHasFormatRecord t WHERE t.mean = :mean"),
+          @NamedQuery(name = "TeamHasFormatRecord.findByStandardDeviation",
+                  query = "SELECT t FROM TeamHasFormatRecord t WHERE t.standardDeviation = :standardDeviation")
+        })
 public class TeamHasFormatRecord implements Serializable
 {
-  private static final long serialVersionUID = 1L;
-  @EmbeddedId
-  protected TeamHasFormatRecordPK teamHasFormatRecordPK;
+  private static final long serialVersionUID = 1517758449111184848L;
   @Basic(optional = false)
   @NotNull
   @Column(name = "mean")
@@ -46,16 +44,22 @@ public class TeamHasFormatRecord implements Serializable
   @NotNull
   @Column(name = "standard_deviation")
   private double standardDeviation;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "points")
+  private int points;
+  @EmbeddedId
+  protected TeamHasFormatRecordPK teamHasFormatRecordPK;
   @JoinColumns(
-  {
-    @JoinColumn(name = "format_id", referencedColumnName = "id", 
-            insertable = false, updatable = false),
-    @JoinColumn(name = "format_game_id", referencedColumnName = "game_id", 
-            insertable = false, updatable = false)
-  })
+          {
+            @JoinColumn(name = "format_id", referencedColumnName = "id",
+                    insertable = false, updatable = false),
+            @JoinColumn(name = "format_game_id", referencedColumnName = "game_id",
+                    insertable = false, updatable = false)
+          })
   @ManyToOne(optional = false)
   private Format format;
-  @JoinColumn(name = "team_id", referencedColumnName = "id", 
+  @JoinColumn(name = "team_id", referencedColumnName = "id",
           insertable = false, updatable = false)
   @ManyToOne(optional = false)
   private Team team;
@@ -69,7 +73,7 @@ public class TeamHasFormatRecord implements Serializable
     this.teamHasFormatRecordPK = teamHasFormatRecordPK;
   }
 
-  public TeamHasFormatRecord(TeamHasFormatRecordPK teamHasFormatRecordPK, 
+  public TeamHasFormatRecord(TeamHasFormatRecordPK teamHasFormatRecordPK,
           double mean, double standardDeviation)
   {
     this.teamHasFormatRecordPK = teamHasFormatRecordPK;
@@ -90,26 +94,6 @@ public class TeamHasFormatRecord implements Serializable
   public void setTeamHasFormatRecordPK(TeamHasFormatRecordPK teamHasFormatRecordPK)
   {
     this.teamHasFormatRecordPK = teamHasFormatRecordPK;
-  }
-
-  public double getMean()
-  {
-    return mean;
-  }
-
-  public void setMean(double mean)
-  {
-    this.mean = mean;
-  }
-
-  public double getStandardDeviation()
-  {
-    return standardDeviation;
-  }
-
-  public void setStandardDeviation(double standardDeviation)
-  {
-    this.standardDeviation = standardDeviation;
   }
 
   public Format getFormat()
@@ -149,16 +133,46 @@ public class TeamHasFormatRecord implements Serializable
       return false;
     }
     TeamHasFormatRecord other = (TeamHasFormatRecord) object;
-    return !((this.teamHasFormatRecordPK == null 
-            && other.teamHasFormatRecordPK != null) 
-            || (this.teamHasFormatRecordPK != null 
+    return !((this.teamHasFormatRecordPK == null
+            && other.teamHasFormatRecordPK != null)
+            || (this.teamHasFormatRecordPK != null
             && !this.teamHasFormatRecordPK.equals(other.teamHasFormatRecordPK)));
   }
 
   @Override
   public String toString()
   {
-    return "com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord[ teamHasFormatRecordPK=" + teamHasFormatRecordPK + " ]";
+    return "Points: " + getPoints() + "\nMean: " + getMean() + "\nSD: " 
+            + getStandardDeviation();
   }
-  
+
+  public double getMean()
+  {
+    return mean;
+  }
+
+  public void setMean(double mean)
+  {
+    this.mean = mean;
+  }
+
+  public double getStandardDeviation()
+  {
+    return standardDeviation;
+  }
+
+  public void setStandardDeviation(double standardDeviation)
+  {
+    this.standardDeviation = standardDeviation;
+  }
+
+  public int getPoints()
+  {
+    return points;
+  }
+
+  public void setPoints(int points)
+  {
+    this.points = points;
+  }
 }

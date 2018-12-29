@@ -148,6 +148,18 @@ public class Format implements Serializable
             + formatPK + " ]";
   }
 
+
+  @XmlTransient
+  public List<TeamHasFormatRecord> getTeamHasFormatRecordList()
+  {
+    return teamHasFormatRecordList;
+  }
+
+  public void setTeamHasFormatRecordList(List<TeamHasFormatRecord> teamHasFormatRecordList)
+  {
+    this.teamHasFormatRecordList = teamHasFormatRecordList;
+  }
+
   public String getName()
   {
     return name;
@@ -166,16 +178,5 @@ public class Format implements Serializable
   public void setDescription(String description)
   {
     this.description = description;
-  }
-
-  @XmlTransient
-  public List<TeamHasFormatRecord> getTeamHasFormatRecordList()
-  {
-    return teamHasFormatRecordList;
-  }
-
-  public void setTeamHasFormatRecordList(List<TeamHasFormatRecord> teamHasFormatRecordList)
-  {
-    this.teamHasFormatRecordList = teamHasFormatRecordList;
   }
 }

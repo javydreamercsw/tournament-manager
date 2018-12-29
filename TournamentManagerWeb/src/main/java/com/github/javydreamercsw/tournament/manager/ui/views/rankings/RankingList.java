@@ -30,7 +30,7 @@ public class RankingList extends TMView
   private static final long serialVersionUID = 495427102994660040L;
   private final ComboBox<Format> format = new ComboBox<>("Format");
   private final Grid<TeamHasFormatRecord> rankings = new Grid<>();
-  private int index=0;
+  private int index = 0;
 
   public RankingList()
   {
@@ -53,22 +53,20 @@ public class RankingList extends TMView
 
     header.add(format);
 
-    rankings.addColumn(this::getRowIndex).setWidth("8em")
+    rankings.addColumn(this::getRowIndex).setWidth("2em")
             .setResizable(true);
     rankings.addColumn(this::getTeam).setHeader("Team").setWidth("8em")
             .setResizable(true);
-    rankings.addColumn(TeamHasFormatRecord::getMean).setHeader("Mean")
-            .setWidth("6em");
-    rankings.addColumn(TeamHasFormatRecord::getStandardDeviation)
-            .setHeader("Standard Deviation")
+    rankings.addColumn(TeamHasFormatRecord::getPoints).setHeader("Points")
             .setWidth("6em");
     rankings.setSelectionMode(SelectionMode.NONE);
 
     container.add(header, rankings);
     add(container);
   }
-  
-  private String getRowIndex(TeamHasFormatRecord thfr){
+
+  private String getRowIndex(TeamHasFormatRecord thfr)
+  {
     index++;
     return String.valueOf(index);
   }

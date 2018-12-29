@@ -516,6 +516,16 @@ public class MatchService extends Service<MatchEntry>
       }
     }
 
+    /**
+     * Quality of the match is used to determine how even the match up is. It'll
+     * be a number between 0% and 100%.
+     *
+     * The closest to zero the higher reward for the lower ranked for a win and
+     * the lower reward for the higher ranked for the win. This number takes
+     * into account all the skills from all the teams in the match.
+     */
+    double quality = getMatchQuality(teams);
+
     // Make the calculations
     Map<IPlayer, Rating> ratings
             = p.getCalculator().calculateNewRatings(p.getGameInfo(),
@@ -532,8 +542,12 @@ public class MatchService extends Service<MatchEntry>
       {
         Player player = temp.get();
 
-        //This assumes that the first tema is the team only contaiining the player.
+        // This assumes that the first tema is the team only contaiining the player.
         Team team = player.getTeamList().get(0);
+
+        int totalPoints = (int) getMatchPointsEarned(team, me, quality);
+
+        // Change modifier based on who beated who
         try
         {
           if (TeamService.getInstance().hasFormatRecord(team, me.getFormat()))
@@ -543,6 +557,12 @@ public class MatchService extends Service<MatchEntry>
                     = TeamService.getInstance().getFormatRecord(team, me.getFormat());
             thfr.setMean(entry.getValue().getMean());
             thfr.setStandardDeviation(entry.getValue().getStandardDeviation());
+            thfr.setPoints(thfr.getPoints() + totalPoints);
+            if (thfr.getPoints() < 0)
+            {
+              // Don't go below zero.
+              thfr.setPoints(0);
+            }
             thfrc.edit(thfr);
           }
           else
@@ -556,6 +576,8 @@ public class MatchService extends Service<MatchEntry>
                             entry.getValue().getStandardDeviation());
             thfr.setFormat(me.getFormat());
             thfr.setTeam(team);
+            //If it'll go below zero ignore it.
+            thfr.setPoints(totalPoints > 0 ? totalPoints : 0);
             thfrc.create(thfr);
             team.getTeamHasFormatRecordList().add(thfr);
           }
@@ -567,5 +589,141 @@ public class MatchService extends Service<MatchEntry>
         TeamService.getInstance().saveTeam(team);
       }
     }
+  }
+
+  /**
+   * Calculate the point modifier based on the match quality.
+   *
+   * @param quality Match quality
+   * @return modifier.
+   */
+  protected double calculateModifier(double quality)
+  {
+    double modifier;
+    if (quality >= 90)
+    {
+      modifier = 1.0;
+    }
+    else if (quality >= 80)
+    {
+      modifier = 1.1;
+    }
+    else if (quality >= 70)
+    {
+      modifier = 1.2;
+    }
+    else if (quality >= 60)
+    {
+      modifier = 1.3;
+    }
+    else if (quality >= 50)
+    {
+      modifier = 1.4;
+    }
+    else if (quality >= 40)
+    {
+      modifier = 1.5;
+    }
+    else if (quality >= 30)
+    {
+      modifier = 1.6;
+    }
+    else if (quality >= 20)
+    {
+      modifier = 1.7;
+    }
+    else if (quality >= 10)
+    {
+      modifier = 1.8;
+    }
+    else
+    {
+      modifier = 2.0;
+    }
+    return modifier;
+  }
+
+  /**
+   * Calculate match points to add/remove based on the result of the match.
+   *
+   * @param team Team to calculate points for.
+   * @param me Match to calculate points for.
+   * @param quality Match quality
+   * @return points earned/lost.
+   */
+  protected double getMatchPointsEarned(Team team, MatchEntry me, double quality)
+  {
+    double base = 10.0;
+
+    // Find result to adjust base accordingly
+    for (MatchHasTeam mht : findMatch(me.getMatchEntryPK()).getMatchHasTeamList())
+    {
+      if (Objects.equals(mht.getTeam().getId(), team.getId()))
+      {
+        switch (mht.getMatchResult().getMatchResultType().getType())
+        {
+          case "result.loss":
+          // Fall thru
+          case "result.forfeit":
+          // Fall thru
+          case "result.no_show":
+            // Points are substracted in a loss.
+            base *= -1;
+            break;
+          case "result.draw":
+            base = 0.0;
+            break;
+          default:
+            // No modification
+            break;
+        }
+        break;
+      }
+    }
+
+    return base * calculateModifier(quality);
+  }
+
+  /**
+   * Get math quality.
+   *
+   * @param me Match entry.
+   * @return Quality of the match, in percentage.
+   * @throws TournamentException if there's an error converting teams.
+   */
+  public double getMatchQuality(MatchEntry me) throws TournamentException
+  {
+    TeamInterface[] teams = new TeamInterface[me.getMatchHasTeamList().size()];
+    //Convert into the JSkill interface for calculations
+
+    int count = 0;
+    for (MatchHasTeam mht : me.getMatchHasTeamList())
+    {
+      try
+      {
+        teams[count] = TeamService.getInstance().convertToTeam(mht.getTeam(),
+                me.getFormat());
+        count++;
+      }
+      catch (Exception ex)
+      {
+        throw new TournamentException(ex);
+      }
+    }
+
+    return getMatchQuality(teams);
+  }
+
+  /**
+   * Get math quality.
+   *
+   * @param teams Teams to get quality from.
+   * @return Quality of the match, in percentage.
+   */
+  public double getMatchQuality(TeamInterface[] teams)
+  {
+    return ((TrueSkillRankingProvider) rp).getCalculator().calculateMatchQuality(
+            ((TrueSkillRankingProvider) rp).getGameInfo(),
+            de.gesundkrank.jskills.Team.concat(teams)) * 100;
   }
 }

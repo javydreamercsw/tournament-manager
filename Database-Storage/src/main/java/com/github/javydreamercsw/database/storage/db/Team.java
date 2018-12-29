@@ -142,15 +142,6 @@ public class Team implements Serializable
     return "com.github.javydreamercsw.database.storage.db.Team[ id=" + id + " ]";
   }
 
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
 
   @XmlTransient
   public List<TeamHasFormatRecord> getTeamHasFormatRecordList()
@@ -161,5 +152,15 @@ public class Team implements Serializable
   public void setTeamHasFormatRecordList(List<TeamHasFormatRecord> teamHasFormatRecordList)
   {
     this.teamHasFormatRecordList = teamHasFormatRecordList;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
   }
 }
