@@ -2,6 +2,8 @@ package com.github.javydreamercsw.tournament.manager.ui.views.rankings;
 
 import static com.github.javydreamercsw.tournament.manager.ui.views.TMView.CURRENT_GAME;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.github.javydreamercsw.database.storage.db.Format;
@@ -55,9 +57,14 @@ public class RankingList extends TMView
 
     rankings.addColumn(this::getRowIndex).setWidth("2em")
             .setResizable(true);
-    rankings.addColumn(this::getTeam).setHeader("Team").setWidth("8em")
+    rankings.addColumn(this::getTeam).setHeader("Team").setWidth("4em")
             .setResizable(true);
     rankings.addColumn(TeamHasFormatRecord::getPoints).setHeader("Points")
+            .setWidth("4em");
+    rankings.addColumn(TeamHasFormatRecord::getMean).setHeader("Mean")
+            .setWidth("6em");
+    rankings.addColumn(TeamHasFormatRecord::getStandardDeviation)
+            .setHeader("Standard Deviation")
             .setWidth("6em");
     rankings.setSelectionMode(SelectionMode.NONE);
 
@@ -84,7 +91,13 @@ public class RankingList extends TMView
     if (f != null)
     {
       // Get all the rankings for this format.
-      rankings.setItems(f.getTeamHasFormatRecordList());
+      List<TeamHasFormatRecord> items = f.getTeamHasFormatRecordList();
+      Collections.sort(items, Comparator
+              .comparingDouble((TeamHasFormatRecord thfr) -> thfr.getPoints())
+              .thenComparingDouble(thfr -> thfr.getMean())
+              .thenComparingDouble(thfr -> thfr.getStandardDeviation())
+              .reversed());
+      rankings.setItems(items);
     }
   }
 }
