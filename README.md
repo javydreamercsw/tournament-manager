@@ -21,6 +21,11 @@ Lists the players in the system as well as means to edit them and create new one
 
 Manage tournaments in different formats. Pairings and rounds are managed as well.-->
 
+**Rankings**
+![Ranking List](docs/images/Rankings_List.png)
+
+Lists the player rankings in the system per game format.
+
 **Matches**
 ![Match List](docs/images/Match_List.png)
 
