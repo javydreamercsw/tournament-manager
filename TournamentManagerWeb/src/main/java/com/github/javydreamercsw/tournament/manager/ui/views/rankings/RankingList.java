@@ -97,6 +97,7 @@ public class RankingList extends TMView
   {
     //Update rankings based on format
     Format f = format.getValue();
+    ranks.clear();
     if (f != null)
     {
       // Get all the rankings for this format.
