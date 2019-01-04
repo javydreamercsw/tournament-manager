@@ -1,7 +1,5 @@
 language: java
 
-CODECOV_TOKEN="106d1987-6ab3-4019-9c63-56f38aba2e67"
-
 jdk:
   - oraclejdk8
   - openjdk8
