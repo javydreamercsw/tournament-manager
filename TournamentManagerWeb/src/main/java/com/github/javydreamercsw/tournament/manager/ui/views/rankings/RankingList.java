@@ -2,13 +2,16 @@ package com.github.javydreamercsw.tournament.manager.ui.views.rankings;
 
 import static com.github.javydreamercsw.tournament.manager.ui.views.TMView.CURRENT_GAME;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.server.FormatService;
+import com.github.javydreamercsw.database.storage.db.server.RankingManager;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
 import com.github.javydreamercsw.tournament.manager.ui.common.FormatLabelGenerator;
 import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
@@ -32,7 +35,7 @@ public class RankingList extends TMView
   private static final long serialVersionUID = 495427102994660040L;
   private final ComboBox<Format> format = new ComboBox<>("Format");
   private final Grid<TeamHasFormatRecord> rankings = new Grid<>();
-  private int index = 0;
+  private Map<Integer, List<TeamHasFormatRecord>> ranks = new HashMap<>();
 
   public RankingList()
   {
@@ -74,8 +77,14 @@ public class RankingList extends TMView
 
   private String getRowIndex(TeamHasFormatRecord thfr)
   {
-    index++;
-    return String.valueOf(index);
+    for (Entry<Integer, List<TeamHasFormatRecord>> entry : ranks.entrySet())
+    {
+      if (entry.getValue().contains(thfr))
+      {
+        return String.valueOf(entry.getKey());
+      }
+    }
+    return "TBD";
   }
 
   private String getTeam(TeamHasFormatRecord thfr)
@@ -91,12 +100,9 @@ public class RankingList extends TMView
     if (f != null)
     {
       // Get all the rankings for this format.
-      List<TeamHasFormatRecord> items = f.getTeamHasFormatRecordList();
-      Collections.sort(items, Comparator
-              .comparingDouble((TeamHasFormatRecord thfr) -> thfr.getPoints())
-              .thenComparingDouble(thfr -> thfr.getMean())
-              .thenComparingDouble(thfr -> thfr.getStandardDeviation())
-              .reversed());
+      List<TeamHasFormatRecord> items = new ArrayList<>();
+      ranks = RankingManager.getRankings(f);
+      ranks.values().forEach(list->items.addAll(list));
       rankings.setItems(items);
     }
   }

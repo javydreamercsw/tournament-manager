@@ -220,9 +220,9 @@ public class MatchServiceTest extends AbstractServerTest
   public Object[][] getQualityToTest()
   {
     Object[][] data = new Object[10][];
-    for (int i = 10; i >0; i--)
+    for (int i = 10; i > 0; i--)
     {
-      data[10-i] = new Object[]
+      data[10 - i] = new Object[]
       {
         i * 10.0
       };
@@ -283,7 +283,7 @@ public class MatchServiceTest extends AbstractServerTest
                 if (mht.getMatchResult().getMatchResultType().getType().equals("result.win"))
                 {
                   assertEquals(TeamService.getInstance().getFormatRecord(mht.getTeam(),
-                          game.getFormatList().get(0)).getPoints() - player1Points, 
+                          game.getFormatList().get(0)).getPoints() - player1Points,
                           10.0 * MatchService.getInstance().calculateModifier(quality));
                 }
                 else
