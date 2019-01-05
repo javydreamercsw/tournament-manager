@@ -35,7 +35,7 @@ public abstract class AbstractTournament implements TournamentInterface
 {
   private int format = 1;
   /**
-   * Amount of non-wins to be  eliminated.
+   * Amount of non-wins to be eliminated.
    */
   private final int eliminations;
   /**
@@ -86,7 +86,7 @@ public abstract class AbstractTournament implements TournamentInterface
           = new ArrayList<>();
   protected final boolean pairAlikeRecords;
   private int id = -1;
-  
+
   public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
           int eliminations, boolean pairAlikeRecords)
   {
@@ -96,7 +96,7 @@ public abstract class AbstractTournament implements TournamentInterface
     this.pairAlikeRecords = pairAlikeRecords;
     this.eliminations = eliminations;
   }
-  
+
   public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
           int eliminations)
   {
@@ -299,16 +299,19 @@ public abstract class AbstractTournament implements TournamentInterface
   {
     boolean result = true;
     //Check that all encounters have a set value.
-    for (Encounter e : getPairings().values())
+    if (getPairings() != null)
     {
-      for (Map.Entry<TeamInterface, EncounterResult> entry
-              : e.getEncounterSummary().entrySet())
+      for (Encounter e : getPairings().values())
       {
-        if (entry.getValue().equals(EncounterResult.UNDECIDED))
+        for (Map.Entry<TeamInterface, EncounterResult> entry
+                : e.getEncounterSummary().entrySet())
         {
-          LOG.log(Level.FINE,
-                  "{0} is still not resolved!", e.toString());
-          result = false;
+          if (entry.getValue().equals(EncounterResult.UNDECIDED))
+          {
+            LOG.log(Level.FINE,
+                    "{0} is still not resolved!", e.toString());
+            result = false;
+          }
         }
       }
     }
@@ -378,8 +381,8 @@ public abstract class AbstractTournament implements TournamentInterface
     {
       //Loss or draw gets you eliminated
       if (team.getTeamMembers().get(0).getRecord().getLosses()
-              + team.getTeamMembers().get(0).getRecord().getDraws() >= 
-              getEliminations())
+              + team.getTeamMembers().get(0).getRecord().getDraws()
+              >= getEliminations())
       {
         toRemove.add(team);
       }
@@ -749,18 +752,21 @@ public abstract class AbstractTournament implements TournamentInterface
   public void showPairings()
   {
     Map<Integer, Encounter> pairings = getPairings();
-    pairings.entrySet().forEach((entry) ->
+    if (pairings != null)
     {
-      LOG.info(MessageFormat.format("{0} vs. {1}",
-              entry.getValue().getEncounterSummary().keySet().toArray(
-                      new TeamInterface[]
-                      {
-                      })[0].getTeamMembers().get(0).toString(),
-              entry.getValue().getEncounterSummary().keySet().toArray(
-                      new TeamInterface[]
-                      {
-                      })[1].getTeamMembers().get(0).toString()));
-    });
+      pairings.entrySet().forEach((entry) ->
+      {
+        LOG.info(MessageFormat.format("{0} vs. {1}",
+                entry.getValue().getEncounterSummary().keySet().toArray(
+                        new TeamInterface[]
+                        {
+                        })[0].getTeamMembers().get(0).toString(),
+                entry.getValue().getEncounterSummary().keySet().toArray(
+                        new TeamInterface[]
+                        {
+                        })[1].getTeamMembers().get(0).toString()));
+      });
+    }
   }
 
   @Override
