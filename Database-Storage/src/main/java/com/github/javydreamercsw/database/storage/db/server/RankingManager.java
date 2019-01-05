@@ -19,9 +19,12 @@ public class RankingManager
 
   public static Map<Integer, List<TeamHasFormatRecord>> getRankings(Format f)
   {
-    Map<Integer, List<TeamHasFormatRecord>> rankings = new HashMap<>();
-    List<TeamHasFormatRecord> items = f.getTeamHasFormatRecordList();
+    return getRankings(f.getTeamHasFormatRecordList());
+  }
 
+  protected static Map<Integer, List<TeamHasFormatRecord>> getRankings(List<TeamHasFormatRecord> items)
+  {
+    Map<Integer, List<TeamHasFormatRecord>> rankings = new HashMap<>();
     // Sort the list based on points, mean and SD (in that order)
     Collections.sort(items, COMP.reversed());
 
@@ -32,9 +35,9 @@ public class RankingManager
       if (rankings.containsKey(rank) && !rankings.get(rank).isEmpty())
       {
         // Compare to the current rank.
-        if (COMP.compare(rankings.get(rank).get(0), thfr) > 0)
+        if (compare(rankings.get(rank).get(0), thfr) > 0)
         {
-          rank++;
+          rank += rankings.get(rank).size();
         }
       }
 
@@ -47,5 +50,10 @@ public class RankingManager
       rankings.get(rank).add(thfr);
     }
     return rankings;
+  }
+
+  public static int compare(TeamHasFormatRecord t1, TeamHasFormatRecord t2)
+  {
+    return COMP.compare(t1, t2);
   }
 }
