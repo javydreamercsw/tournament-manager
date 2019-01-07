@@ -147,7 +147,7 @@ public class MatchServiceTest extends AbstractServerTest
       MatchService.getInstance().lockMatchResult(result);
 
       assertTrue(mht.getTeam().getPlayerList().size() > 0);
-      mht.getTeam().getPlayerList().forEach(p ->
+      mht.getTeam().getRecordList().forEach(record ->
       {
         switch (result.getMatchResultType().getType())
         {
@@ -157,19 +157,19 @@ public class MatchServiceTest extends AbstractServerTest
           case "result.forfeit":
           //Fall thru
           case "result.no_show":
-            assertEquals(p.getRecordList().get(0).getWins(), 0);
-            assertEquals(p.getRecordList().get(0).getLoses(), 1);
-            assertEquals(p.getRecordList().get(0).getDraws(), 0);
+            assertEquals(record.getWins(), 0);
+            assertEquals(record.getLoses(), 1);
+            assertEquals(record.getDraws(), 0);
             break;
           case "result.draw":
-            assertEquals(p.getRecordList().get(0).getWins(), 0);
-            assertEquals(p.getRecordList().get(0).getLoses(), 0);
-            assertEquals(p.getRecordList().get(0).getDraws(), 1);
+            assertEquals(record.getWins(), 0);
+            assertEquals(record.getLoses(), 0);
+            assertEquals(record.getDraws(), 1);
             break;
           case "result.win":
-            assertEquals(p.getRecordList().get(0).getWins(), 1);
-            assertEquals(p.getRecordList().get(0).getLoses(), 0);
-            assertEquals(p.getRecordList().get(0).getDraws(), 0);
+            assertEquals(record.getWins(), 1);
+            assertEquals(record.getLoses(), 0);
+            assertEquals(record.getDraws(), 0);
             break;
         }
       });
@@ -177,12 +177,12 @@ public class MatchServiceTest extends AbstractServerTest
 
     // All players must hava a non-zero record.
     assertFalse(PlayerService.getInstance().getAll().isEmpty());
-    PlayerService.getInstance().getAll().forEach(p ->
+    TeamService.getInstance().getAll().forEach(team ->
     {
-      assertTrue(p.getRecordList().size() == 1);
-      assertTrue(p.getRecordList().get(0).getDraws()
-              + p.getRecordList().get(0).getLoses()
-              + p.getRecordList().get(0).getWins() > 0);
+      assertTrue(team.getRecordList().size() == 1);
+      assertTrue(team.getRecordList().get(0).getDraws()
+              + team.getRecordList().get(0).getLoses()
+              + team.getRecordList().get(0).getWins() > 0);
     });
 
     MatchService.getInstance().saveMatch(me);
@@ -205,8 +205,7 @@ public class MatchServiceTest extends AbstractServerTest
   @Test
   public void testFindMatchesWithFormat()
   {
-    assertEquals(MatchService.getInstance().findMatchesWithFormat("").size(),
-            game.getFormatList().size());
+    assertEquals(MatchService.getInstance().findMatchesWithFormat("").size(), 1);
 
     assertEquals(MatchService.getInstance()
             .findMatchesWithFormat(game.getFormatList().get(0).getName()).size(), 1);

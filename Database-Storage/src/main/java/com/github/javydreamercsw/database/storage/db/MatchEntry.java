@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlTransient;
         })
 public class MatchEntry implements Serializable
 {
-  private static final long serialVersionUID = 3610712802330920081L;
+  private static final long serialVersionUID = -8541562626617426725L;
   @EmbeddedId
   protected MatchEntryPK matchEntryPK;
   @Basic(optional = false)

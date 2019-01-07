@@ -23,7 +23,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 public class RoundJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -6387501653143947641L;
-
+  
   public RoundJpaController(EntityManagerFactory emf)
   {
     super(emf);

@@ -11,7 +11,6 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
@@ -58,13 +57,6 @@ public class TournamentHasTeamJpaController extends AbstractController implement
         tournament = em.getReference(tournament.getClass(), tournament.getTournamentPK());
         tournamentHasTeam.setTournament(tournament);
       }
-      List<Record> attachedRecordList = new ArrayList<>();
-      for (Record recordListRecordToAttach : tournamentHasTeam.getRecordList())
-      {
-        recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getRecordPK());
-        attachedRecordList.add(recordListRecordToAttach);
-      }
-      tournamentHasTeam.setRecordList(attachedRecordList);
       em.persist(tournamentHasTeam);
       if (team != null)
       {
@@ -75,11 +67,6 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       {
         tournament.getTournamentHasTeamList().add(tournamentHasTeam);
         tournament = em.merge(tournament);
-      }
-      for (Record recordListRecord : tournamentHasTeam.getRecordList())
-      {
-        recordListRecord.getTournamentHasTeamList().add(tournamentHasTeam);
-        recordListRecord = em.merge(recordListRecord);
       }
       em.getTransaction().commit();
     }
@@ -114,8 +101,6 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       Team teamNew = tournamentHasTeam.getTeam();
       Tournament tournamentOld = persistentTournamentHasTeam.getTournament();
       Tournament tournamentNew = tournamentHasTeam.getTournament();
-      List<Record> recordListOld = persistentTournamentHasTeam.getRecordList();
-      List<Record> recordListNew = tournamentHasTeam.getRecordList();
       if (teamNew != null)
       {
         teamNew = em.getReference(teamNew.getClass(), teamNew.getId());
@@ -126,14 +111,6 @@ public class TournamentHasTeamJpaController extends AbstractController implement
         tournamentNew = em.getReference(tournamentNew.getClass(), tournamentNew.getTournamentPK());
         tournamentHasTeam.setTournament(tournamentNew);
       }
-      List<Record> attachedRecordListNew = new ArrayList<>();
-      for (Record recordListNewRecordToAttach : recordListNew)
-      {
-        recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getRecordPK());
-        attachedRecordListNew.add(recordListNewRecordToAttach);
-      }
-      recordListNew = attachedRecordListNew;
-      tournamentHasTeam.setRecordList(recordListNew);
       tournamentHasTeam = em.merge(tournamentHasTeam);
       if (teamOld != null && !teamOld.equals(teamNew))
       {
@@ -154,22 +131,6 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       {
         tournamentNew.getTournamentHasTeamList().add(tournamentHasTeam);
         tournamentNew = em.merge(tournamentNew);
-      }
-      for (Record recordListOldRecord : recordListOld)
-      {
-        if (!recordListNew.contains(recordListOldRecord))
-        {
-          recordListOldRecord.getTournamentHasTeamList().remove(tournamentHasTeam);
-          recordListOldRecord = em.merge(recordListOldRecord);
-        }
-      }
-      for (Record recordListNewRecord : recordListNew)
-      {
-        if (!recordListOld.contains(recordListNewRecord))
-        {
-          recordListNewRecord.getTournamentHasTeamList().add(tournamentHasTeam);
-          recordListNewRecord = em.merge(recordListNewRecord);
-        }
       }
       em.getTransaction().commit();
     }
@@ -223,12 +184,6 @@ public class TournamentHasTeamJpaController extends AbstractController implement
       {
         tournament.getTournamentHasTeamList().remove(tournamentHasTeam);
         tournament = em.merge(tournament);
-      }
-      List<Record> recordList = tournamentHasTeam.getRecordList();
-      for (Record recordListRecord : recordList)
-      {
-        recordListRecord.getTournamentHasTeamList().remove(tournamentHasTeam);
-        recordListRecord = em.merge(recordListRecord);
       }
       em.remove(tournamentHasTeam);
       em.getTransaction().commit();

@@ -34,6 +34,19 @@ public class TestGame implements IGame
         return "Dummy Format Description";
       }
     });
+    formats.add(new GameFormat() {
+      @Override
+      public String getName()
+      {
+        return "X Format";
+      }
+
+      @Override
+      public String getDescription()
+      {
+        return "X Format Description";
+      }
+    });
     return formats;
   }
 }

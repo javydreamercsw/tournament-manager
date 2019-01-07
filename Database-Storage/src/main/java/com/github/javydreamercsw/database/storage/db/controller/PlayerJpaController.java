@@ -12,7 +12,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import com.github.javydreamercsw.database.storage.db.Player;
-import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.database.storage.db.server.AbstractController;
@@ -30,41 +29,25 @@ public class PlayerJpaController extends AbstractController implements Serializa
   {
     if (player.getTeamList() == null)
     {
-      player.setTeamList(new ArrayList<Team>());
-    }
-    if (player.getRecordList() == null)
-    {
-      player.setRecordList(new ArrayList<Record>());
+      player.setTeamList(new ArrayList<>());
     }
     EntityManager em = null;
     try
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      List<Team> attachedTeamList = new ArrayList<Team>();
+      List<Team> attachedTeamList = new ArrayList<>();
       for (Team teamListTeamToAttach : player.getTeamList())
       {
         teamListTeamToAttach = em.getReference(teamListTeamToAttach.getClass(), teamListTeamToAttach.getId());
         attachedTeamList.add(teamListTeamToAttach);
       }
       player.setTeamList(attachedTeamList);
-      List<Record> attachedRecordList = new ArrayList<Record>();
-      for (Record recordListRecordToAttach : player.getRecordList())
-      {
-        recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getRecordPK());
-        attachedRecordList.add(recordListRecordToAttach);
-      }
-      player.setRecordList(attachedRecordList);
       em.persist(player);
       for (Team teamListTeam : player.getTeamList())
       {
         teamListTeam.getPlayerList().add(player);
         teamListTeam = em.merge(teamListTeam);
-      }
-      for (Record recordListRecord : player.getRecordList())
-      {
-        recordListRecord.getPlayerList().add(player);
-        recordListRecord = em.merge(recordListRecord);
       }
       em.getTransaction().commit();
     }
@@ -87,9 +70,7 @@ public class PlayerJpaController extends AbstractController implements Serializa
       Player persistentPlayer = em.find(Player.class, player.getId());
       List<Team> teamListOld = persistentPlayer.getTeamList();
       List<Team> teamListNew = player.getTeamList();
-      List<Record> recordListOld = persistentPlayer.getRecordList();
-      List<Record> recordListNew = player.getRecordList();
-      List<Team> attachedTeamListNew = new ArrayList<Team>();
+      List<Team> attachedTeamListNew = new ArrayList<>();
       for (Team teamListNewTeamToAttach : teamListNew)
       {
         teamListNewTeamToAttach = em.getReference(teamListNewTeamToAttach.getClass(), teamListNewTeamToAttach.getId());
@@ -97,14 +78,6 @@ public class PlayerJpaController extends AbstractController implements Serializa
       }
       teamListNew = attachedTeamListNew;
       player.setTeamList(teamListNew);
-      List<Record> attachedRecordListNew = new ArrayList<Record>();
-      for (Record recordListNewRecordToAttach : recordListNew)
-      {
-        recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getRecordPK());
-        attachedRecordListNew.add(recordListNewRecordToAttach);
-      }
-      recordListNew = attachedRecordListNew;
-      player.setRecordList(recordListNew);
       player = em.merge(player);
       for (Team teamListOldTeam : teamListOld)
       {
@@ -120,22 +93,6 @@ public class PlayerJpaController extends AbstractController implements Serializa
         {
           teamListNewTeam.getPlayerList().add(player);
           teamListNewTeam = em.merge(teamListNewTeam);
-        }
-      }
-      for (Record recordListOldRecord : recordListOld)
-      {
-        if (!recordListNew.contains(recordListOldRecord))
-        {
-          recordListOldRecord.getPlayerList().remove(player);
-          recordListOldRecord = em.merge(recordListOldRecord);
-        }
-      }
-      for (Record recordListNewRecord : recordListNew)
-      {
-        if (!recordListOld.contains(recordListNewRecord))
-        {
-          recordListNewRecord.getPlayerList().add(player);
-          recordListNewRecord = em.merge(recordListNewRecord);
         }
       }
       em.getTransaction().commit();
@@ -184,12 +141,6 @@ public class PlayerJpaController extends AbstractController implements Serializa
       {
         teamListTeam.getPlayerList().remove(player);
         teamListTeam = em.merge(teamListTeam);
-      }
-      List<Record> recordList = player.getRecordList();
-      for (Record recordListRecord : recordList)
-      {
-        recordListRecord.getPlayerList().remove(player);
-        recordListRecord = em.merge(recordListRecord);
       }
       em.remove(player);
       em.getTransaction().commit();

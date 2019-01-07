@@ -7,10 +7,8 @@ import java.util.Optional;
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.Player;
-import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.controller.PlayerJpaController;
-import com.github.javydreamercsw.database.storage.db.controller.RecordJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.tournament.manager.UIPlayer;
 
@@ -151,16 +149,10 @@ public class PlayerService extends Service<Player>
   {
     try
     {
-      RecordJpaController rc
-              = new RecordJpaController(DataBaseManager.getEntityManagerFactory());
       player.getTeamList().forEach((team) ->
       {
         TeamService.getInstance().deleteTeam(team);
       });
-      for (Record r : player.getRecordList())
-      {
-        rc.destroy(r.getRecordPK());
-      }
       pc.destroy(player.getId());
     }
     catch (NonexistentEntityException ex)

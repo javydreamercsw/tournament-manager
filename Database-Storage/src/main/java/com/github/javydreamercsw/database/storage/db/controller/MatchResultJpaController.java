@@ -22,7 +22,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 public class MatchResultJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -4857066805022202452L;
-
+  
   public MatchResultJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -277,5 +277,5 @@ public class MatchResultJpaController extends AbstractController implements Seri
       em.close();
     }
   }
-
+  
 }

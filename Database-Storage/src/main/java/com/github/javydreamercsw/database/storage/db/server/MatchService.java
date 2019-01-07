@@ -195,35 +195,12 @@ public class MatchService extends Service<MatchEntry>
 
     match.getMatchHasTeamList().add(mht);
 
-    // Make sure each team member has a record for this game. Add one otherwise.
-    team.getPlayerList().forEach(player ->
-    {
-      boolean found = false;
-      for (Record r : player.getRecordList())
-      {
-        if (Objects.equals(r.getGame().getId(),
-                match.getFormat().getGame().getId()))
-        {
-          found = true;
-          break;
-        }
-      }
-      if (!found)
-      {
-        try
-        {
-          Record record = new Record();
-          record.getPlayerList().add(player);
-          record.setGame(match.getFormat().getGame());
-          RecordService.getInstance().saveRecord(record);
-          player.getRecordList().add(record);
-        }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
-      }
-    });
+    // Add record for this match.
+    Record record = new Record();
+    record.getTeamList().add(team);
+    record.setGame(match.getFormat().getGame());
+    RecordService.getInstance().saveRecord(record);
+    team.getRecordList().add(record);
     return true;
   }
 
@@ -356,35 +333,32 @@ public class MatchService extends Service<MatchEntry>
     // Update the record
     mr.getMatchHasTeamList().forEach(mht ->
     {
-      mht.getTeam().getPlayerList().forEach(player ->
+      Record record = mht.getTeam().getRecordList().get(0);
+      switch (mr.getMatchResultType().getType())
       {
-        Record record = player.getRecordList().get(0);
-        switch (mr.getMatchResultType().getType())
-        {
-          case "result.loss":
-          //Fall thru
-          case "result.forfeit":
-          //Fall thru
-          case "result.no_show":
-            record.setLoses(record.getLoses() + 1);
-            break;
-          case "result.draw":
-            record.setDraws(record.getDraws() + 1);
-            break;
-          //Various reasons leading to a win.
-          case "result.win":
-            record.setWins(record.getWins() + 1);
-            break;
-        }
-        try
-        {
-          RecordService.getInstance().saveRecord(record);
-        }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
-      });
+        case "result.loss":
+        //Fall thru
+        case "result.forfeit":
+        //Fall thru
+        case "result.no_show":
+          record.setLoses(record.getLoses() + 1);
+          break;
+        case "result.draw":
+          record.setDraws(record.getDraws() + 1);
+          break;
+        //Various reasons leading to a win.
+        case "result.win":
+          record.setWins(record.getWins() + 1);
+          break;
+      }
+      try
+      {
+        RecordService.getInstance().saveRecord(record);
+      }
+      catch (Exception ex)
+      {
+        Exceptions.printStackTrace(ex);
+      }
     });
     mrc.edit(mr);
   }

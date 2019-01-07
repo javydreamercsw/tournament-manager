@@ -6,8 +6,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.github.javydreamercsw.database.storage.db.Format;
+import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 
 public class RankingManager
@@ -17,9 +19,58 @@ public class RankingManager
           .thenComparingDouble(thfr -> thfr.getMean())
           .thenComparingDouble(thfr -> thfr.getStandardDeviation());
 
+  /**
+   * Get rankings for a specific game format.
+   *
+   * @param f Format to get rankings for.
+   * @return A map with the rankings.
+   */
   public static Map<Integer, List<TeamHasFormatRecord>> getRankings(Format f)
   {
     return getRankings(f.getTeamHasFormatRecordList());
+  }
+
+  /**
+   * Get rankings for a specific game.
+   *
+   * @param game Game name to get rankings for.
+   * @return A map with the rankings.
+   */
+  public static Map<Integer, List<TeamHasFormatRecord>> getRankings(String game)
+  {
+    List<TeamHasFormatRecord> items = new ArrayList<>();
+    Optional<Game> g = GameService.getInstance().findGameByName(game);
+    Map<Integer, TeamHasFormatRecord> map = new HashMap<>();
+    if (g.isPresent())
+    {
+      g.get().getFormatList().forEach(f ->
+      {
+        f.getTeamHasFormatRecordList().forEach(item ->
+        {
+          if (map.containsKey(item.getTeam().getId()))
+          {
+            TeamHasFormatRecord temp = map.get(item.getTeam().getId());
+
+            // Add points
+            temp.setPoints(temp.getPoints() + item.getPoints());
+
+            // Agregate the mean.
+            temp.setMean(temp.getMean() + item.getMean());
+
+            // Calculate new SD
+            temp.setStandardDeviation(Math.sqrt(
+                    Math.pow(temp.getStandardDeviation(), 2)
+                    + Math.pow(item.getStandardDeviation(), 2)));
+          }
+          else
+          {
+            map.put(item.getTeam().getId(), item);
+          }
+        });
+      });
+    }
+    items.addAll(map.values());
+    return getRankings(items);
   }
 
   protected static Map<Integer, List<TeamHasFormatRecord>> getRankings(List<TeamHasFormatRecord> items)

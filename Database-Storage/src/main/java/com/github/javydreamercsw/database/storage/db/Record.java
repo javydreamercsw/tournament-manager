@@ -6,8 +6,10 @@ import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -25,22 +27,21 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries(
 {
   @NamedQuery(name = "Record.findAll", query = "SELECT r FROM Record r"),
-  @NamedQuery(name = "Record.findById", 
-          query = "SELECT r FROM Record r WHERE r.recordPK.id = :id"),
   @NamedQuery(name = "Record.findByWins", 
           query = "SELECT r FROM Record r WHERE r.wins = :wins"),
   @NamedQuery(name = "Record.findByLoses", 
           query = "SELECT r FROM Record r WHERE r.loses = :loses"),
   @NamedQuery(name = "Record.findByDraws", 
           query = "SELECT r FROM Record r WHERE r.draws = :draws"),
-  @NamedQuery(name = "Record.findByGameId", 
-          query = "SELECT r FROM Record r WHERE r.recordPK.gameId = :gameId")
 })
 public class Record implements Serializable
 {
-  private static final long serialVersionUID = -893880954416960217L;
-  @EmbeddedId
-  protected RecordPK recordPK;
+  private static final long serialVersionUID = -587143815558105193L;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Basic(optional = false)
+  @Column(name = "id")
+  private Integer id;
   @Basic(optional = false)
   @NotNull
   @Column(name = "wins")
@@ -53,8 +54,15 @@ public class Record implements Serializable
   @NotNull
   @Column(name = "draws")
   private int draws;
-  @ManyToMany(mappedBy = "recordList")
-  private List<Player> playerList;
+  @JoinTable(name = "team_has_record", joinColumns =
+  {
+    @JoinColumn(name = "record_id", referencedColumnName = "id")
+  }, inverseJoinColumns =
+  {
+    @JoinColumn(name = "team_id", referencedColumnName = "id")
+  })
+  @ManyToMany
+  private List<Team> teamList;
   @JoinTable(name = "tournament_has_team_has_record", joinColumns =
   {
     @JoinColumn(name = "record_id", referencedColumnName = "id"),
@@ -84,24 +92,8 @@ public class Record implements Serializable
     this.loses = loses;
     this.draws = draws;
     tournamentHasTeamList = new ArrayList<>();
-    playerList = new ArrayList<>();
+    teamList = new ArrayList<>();
   }
-
-  public Record(int gameId)
-  {
-    this.recordPK = new RecordPK(gameId);
-  }
-
-  public RecordPK getRecordPK()
-  {
-    return recordPK;
-  }
-
-  public void setRecordPK(RecordPK recordPK)
-  {
-    this.recordPK = recordPK;
-  }
-
 
   public Game getGame()
   {
@@ -113,32 +105,38 @@ public class Record implements Serializable
     this.game = game;
   }
 
-  @Override
-  public int hashCode()
+  @XmlTransient
+  public List<TournamentHasTeam> getTournamentHasTeamList()
   {
-    int hash = 0;
-    hash += (recordPK != null ? recordPK.hashCode() : 0);
-    return hash;
+    return tournamentHasTeamList;
   }
 
-  @Override
-  public boolean equals(Object object)
+  public void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
   {
-    // TODO: Warning - this method won't work in the case the id fields are not set
-    if (!(object instanceof Record))
-    {
-      return false;
-    }
-    Record other = (Record) object;
-    return !((this.recordPK == null && other.recordPK != null) 
-            || (this.recordPK != null && !this.recordPK.equals(other.recordPK)));
+    this.tournamentHasTeamList = tournamentHasTeamList;
   }
 
-  @Override
-  public String toString()
+  public Record(Integer id)
   {
-    return "com.github.javydreamercsw.database.storage.db.Record[ recordPK=" 
-            + recordPK + " ]";
+    this.id = id;
+  }
+
+  public Record(Integer id, int wins, int loses, int draws)
+  {
+    this.id = id;
+    this.wins = wins;
+    this.loses = loses;
+    this.draws = draws;
+  }
+
+  public Integer getId()
+  {
+    return id;
+  }
+
+  public void setId(Integer id)
+  {
+    this.id = id;
   }
 
   public int getWins()
@@ -172,25 +170,40 @@ public class Record implements Serializable
   }
 
   @XmlTransient
-  public List<Player> getPlayerList()
+  public List<Team> getTeamList()
   {
-    return playerList;
+    return teamList;
   }
 
-  public void setPlayerList(List<Player> playerList)
+  public void setTeamList(List<Team> teamList)
   {
-    this.playerList = playerList;
+    this.teamList = teamList;
   }
 
-  @XmlTransient
-  public List<TournamentHasTeam> getTournamentHasTeamList()
+  @Override
+  public int hashCode()
   {
-    return tournamentHasTeamList;
+    int hash = 0;
+    hash += (id != null ? id.hashCode() : 0);
+    return hash;
   }
 
-  public void setTournamentHasTeamList(List<TournamentHasTeam> tournamentHasTeamList)
+  @Override
+  public boolean equals(Object object)
   {
-    this.tournamentHasTeamList = tournamentHasTeamList;
+    // TODO: Warning - this method won't work in the case the id fields are not set
+    if (!(object instanceof Record))
+    {
+      return false;
+    }
+    Record other = (Record) object;
+    return !((this.id == null && other.id != null) || (this.id != null 
+            && !this.id.equals(other.id)));
   }
-  
+
+  @Override
+  public String toString()
+  {
+    return "com.github.javydreamercsw.database.storage.db.Record[ id=" + id + " ]";
+  }
 }

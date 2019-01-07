@@ -20,6 +20,7 @@ import com.github.javydreamercsw.database.storage.db.AbstractServerTest;
 import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.IllegalOrphanException;
@@ -57,7 +58,69 @@ public class RankingManagerNGTest extends AbstractServerTest
    * @throws java.lang.Exception
    */
   @Test
-  public void testGetRankings() throws Exception
+  public void testGetRankingsFormat() throws Exception
+  {
+    prepareTest();
+
+    // Check the rankings
+    Map<Integer, List<TeamHasFormatRecord>> rankings
+            = RankingManager.getRankings(FormatService.getInstance()
+                    .getAll().get(0));
+    validateRankings(rankings);
+    assertEquals(rankings.size(), 4);
+  }
+
+  /**
+   * Test of getRankings method, of class RankingManager.
+   *
+   * @throws java.lang.Exception
+   */
+  @Test
+  public void testGetRankingsGame() throws Exception
+  {
+    prepareTest();
+
+    // Check game overall rankings
+    Map<Integer, List<TeamHasFormatRecord>> rankings
+            = RankingManager.getRankings(game.getName());
+    validateRankings(rankings);
+
+    assertEquals(rankings.size(), 4);
+  }
+
+  /**
+   * Test of getRankings method, of class RankingManager. Some edge cases.
+   *
+   * @throws java.lang.Exception
+   */
+  @Test
+  public void testGetRankingsEdges() throws Exception
+  {
+    // Create ficticious rankings with equal results
+    List<TeamHasFormatRecord> items = new ArrayList<>();
+    Random random = new Random();
+    for (int i = 0; i < 10; i++)
+    {
+      TeamHasFormatRecord thfr = new TeamHasFormatRecord();
+      if (i < 2)
+      {
+        thfr.setPoints(100);
+        thfr.setMean(10.0);
+        thfr.setStandardDeviation(10.0);
+      }
+      else
+      {
+        thfr.setPoints(random.nextInt(90));
+        thfr.setMean(random.nextDouble() * 100.0);
+        thfr.setStandardDeviation(random.nextDouble() * 100.0);
+      }
+      items.add(thfr);
+    }
+
+    validateRankings(RankingManager.getRankings(items));
+  }
+
+  private void prepareTest() throws Exception
   {
     Random random = new Random();
 
@@ -72,14 +135,14 @@ public class RankingManagerNGTest extends AbstractServerTest
 
     for (int i = 0; i < 100; i++)
     {
-      TeamService.getInstance().getAll().forEach(team ->
+      for (Team team : TeamService.getInstance().getAll())
       {
         boolean create = matches.lastEntry() == null
                 || matches.lastEntry().getValue().getMatchHasTeamList().size() == 2;
         if (create)
         {
           MatchEntry me = new MatchEntry();
-          me.setFormat(game.getFormatList().get(0));
+          me.setFormat(game.getFormatList().get(i % 2));
           me.setRound(t.getRoundList().get(0));
 
           try
@@ -121,43 +184,8 @@ public class RankingManagerNGTest extends AbstractServerTest
           Exceptions.printStackTrace(ex);
           fail();
         }
-      });
-    }
-
-    // Check the rankings
-    validateRankings(RankingManager.getRankings(FormatService.getInstance().getAll().get(0)));
-  }
-
-  /**
-   * Test of getRankings method, of class RankingManager. Some edge cases.
-   *
-   * @throws java.lang.Exception
-   */
-  @Test
-  public void testGetRankingsEdges() throws Exception
-  {
-    // Create ficticious rankings with equal results
-    List<TeamHasFormatRecord> items = new ArrayList<>();
-    Random random = new Random();
-    for (int i = 0; i < 10; i++)
-    {
-      TeamHasFormatRecord thfr = new TeamHasFormatRecord();
-      if (i < 2)
-      {
-        thfr.setPoints(100);
-        thfr.setMean(10.0);
-        thfr.setStandardDeviation(10.0);
       }
-      else
-      {
-        thfr.setPoints(random.nextInt(90));
-        thfr.setMean(random.nextDouble() * 100.0);
-        thfr.setStandardDeviation(random.nextDouble() * 100.0);
-      }
-      items.add(thfr);
     }
-    
-    validateRankings(RankingManager.getRankings(items));
   }
 
   private void validateRankings(Map<Integer, List<TeamHasFormatRecord>> rankings)
@@ -174,16 +202,19 @@ public class RankingManagerNGTest extends AbstractServerTest
           assertEquals(RankingManager.compare(temp, item), 0);
         });
       }
-      if (last == null)
+      System.out.print(entry.getKey() + ": ");
+      for (TeamHasFormatRecord item : entry.getValue())
       {
-        last = entry.getValue().get(0);
-      }
-      else
-      {
-        for (TeamHasFormatRecord item : entry.getValue())
+        if (last != null)
         {
           assertTrue(RankingManager.compare(last, item) > 0);
         }
+        System.out.println(item);
+      }
+      
+      if (last == null)
+      {
+        last = entry.getValue().get(0);
       }
     }
   }

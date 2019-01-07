@@ -52,7 +52,7 @@ public class RecordService extends Service<Record>
 
   public void saveRecord(Record record) throws Exception
   {
-    if (record.getRecordPK() == null)
+    if (record.getId() == null)
     {
       rc.create(record);
     }

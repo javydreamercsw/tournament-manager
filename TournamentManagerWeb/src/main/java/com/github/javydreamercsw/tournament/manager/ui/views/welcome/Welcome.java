@@ -13,10 +13,10 @@ import com.github.javydreamercsw.database.storage.db.server.DataBaseManager;
 import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.tournament.manager.api.IGame;
 import com.github.javydreamercsw.tournament.manager.ui.MainLayout;
+import com.github.javydreamercsw.tournament.manager.ui.common.GameLabelGenerator;
 import com.github.javydreamercsw.tournament.manager.ui.views.TMView;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeListener;
-import com.vaadin.flow.component.ItemLabelGenerator;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
@@ -30,6 +30,7 @@ import com.vaadin.flow.router.Route;
 public class Welcome extends TMView
 {
   private static final long serialVersionUID = 1252548231807630022L;
+  private final ComboBox<IGame> cb = new ComboBox<>();
 
   static
   {
@@ -99,11 +100,7 @@ public class Welcome extends TMView
     addClassName("welcome-list");
     setDefaultHorizontalComponentAlignment(Alignment.STRETCH);
     TextArea mda = new TextArea("Hello world !");
-    List<IGame> games = new ArrayList<>();
-    games.addAll(Lookup.getDefault().lookupAll(IGame.class));
-    ComboBox<IGame> cb = new ComboBox<>();
     cb.setLabel("Select a Game: ");
-    cb.setDataProvider(new ListDataProvider<>(games));
     cb.setItemLabelGenerator(new GameLabelGenerator());
     cb.addValueChangeListener(new ValueChangeListener()
     {
@@ -116,12 +113,6 @@ public class Welcome extends TMView
         saveValue(CURRENT_GAME, gameAPI.getName());
       }
     });
-    cb.setEnabled(games.size() > 1);
-    if (games.size() == 1)
-    {
-      // Select the only option
-      cb.setValue(games.get(0));
-    }
 
     add(mda);
     add(cb);
@@ -130,17 +121,14 @@ public class Welcome extends TMView
   @Override
   public void updateView()
   {
-    // Nothing to do
-  }
-
-  private class GameLabelGenerator implements ItemLabelGenerator<IGame>
-  {
-    private static final long serialVersionUID = -4396467477758231860L;
-
-    @Override
-    public String apply(IGame g)
+    List<IGame> games = new ArrayList<>();
+    games.addAll(Lookup.getDefault().lookupAll(IGame.class));
+    cb.setDataProvider(new ListDataProvider<>(games));
+    cb.setEnabled(games.size() > 1);
+    if (games.size() == 1)
     {
-      return g.getName();
+      // Select the only option
+      cb.setValue(games.get(0));
     }
   }
 }

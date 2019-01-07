@@ -142,8 +142,9 @@ public class TeamHasFormatRecord implements Serializable
   @Override
   public String toString()
   {
-    return "Points: " + getPoints() + "\nMean: " + getMean() + "\nSD: " 
-            + getStandardDeviation();
+    return (getTeam() == null ? "" : "Team: " + getTeam().getName())
+            + "\nPoints: " + getPoints() + "\nMean: " + getMean()
+            + "\nSD: " + getStandardDeviation();
   }
 
   public double getMean()

@@ -22,7 +22,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 public class MatchHasTeamJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -2927053439134199404L;
-
+  
   public MatchHasTeamJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -291,5 +291,5 @@ public class MatchHasTeamJpaController extends AbstractController implements Ser
       em.close();
     }
   }
-
+  
 }

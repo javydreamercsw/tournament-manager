@@ -13,6 +13,7 @@ import javax.persistence.criteria.Root;
 
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.Player;
+import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
@@ -23,7 +24,7 @@ import com.github.javydreamercsw.database.storage.db.server.AbstractController;
 public class TeamJpaController extends AbstractController implements Serializable
 {
   private static final long serialVersionUID = -948309699404935164L;
-
+  
   public TeamJpaController(EntityManagerFactory emf)
   {
     super(emf);
@@ -46,6 +47,10 @@ public class TeamJpaController extends AbstractController implements Serializabl
     if (team.getTeamHasFormatRecordList() == null)
     {
       team.setTeamHasFormatRecordList(new ArrayList<>());
+    }
+    if (team.getRecordList() == null)
+    {
+      team.setRecordList(new ArrayList<>());
     }
     EntityManager em = null;
     try
@@ -80,6 +85,13 @@ public class TeamJpaController extends AbstractController implements Serializabl
         attachedTeamHasFormatRecordList.add(teamHasFormatRecordListTeamHasFormatRecordToAttach);
       }
       team.setTeamHasFormatRecordList(attachedTeamHasFormatRecordList);
+      List<Record> attachedRecordList = new ArrayList<>();
+      for (Record recordListRecordToAttach : team.getRecordList())
+      {
+        recordListRecordToAttach = em.getReference(recordListRecordToAttach.getClass(), recordListRecordToAttach.getId());
+        attachedRecordList.add(recordListRecordToAttach);
+      }
+      team.setRecordList(attachedRecordList);
       em.persist(team);
       for (Player playerListPlayer : team.getPlayerList())
       {
@@ -119,6 +131,11 @@ public class TeamJpaController extends AbstractController implements Serializabl
           oldTeamOfTeamHasFormatRecordListTeamHasFormatRecord = em.merge(oldTeamOfTeamHasFormatRecordListTeamHasFormatRecord);
         }
       }
+      for (Record recordListRecord : team.getRecordList())
+      {
+        recordListRecord.getTeamList().add(team);
+        recordListRecord = em.merge(recordListRecord);
+      }
       em.getTransaction().commit();
     }
     finally
@@ -146,6 +163,8 @@ public class TeamJpaController extends AbstractController implements Serializabl
       List<TournamentHasTeam> tournamentHasTeamListNew = team.getTournamentHasTeamList();
       List<TeamHasFormatRecord> teamHasFormatRecordListOld = persistentTeam.getTeamHasFormatRecordList();
       List<TeamHasFormatRecord> teamHasFormatRecordListNew = team.getTeamHasFormatRecordList();
+      List<Record> recordListOld = persistentTeam.getRecordList();
+      List<Record> recordListNew = team.getRecordList();
       List<String> illegalOrphanMessages = null;
       for (MatchHasTeam matchHasTeamListOldMatchHasTeam : matchHasTeamListOld)
       {
@@ -216,6 +235,14 @@ public class TeamJpaController extends AbstractController implements Serializabl
       }
       teamHasFormatRecordListNew = attachedTeamHasFormatRecordListNew;
       team.setTeamHasFormatRecordList(teamHasFormatRecordListNew);
+      List<Record> attachedRecordListNew = new ArrayList<>();
+      for (Record recordListNewRecordToAttach : recordListNew)
+      {
+        recordListNewRecordToAttach = em.getReference(recordListNewRecordToAttach.getClass(), recordListNewRecordToAttach.getId());
+        attachedRecordListNew.add(recordListNewRecordToAttach);
+      }
+      recordListNew = attachedRecordListNew;
+      team.setRecordList(recordListNew);
       team = em.merge(team);
       for (Player playerListOldPlayer : playerListOld)
       {
@@ -273,6 +300,22 @@ public class TeamJpaController extends AbstractController implements Serializabl
             oldTeamOfTeamHasFormatRecordListNewTeamHasFormatRecord.getTeamHasFormatRecordList().remove(teamHasFormatRecordListNewTeamHasFormatRecord);
             oldTeamOfTeamHasFormatRecordListNewTeamHasFormatRecord = em.merge(oldTeamOfTeamHasFormatRecordListNewTeamHasFormatRecord);
           }
+        }
+      }
+      for (Record recordListOldRecord : recordListOld)
+      {
+        if (!recordListNew.contains(recordListOldRecord))
+        {
+          recordListOldRecord.getTeamList().remove(team);
+          recordListOldRecord = em.merge(recordListOldRecord);
+        }
+      }
+      for (Record recordListNewRecord : recordListNew)
+      {
+        if (!recordListOld.contains(recordListNewRecord))
+        {
+          recordListNewRecord.getTeamList().add(team);
+          recordListNewRecord = em.merge(recordListNewRecord);
         }
       }
       em.getTransaction().commit();
@@ -353,6 +396,12 @@ public class TeamJpaController extends AbstractController implements Serializabl
       {
         playerListPlayer.getTeamList().remove(team);
         playerListPlayer = em.merge(playerListPlayer);
+      }
+      List<Record> recordList = team.getRecordList();
+      for (Record recordListRecord : recordList)
+      {
+        recordListRecord.getTeamList().remove(team);
+        recordListRecord = em.merge(recordListRecord);
       }
       em.remove(team);
       em.getTransaction().commit();
