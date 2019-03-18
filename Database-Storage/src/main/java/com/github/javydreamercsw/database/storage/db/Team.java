@@ -155,15 +155,6 @@ public class Team implements Serializable
     this.teamHasFormatRecordList = teamHasFormatRecordList;
   }
   
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
 
   @XmlTransient
   public List<Record> getRecordList()
@@ -174,5 +165,15 @@ public class Team implements Serializable
   public void setRecordList(List<Record> recordList)
   {
     this.recordList = recordList;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
   }
 }

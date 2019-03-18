@@ -11,7 +11,6 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import com.github.javydreamercsw.database.storage.db.Game;
 import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
@@ -42,12 +41,6 @@ public class RecordJpaController extends AbstractController implements Serializa
     {
       em = getEntityManager();
       em.getTransaction().begin();
-      Game game = record.getGame();
-      if (game != null)
-      {
-        game = em.getReference(game.getClass(), game.getId());
-        record.setGame(game);
-      }
       List<TournamentHasTeam> attachedTournamentHasTeamList = new ArrayList<>();
       for (TournamentHasTeam tournamentHasTeamListTournamentHasTeamToAttach : record.getTournamentHasTeamList())
       {

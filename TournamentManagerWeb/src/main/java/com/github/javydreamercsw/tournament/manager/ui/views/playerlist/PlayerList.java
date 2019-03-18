@@ -126,7 +126,7 @@ public class PlayerList extends TMView
   private String getWinCount(Player player)
   {
     int wins = 0;
-    for (Record r : player.getRecordList())
+    for (Record r : player.getTeamList().get(0).getRecordList())
     {
       wins += r.getWins();
     }
@@ -136,9 +136,9 @@ public class PlayerList extends TMView
   private String getLossCount(Player player)
   {
     int losses = 0;
-    for (Record r : player.getRecordList())
+    for (Record r : player.getTeamList().get(0).getRecordList())
     {
-      losses += r.getLoses();
+      losses += r.getLosses();
     }
     return Integer.toString(losses);
   }
@@ -146,9 +146,9 @@ public class PlayerList extends TMView
   private String getDrawCount(Player player)
   {
     int losses = 0;
-    for (Record r : player.getRecordList())
+    for (Record r : player.getTeamList().get(0).getRecordList())
     {
-      losses += r.getLoses();
+      losses += r.getLosses();
     }
     return Integer.toString(losses);
   }

@@ -1,13 +1,13 @@
 package com.github.javydreamercsw.tournament.manager.ui.views.matchlist;
 
-import com.github.javydreamercsw.tournament.manager.ui.common.MatchResultTypeLabelGenerator;
-
 import org.openide.util.Exceptions;
 
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.server.MatchService;
+import com.github.javydreamercsw.tournament.manager.api.TournamentException;
+import com.github.javydreamercsw.tournament.manager.ui.common.MatchResultTypeLabelGenerator;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeListener;
 import com.vaadin.flow.component.button.Button;
@@ -73,9 +73,9 @@ public class ResultForm extends FormLayout
       {
         try
         {
-          MatchService.getInstance().lockMatchResult(mht.getMatchResult());
+          MatchService.getInstance().lockMatchResult(mht.getMatchEntry());
         }
-        catch (Exception ex)
+        catch (TournamentException ex)
         {
           Exceptions.printStackTrace(ex);
         }

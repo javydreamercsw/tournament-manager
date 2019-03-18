@@ -13,6 +13,7 @@ import org.openide.util.Lookup;
 
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Game;
+import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.server.FormatService;
 import com.github.javydreamercsw.database.storage.db.server.GameService;
@@ -143,19 +144,34 @@ public class RankingList extends TMView
     }
     return "UNRANKED";
   }
-  
-  private String getWins(TeamHasFormatRecord thfr){
+
+  private String getWins(TeamHasFormatRecord thfr)
+  {
     int total = 0;
+    for (Record r : thfr.getTeam().getRecordList())
+    {
+      total += r.getWins();
+    }
     return String.valueOf(total);
   }
-  
-  private String getLosses(TeamHasFormatRecord thfr){
+
+  private String getLosses(TeamHasFormatRecord thfr)
+  {
     int total = 0;
+    for (Record r : thfr.getTeam().getRecordList())
+    {
+      total += r.getLosses();
+    }
     return String.valueOf(total);
   }
-  
-  private String getDraws(TeamHasFormatRecord thfr){
+
+  private String getDraws(TeamHasFormatRecord thfr)
+  {
     int total = 0;
+    for (Record r : thfr.getTeam().getRecordList())
+    {
+      total += r.getDraws();
+    }
     return String.valueOf(total);
   }
 

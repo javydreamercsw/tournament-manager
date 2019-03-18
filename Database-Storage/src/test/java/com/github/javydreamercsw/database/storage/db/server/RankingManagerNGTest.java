@@ -67,7 +67,7 @@ public class RankingManagerNGTest extends AbstractServerTest
             = RankingManager.getRankings(FormatService.getInstance()
                     .getAll().get(0));
     validateRankings(rankings);
-    assertEquals(rankings.size(), 4);
+    assertEquals(rankings.size(), PlayerService.getInstance().getAll().size());
   }
 
   /**
@@ -85,7 +85,7 @@ public class RankingManagerNGTest extends AbstractServerTest
             = RankingManager.getRankings(game.getName());
     validateRankings(rankings);
 
-    assertEquals(rankings.size(), 4);
+    assertEquals(rankings.size(),  PlayerService.getInstance().getAll().size());
   }
 
   /**
@@ -121,7 +121,7 @@ public class RankingManagerNGTest extends AbstractServerTest
   }
 
   private void prepareTest() throws Exception
-  {
+  { 
     Random random = new Random();
 
     // Add teams

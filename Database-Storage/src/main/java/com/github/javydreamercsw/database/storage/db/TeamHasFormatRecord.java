@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlRootElement;
         })
 public class TeamHasFormatRecord implements Serializable
 {
-  private static final long serialVersionUID = 1517758449111184848L;
+  private static final long serialVersionUID = 8671933829541518266L;
   @Basic(optional = false)
   @NotNull
   @Column(name = "mean")
@@ -48,6 +48,18 @@ public class TeamHasFormatRecord implements Serializable
   @NotNull
   @Column(name = "points")
   private int points;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "wins")
+  private int wins;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "losses")
+  private int losses;
+  @Basic(optional = false)
+  @NotNull
+  @Column(name = "draws")
+  private int draws;
   @EmbeddedId
   protected TeamHasFormatRecordPK teamHasFormatRecordPK;
   @JoinColumns(
@@ -175,5 +187,35 @@ public class TeamHasFormatRecord implements Serializable
   public void setPoints(int points)
   {
     this.points = points;
+  }
+
+  public int getWins()
+  {
+    return wins;
+  }
+
+  public void setWins(int wins)
+  {
+    this.wins = wins;
+  }
+
+  public int getLosses()
+  {
+    return losses;
+  }
+
+  public void setLosses(int losses)
+  {
+    this.losses = losses;
+  }
+
+  public int getDraws()
+  {
+    return draws;
+  }
+
+  public void setDraws(int draws)
+  {
+    this.draws = draws;
   }
 }

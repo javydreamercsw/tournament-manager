@@ -27,7 +27,6 @@ import com.github.javydreamercsw.database.storage.db.controller.exceptions.Illeg
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.tournament.manager.api.IGame;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
-import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 
 /**
  *
@@ -47,18 +46,10 @@ public class MatchServiceTest extends AbstractServerTest
     super.setup();
     game = GameService.getInstance().findGameByName(Lookup.getDefault()
             .lookup(IGame.class).getName()).get();
-    t.setTournamentFormat(TournamentService.getInstance()
-            .findFormat(Lookup.getDefault().lookup(TournamentInterface.class)
-                    .getName()));
-    t.setFormat(FormatService.getInstance().getAll().get(0));
-    TournamentService.getInstance().saveTournament(t);
-    TournamentService.getInstance().addRound(t);
-
     GameService.getInstance().saveGame(game);
 
     me = new MatchEntry();
     me.setFormat(game.getFormatList().get(0));
-    me.setRound(t.getRoundList().get(0));
 
     MatchService.getInstance().saveMatch(me);
   }
@@ -144,7 +135,7 @@ public class MatchServiceTest extends AbstractServerTest
     for (MatchHasTeam mht : match.getMatchHasTeamList())
     {
       MatchResult result = mht.getMatchResult();
-      MatchService.getInstance().lockMatchResult(result);
+      MatchService.getInstance().lockMatchResult(match, result);
 
       assertTrue(mht.getTeam().getPlayerList().size() > 0);
       mht.getTeam().getRecordList().forEach(record ->
@@ -158,17 +149,17 @@ public class MatchServiceTest extends AbstractServerTest
           //Fall thru
           case "result.no_show":
             assertEquals(record.getWins(), 0);
-            assertEquals(record.getLoses(), 1);
+            assertEquals(record.getLosses(), 1);
             assertEquals(record.getDraws(), 0);
             break;
           case "result.draw":
             assertEquals(record.getWins(), 0);
-            assertEquals(record.getLoses(), 0);
+            assertEquals(record.getLosses(), 0);
             assertEquals(record.getDraws(), 1);
             break;
           case "result.win":
             assertEquals(record.getWins(), 1);
-            assertEquals(record.getLoses(), 0);
+            assertEquals(record.getLosses(), 0);
             assertEquals(record.getDraws(), 0);
             break;
         }
@@ -179,10 +170,10 @@ public class MatchServiceTest extends AbstractServerTest
     assertFalse(PlayerService.getInstance().getAll().isEmpty());
     TeamService.getInstance().getAll().forEach(team ->
     {
-      assertTrue(team.getRecordList().size() == 1);
-      assertTrue(team.getRecordList().get(0).getDraws()
-              + team.getRecordList().get(0).getLoses()
-              + team.getRecordList().get(0).getWins() > 0);
+      assertTrue(team.getTeamHasFormatRecordList().size() == 1);
+      assertTrue(team.getTeamHasFormatRecordList().get(0).getDraws()
+              + team.getTeamHasFormatRecordList().get(0).getLosses()
+              + team.getTeamHasFormatRecordList().get(0).getWins() > 0);
     });
 
     MatchService.getInstance().saveMatch(me);

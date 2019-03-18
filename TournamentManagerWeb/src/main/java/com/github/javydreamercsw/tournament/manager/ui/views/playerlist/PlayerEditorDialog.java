@@ -59,7 +59,7 @@ public class PlayerEditorDialog extends AbstractEditorDialog<Player>
   @Override
   protected void confirmDelete()
   {
-    if (getCurrentItem().getRecordList().size() > 0
+    if (getCurrentItem().getTeamList().get(0).getRecordList().size() > 0
             || getCurrentItem().getTeamList().size() > 0)
     {
       openConfirmationDialog("Delete player",

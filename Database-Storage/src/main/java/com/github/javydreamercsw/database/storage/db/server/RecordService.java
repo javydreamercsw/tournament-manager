@@ -3,12 +3,16 @@ package com.github.javydreamercsw.database.storage.db.server;
 import java.util.List;
 
 import com.github.javydreamercsw.database.storage.db.Record;
+import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.controller.RecordJpaController;
+import com.github.javydreamercsw.database.storage.db.controller.TeamHasFormatRecordJpaController;
 
 public class RecordService extends Service<Record>
 {
   private RecordJpaController rc
           = new RecordJpaController(DataBaseManager.getEntityManagerFactory());
+  private TeamHasFormatRecordJpaController thfrc
+          = new TeamHasFormatRecordJpaController(DataBaseManager.getEntityManagerFactory());
 
   /**
    * Helper class to initialize the singleton Service in a thread-safe way and
@@ -50,6 +54,12 @@ public class RecordService extends Service<Record>
     return SingletonHolder.INSTANCE;
   }
 
+  /**
+   * Save a tournament record.
+   *
+   * @param record Record to save.
+   * @throws Exception Persisting to database.
+   */
   public void saveRecord(Record record) throws Exception
   {
     if (record.getId() == null)
@@ -61,10 +71,28 @@ public class RecordService extends Service<Record>
       rc.edit(record);
     }
   }
-  
+
   @Override
   public List<Record> getAll()
   {
     return rc.findRecordEntities();
+  }
+
+  /**
+   * Save overall record.
+   *
+   * @param teamRecord Record to save.
+   * @throws Exception Persisting to database.
+   */
+  public void saveRecord(TeamHasFormatRecord teamRecord) throws Exception
+  {
+    if (teamRecord.getTeamHasFormatRecordPK() == null)
+    {
+      thfrc.create(teamRecord);
+    }
+    else
+    {
+      thfrc.edit(teamRecord);
+    }
   }
 }

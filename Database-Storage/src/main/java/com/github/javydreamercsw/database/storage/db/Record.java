@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -30,7 +29,7 @@ import javax.xml.bind.annotation.XmlTransient;
   @NamedQuery(name = "Record.findByWins", 
           query = "SELECT r FROM Record r WHERE r.wins = :wins"),
   @NamedQuery(name = "Record.findByLoses", 
-          query = "SELECT r FROM Record r WHERE r.loses = :loses"),
+          query = "SELECT r FROM Record r WHERE r.losses = :losses"),
   @NamedQuery(name = "Record.findByDraws", 
           query = "SELECT r FROM Record r WHERE r.draws = :draws"),
 })
@@ -48,8 +47,8 @@ public class Record implements Serializable
   private int wins;
   @Basic(optional = false)
   @NotNull
-  @Column(name = "loses")
-  private int loses;
+  @Column(name = "losses")
+  private int losses;
   @Basic(optional = false)
   @NotNull
   @Column(name = "draws")
@@ -66,7 +65,6 @@ public class Record implements Serializable
   @JoinTable(name = "tournament_has_team_has_record", joinColumns =
   {
     @JoinColumn(name = "record_id", referencedColumnName = "id"),
-    @JoinColumn(name = "record_game_id", referencedColumnName = "game_id")
   }, inverseJoinColumns =
   {
     @JoinColumn(name = "tournament_has_team_tournament_id", 
@@ -76,33 +74,19 @@ public class Record implements Serializable
   })
   @ManyToMany
   private List<TournamentHasTeam> tournamentHasTeamList;
-  @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false, 
-          updatable = false)
-  @ManyToOne(optional = false)
-  private Game game;
 
   public Record()
   {
     this(0, 0, 0);
   }
 
-  public Record(int wins, int loses, int draws)
+  public Record(int wins, int losses, int draws)
   {
     this.wins = wins;
-    this.loses = loses;
+    this.losses = losses;
     this.draws = draws;
     tournamentHasTeamList = new ArrayList<>();
     teamList = new ArrayList<>();
-  }
-
-  public Game getGame()
-  {
-    return game;
-  }
-
-  public void setGame(Game game)
-  {
-    this.game = game;
   }
 
   @XmlTransient
@@ -121,11 +105,11 @@ public class Record implements Serializable
     this.id = id;
   }
 
-  public Record(Integer id, int wins, int loses, int draws)
+  public Record(Integer id, int wins, int losses, int draws)
   {
     this.id = id;
     this.wins = wins;
-    this.loses = loses;
+    this.losses = losses;
     this.draws = draws;
   }
 
@@ -149,14 +133,14 @@ public class Record implements Serializable
     this.wins = wins;
   }
 
-  public int getLoses()
+  public int getLosses()
   {
-    return loses;
+    return losses;
   }
 
-  public void setLoses(int loses)
+  public void setLosses(int losses)
   {
-    this.loses = loses;
+    this.losses = losses;
   }
 
   public int getDraws()
