@@ -27,11 +27,7 @@ public class CustomDateTimePicker extends CustomField<LocalDateTime>
   @Override
   protected LocalDateTime generateModelValue()
   {
-    final LocalDate date = datePicker.getValue();
-    final LocalTime time = timePicker.getValue();
-    return date != null && time != null
-            ? LocalDateTime.of(date, time)
-            : null;
+    return getValue();
   }
 
   @Override
@@ -44,11 +40,46 @@ public class CustomDateTimePicker extends CustomField<LocalDateTime>
     timePicker.setValue(newPresentationValue != null
             ? newPresentationValue.toLocalTime()
             : null);
-
   }
 
-  public void setMin(LocalDate minDate)
+  @Override
+  public LocalDateTime getValue()
+  {
+    final LocalDate date = datePicker.getValue();
+    final LocalTime time = timePicker.getValue();
+    return date != null && time != null
+            ? LocalDateTime.of(date, time)
+            : null;
+  }
+
+  @Override
+  public void setValue(LocalDateTime value)
+  {
+    if (value != null)
+    {
+      datePicker.setValue(value.toLocalDate());
+      timePicker.setValue(value.toLocalTime());
+    }
+    super.setValue(value);
+  }
+
+  public void setMinDate(LocalDate minDate)
   {
     datePicker.setMin(minDate);
+  }
+
+  public void setMaxDate(LocalDate maxDate)
+  {
+    datePicker.setMax(maxDate);
+  }
+  
+  public void setMinTime(String minTime)
+  {
+    timePicker.setMin(minTime);
+  }
+  
+  public void setMaxTime(String maxTime)
+  {
+    timePicker.setMax(maxTime);
   }
 }

@@ -29,6 +29,7 @@ import com.github.javydreamercsw.tournament.manager.ui.CustomDateTimePicker;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.github.javydreamercsw.tournament.manager.ui.common.TournamentFormatLabelGenerator;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.validator.StringLengthValidator;
@@ -40,9 +41,13 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
 {
   private static final long serialVersionUID = 1075907611022458493L;
   private final TextField tournamentNameField = new TextField("Name");
-  private final ComboBox<Float> winPoints = new ComboBox<>("Points per win");
-  private final ComboBox<Float> lossPoints = new ComboBox<>("Points per loss");
-  private final ComboBox<Float> drawPoints = new ComboBox<>("Points per draw");
+  private final NumberField winPoints = new NumberField("Points per win");
+  private final NumberField lossPoints = new NumberField("Points per loss");
+  private final NumberField drawPoints = new NumberField("Points per draw");
+  private final NumberField signupLength
+          = new NumberField("Signup time limit (Minutes)");
+  private final NumberField roundLength
+          = new NumberField("Round time limit (Minutes)");
   private final ComboBox<TournamentFormat> format = new ComboBox<>("Format");
   private final CustomDateTimePicker signupDate = new CustomDateTimePicker();
 
@@ -67,43 +72,38 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
 
   private void addSettings()
   {
-    List<Integer> minutes = new ArrayList<>();
-    for (int i = 0; i <= 60; i++)
-    {
-      minutes.add(i);
-    }
-
     LocalDateTime now = LocalDateTime.now();
 
-    signupDate.setMin(now.toLocalDate());
+    signupDate.setMinDate(now.toLocalDate());
     signupDate.setLabel("Signups Start Date");
     if (getCurrentItem() != null)
     {
       signupDate.setValue(getCurrentItem().getSignupDate() == null ? null
-              : getCurrentItem().getSignupDate().toLocalDate());
+              : getCurrentItem().getSignupDate());
     }
     getFormLayout().add(signupDate);
-    signupDate.addValueChangeListener(event ->
-    {
-      validate();
-    });
+    signupDate.addValueChangeListener(event -> validate());
     getBinder().forField(signupDate)
             .bind(Tournament::getSignupDate, Tournament::setSignupDate);
 
-    ComboBox<Integer> signupLength = new ComboBox<>();
-    signupLength.setLabel("Signup time limit (Minutes)");
-    signupLength.setDataProvider(new ListDataProvider<>(minutes));
+    signupLength.setMin(0);
+    signupLength.setStep(1);
+    signupLength.setHasControls(true);
+    signupLength.addValueChangeListener(event -> validate());
 
     getFormLayout().add(signupLength);
     getBinder().forField(signupLength)
+            .withConverter(new DoubletoIntegerConverter())
             .bind(Tournament::getSignupTimeLimit, Tournament::setSignupTimeLimit);
 
-    ComboBox<Integer> roundLength = new ComboBox<>();
-    roundLength.setLabel("Round time limit (Minutes)");
-    roundLength.setDataProvider(new ListDataProvider<>(minutes));
+    roundLength.setMin(0);
+    roundLength.setStep(1);
+    roundLength.setHasControls(true);
+    roundLength.addValueChangeListener(event -> validate());
 
     getFormLayout().add(roundLength);
     getBinder().forField(roundLength)
+            .withConverter(new DoubletoIntegerConverter())
             .bind(Tournament::getRoundTimeLimit, Tournament::setRoundTimeLimit);
   }
 
@@ -138,6 +138,9 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
 
   private void addNameWinPoints()
   {
+    winPoints.setMin(0);
+    winPoints.setStep(0.5);
+    winPoints.setHasControls(true);
     getFormLayout().add(winPoints);
 
     winPoints.addValueChangeListener(listener -> validate());
@@ -148,6 +151,9 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
 
   private void addNameLossPoints()
   {
+    lossPoints.setMin(0);
+    lossPoints.setStep(0.5);
+    lossPoints.setHasControls(true);
     getFormLayout().add(lossPoints);
 
     lossPoints.addValueChangeListener(listener -> validate());
@@ -158,6 +164,9 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
 
   private void addNameDrawPoints()
   {
+    drawPoints.setMin(0);
+    drawPoints.setStep(0.5);
+    drawPoints.setHasControls(true);
     getFormLayout().add(drawPoints);
 
     drawPoints.addValueChangeListener(listener -> validate());
@@ -195,34 +204,40 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
   @Override
   protected boolean isValid()
   {
-    if (tournamentNameField.getValue() == null || 
-            tournamentNameField.getValue().isBlank())
+    if (tournamentNameField.getValue() == null
+            || tournamentNameField.getValue().isBlank())
     {
-      System.out.println("Invalid name: " + tournamentNameField.getValue());
-      // No name
+      // Invalid name
       return false;
     }
     if (format.getValue() == null)
     {
-      System.out.println("Missing format");
       // No format
       return false;
     }
     if (winPoints.getValue() <= lossPoints.getValue()
             || winPoints.getValue() <= drawPoints.getValue())
     {
-      System.out.println("Invalid points");
       // Win points are less than loss and/or draw.
       return false;
     }
 
-//    if (getCurrentItem().getNoShowTimeLimit() == null
-//            || (getCurrentItem().getNoShowTimeLimit().getHour()
-//            + getCurrentItem().getNoShowTimeLimit().getMinute() == 0))
-//    {
-//      // Must be valid
-//      return false;
-//    }
+    if (signupDate.getValue() == null)
+    {
+      return false;
+    }
+
+    if (roundLength.getValue() == null)
+    {
+      // Must be valid
+      return false;
+    }
+    
+    if (signupLength.getValue() == null)
+    {
+      // Must be valid
+      return false;
+    }
     // All are zero
     return drawPoints.getValue() + lossPoints.getValue()
             + winPoints.getValue() > 0;
