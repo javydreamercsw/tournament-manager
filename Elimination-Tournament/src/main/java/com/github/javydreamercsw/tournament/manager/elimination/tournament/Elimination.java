@@ -57,8 +57,8 @@ public abstract class Elimination extends AbstractTournament
    * @param drawPoints points to be allocated for a draw
    * @param pairAlikeRecords true to pair alike records, false for random
    */
-  public Elimination(int eliminations, int winPoints, int lossPoints,
-          int drawPoints, boolean pairAlikeRecords)
+  public Elimination(int eliminations, double winPoints, double lossPoints,
+          double drawPoints, boolean pairAlikeRecords)
   {
     super(winPoints, lossPoints, drawPoints, eliminations, pairAlikeRecords);
   }
@@ -99,7 +99,7 @@ public abstract class Elimination extends AbstractTournament
           Random rnd = new Random();
           //This will hold the reminder unpaired player due to odd number of players with same record.
           TeamInterface pending = null;
-          for (Entry<Integer, List<TeamInterface>> rankings : getRankings().entrySet())
+          for (Entry<Double, List<TeamInterface>> rankings : getRankings().entrySet())
           {
             //Pair all people with same ranking together
             exclude = new Integer[]

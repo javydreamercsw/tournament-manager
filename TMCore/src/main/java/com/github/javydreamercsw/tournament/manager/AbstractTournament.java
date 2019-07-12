@@ -69,17 +69,17 @@ public abstract class AbstractTournament implements TournamentInterface
   /**
    * Amount of points for a win.
    */
-  private final int winPoints;
+  private final double winPoints;
 
   /**
    * Amount of points for a loss.
    */
-  private final int lossPoints;
+  private final double lossPoints;
 
   /**
    * Amount of points for a draw.
    */
-  private final int drawPoints;
+  private final double drawPoints;
   private long no_show_time;
   private long round_time;
   private final List<TournamentListener> listeners
@@ -87,7 +87,7 @@ public abstract class AbstractTournament implements TournamentInterface
   protected final boolean pairAlikeRecords;
   private int id = -1;
 
-  public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
+  public AbstractTournament(double winPoints, double lossPoints, double drawPoints,
           int eliminations, boolean pairAlikeRecords)
   {
     this.winPoints = winPoints;
@@ -97,7 +97,7 @@ public abstract class AbstractTournament implements TournamentInterface
     this.eliminations = eliminations;
   }
 
-  public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
+  public AbstractTournament(double winPoints, double lossPoints, double drawPoints,
           int eliminations)
   {
     this.winPoints = winPoints;
@@ -107,7 +107,7 @@ public abstract class AbstractTournament implements TournamentInterface
     this.eliminations = eliminations;
   }
 
-  public AbstractTournament(int winPoints, int lossPoints, int drawPoints,
+  public AbstractTournament(double winPoints, double lossPoints, double drawPoints,
           boolean pairAlikeRecords)
   {
     this.winPoints = winPoints;
@@ -117,7 +117,7 @@ public abstract class AbstractTournament implements TournamentInterface
     this.eliminations = 1;
   }
 
-  public AbstractTournament(int winPoints, int lossPoints, int drawPoints)
+  public AbstractTournament(double winPoints, double lossPoints, double drawPoints)
   {
     this.winPoints = winPoints;
     this.lossPoints = lossPoints;
@@ -319,13 +319,13 @@ public abstract class AbstractTournament implements TournamentInterface
   }
 
   @Override
-  public TreeMap<Integer, List<TeamInterface>> getRankings()
+  public TreeMap<Double, List<TeamInterface>> getRankings()
   {
-    TreeMap<Integer, List<TeamInterface>> rankings
-            = new TreeMap<>((Integer o1, Integer o2) -> o2.compareTo(o1));
+    TreeMap<Double, List<TeamInterface>> rankings
+            = new TreeMap<>((Double o1, Double o2) -> o2.compareTo(o1));
     getTeams().forEach((player) ->
     {
-      int points = getPoints(player);
+      double points = getPoints(player);
       if (rankings.get(points) == null)
       {
         List<TeamInterface> list = new ArrayList<>();
@@ -344,7 +344,7 @@ public abstract class AbstractTournament implements TournamentInterface
   public void displayRankings()
   {
     int i = 1;
-    for (Entry<Integer, List<TeamInterface>> entry : getRankings().entrySet())
+    for (Entry<Double, List<TeamInterface>> entry : getRankings().entrySet())
     {
       List<TeamInterface> tied = entry.getValue();
       String value;
@@ -421,7 +421,7 @@ public abstract class AbstractTournament implements TournamentInterface
           Random rnd = new Random();
           //This will hold the reminder unpaired player due to odd number of players with same record.
           TeamInterface pending = null;
-          for (Entry<Integer, List<TeamInterface>> rankings : getRankings().entrySet())
+          for (Entry<Double, List<TeamInterface>> rankings : getRankings().entrySet())
           {
             //Pair all people with same ranking together
             exclude = new Integer[]
@@ -564,25 +564,25 @@ public abstract class AbstractTournament implements TournamentInterface
   }
 
   @Override
-  public int getWinPoints()
+  public double getWinPoints()
   {
     return winPoints;
   }
 
   @Override
-  public int getLossPoints()
+  public double getLossPoints()
   {
     return lossPoints;
   }
 
   @Override
-  public int getDrawPoints()
+  public double getDrawPoints()
   {
     return drawPoints;
   }
 
   @Override
-  public int getPoints(TeamInterface team)
+  public double getPoints(TeamInterface team)
   {
     return team.getTeamMembers().get(0).getRecord().getWins() * getWinPoints()
             + team.getTeamMembers().get(0).getRecord().getDraws() * getDrawPoints();

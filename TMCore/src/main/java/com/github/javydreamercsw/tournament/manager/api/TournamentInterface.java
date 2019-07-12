@@ -131,7 +131,7 @@ public interface TournamentInterface
    *
    * @return current rankings
    */
-  public TreeMap<Integer, List<TeamInterface>> getRankings();
+  public TreeMap<Double, List<TeamInterface>> getRankings();
 
   /**
    * If no one drops, the amount of minimum rounds expected based on entries.
@@ -146,22 +146,22 @@ public interface TournamentInterface
    * @param team player to get points from.
    * @return points in the tournament
    */
-  public int getPoints(TeamInterface team);
+  public double getPoints(TeamInterface team);
 
   /**
    * @return the winPoints
    */
-  public int getWinPoints();
+  public double getWinPoints();
 
   /**
    * @return the lossPoints
    */
-  public int getLossPoints();
+  public double getLossPoints();
 
   /**
    * @return the drawPoints
    */
-  public int getDrawPoints();
+  public double getDrawPoints();
 
   /**
    * Get the winning team.
@@ -258,13 +258,13 @@ public interface TournamentInterface
    *
    * @param teams Teams to add
    * @param winPoints Points per win
-   * @param lossPoints Poinst per loss
+   * @param lossPoints Points per loss
    * @param drawPoints Points per draw
    * @return Created tournament
    * @throws TournamentSignupException if something goes wrong adding players.
    */
   public TournamentInterface createTournament(List<TeamInterface> teams,
-          int winPoints, int lossPoints, int drawPoints)
+          double winPoints, double lossPoints, double drawPoints)
           throws TournamentSignupException;
 
   /**

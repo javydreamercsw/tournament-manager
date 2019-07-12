@@ -34,7 +34,7 @@ public class EliminationTest extends AbstractTournamentTester
 
       @Override
       public TournamentInterface createTournament(List<TeamInterface> teams, 
-              int winPoints, int lossPoints, int drawPoints)
+              double winPoints, double lossPoints, double drawPoints)
       {
         return null;
       }

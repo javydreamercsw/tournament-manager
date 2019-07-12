@@ -17,8 +17,8 @@ import com.github.javydreamercsw.tournament.manager.api.EncounterResult;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
-import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 import com.github.javydreamercsw.tournament.manager.api.TournamentListener;
+import com.github.javydreamercsw.tournament.manager.signup.TournamentSignupException;
 
 /**
  *
@@ -241,7 +241,7 @@ public class AbstractTournamentTest
     }
 
     @Override
-    public TournamentInterface createTournament(List<TeamInterface> teams, int winPoints, int lossPoints, int drawPoints)
+    public TournamentInterface createTournament(List<TeamInterface> teams, double winPoints, double lossPoints, double drawPoints)
     {
       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

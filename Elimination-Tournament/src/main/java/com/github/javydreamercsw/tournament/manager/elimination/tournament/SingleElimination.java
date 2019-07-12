@@ -16,7 +16,7 @@ public class SingleElimination extends Elimination
     super(1, false);
   }
 
-  public SingleElimination(int winPoints, int lossPoints, int drawPoints, 
+  public SingleElimination(double winPoints, double lossPoints, double drawPoints, 
           boolean pairAlikeRecords)
   {
     super(1, winPoints, lossPoints, drawPoints, pairAlikeRecords);
@@ -32,7 +32,7 @@ public class SingleElimination extends Elimination
 
   @Override
   public TournamentInterface createTournament(List<TeamInterface> teams, 
-          int winPoints, int lossPoints, int drawPoints) 
+          double winPoints, double lossPoints, double drawPoints) 
           throws TournamentSignupException
   {
     SingleElimination se = new SingleElimination(winPoints, lossPoints, 

@@ -325,11 +325,11 @@ public abstract class AbstractTournamentTester
       }
       tournament.displayRankings();
       //To store the amount of points on each ranking spot.
-      List<Integer> points = new ArrayList<>();
+      List<Double> points = new ArrayList<>();
       tournament.getRankings().entrySet().stream().filter((rankings)
               -> (rankings.getValue().size() > 0)).map((rankings) ->
       {
-        int max = -1;
+        double max = -1;
         for (TeamInterface team : rankings.getValue())
         {
           //Everyone tied has same amount of points

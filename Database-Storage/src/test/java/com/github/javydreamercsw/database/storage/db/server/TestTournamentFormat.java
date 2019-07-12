@@ -19,13 +19,15 @@ public class TestTournamentFormat extends AbstractTournament
     super(3, 0, 1, true);
   }
 
-  public TestTournamentFormat(int winPoints, int lossPoints, int drawPoints, 
+  public TestTournamentFormat(double winPoints, double lossPoints, 
+          double drawPoints, 
           boolean pairAlikeRecords)
   {
     super(winPoints, lossPoints, drawPoints, pairAlikeRecords);
   }
 
-  public TestTournamentFormat(int winPoints, int lossPoints, int drawPoints)
+  public TestTournamentFormat(double winPoints, double lossPoints, 
+          double drawPoints)
   {
     super(winPoints, lossPoints, drawPoints);
   }
@@ -44,7 +46,7 @@ public class TestTournamentFormat extends AbstractTournament
 
   @Override
   public TournamentInterface createTournament(List<TeamInterface> teams, 
-          int winPoints, int lossPoints, int drawPoints) 
+          double winPoints, double lossPoints, double drawPoints) 
           throws TournamentSignupException
   {
     TestTournamentFormat dummy = new TestTournamentFormat(winPoints, lossPoints, 

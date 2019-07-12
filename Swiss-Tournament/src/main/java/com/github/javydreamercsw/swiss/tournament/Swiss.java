@@ -32,7 +32,7 @@ public class Swiss extends AbstractTournament implements TournamentInterface {
         super(3, 0, 1);
     }
 
-    public Swiss(int winPoints, int lossPoints, int drawPoints) {
+    public Swiss(double winPoints, double lossPoints, double drawPoints) {
         super(winPoints, lossPoints, drawPoints);
     }
 
@@ -44,16 +44,16 @@ public class Swiss extends AbstractTournament implements TournamentInterface {
     @Override
     public Map<Integer, Encounter> getPairings() {
         //Now make sure we don't have a winner already
-        TreeMap<Integer, List<TeamInterface>> rankings = getRankings();
+        TreeMap<Double, List<TeamInterface>> rankings = getRankings();
         if (rankings.size() >= 2 && round > 1) {
-            Integer leader = rankings.firstKey();
+            double leader = rankings.firstKey();
             List<TeamInterface> highRank = rankings.get(leader);
             displayRankings();
             if (highRank != null && highRank.size() == 1) {
                 //Only one leader, make sure has enough points
                 TeamInterface potentialWinner = highRank.get(0);
                 //Get the next ranking
-                int second = leader - 1;
+                double second = leader - 1;
                 for (; second >= 0; second--) {
                     if (rankings.get(second) != null) {
                         break;
@@ -90,7 +90,8 @@ public class Swiss extends AbstractTournament implements TournamentInterface {
 
     @Override
     public TournamentInterface createTournament(List<TeamInterface> teams, 
-            int winPoints, int lossPoints, int drawPoints) throws TournamentSignupException {
+            double winPoints, double lossPoints, double drawPoints) 
+            throws TournamentSignupException {
         Swiss swiss = new Swiss(winPoints, lossPoints,  drawPoints);
         swiss.addTeams(teams);
         return swiss;

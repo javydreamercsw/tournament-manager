@@ -125,7 +125,7 @@ public class TournamentList extends TMView
     grid.addColumn(new ComponentRenderer<>(this::createEditButton))
             .setFlexGrow(0);
     grid.addColumn(new ComponentRenderer<>(this::createControlButton))
-            .setFlexGrow(0);
+            .setFlexGrow(1);
     grid.setSelectionMode(SelectionMode.NONE);
 
     container.add(header, grid);

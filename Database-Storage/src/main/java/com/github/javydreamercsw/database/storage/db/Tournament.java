@@ -64,15 +64,15 @@ public class Tournament implements Serializable
   @Basic(optional = false)
   @NotNull
   @Column(name = "winPoints")
-  private int winPoints;
+  private double winPoints;
   @Basic(optional = false)
   @NotNull
   @Column(name = "drawPoints")
-  private int drawPoints;
+  private double drawPoints;
   @Basic(optional = false)
   @NotNull
   @Column(name = "lossPoints")
-  private int lossPoints;
+  private double lossPoints;
   @Basic(optional = false)
   @NotNull
   @Column(name = "startDate")
@@ -291,32 +291,32 @@ public class Tournament implements Serializable
     this.name = name;
   }
 
-  public int getWinPoints()
+  public double getWinPoints()
   {
     return winPoints;
   }
 
-  public void setWinPoints(int winPoints)
+  public void setWinPoints(double winPoints)
   {
     this.winPoints = winPoints;
   }
 
-  public int getDrawPoints()
+  public double getDrawPoints()
   {
     return drawPoints;
   }
 
-  public void setDrawPoints(int drawPoints)
+  public void setDrawPoints(double drawPoints)
   {
     this.drawPoints = drawPoints;
   }
 
-  public int getLossPoints()
+  public double getLossPoints()
   {
     return lossPoints;
   }
 
-  public void setLossPoints(int lossPoints)
+  public void setLossPoints(double lossPoints)
   {
     this.lossPoints = lossPoints;
   }
