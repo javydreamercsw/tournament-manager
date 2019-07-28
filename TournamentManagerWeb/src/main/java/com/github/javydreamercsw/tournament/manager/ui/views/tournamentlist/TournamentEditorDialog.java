@@ -15,6 +15,8 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist;
 
+import com.github.javydreamercsw.tournament.manager.ui.common.DoubletoIntegerConverter;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -227,13 +229,15 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
       return false;
     }
 
-    if (roundLength.getValue() == null)
+    if (roundLength.getValue() == null
+            || roundLength.getValue() <= 0)
     {
       // Must be valid
       return false;
     }
     
-    if (signupLength.getValue() == null)
+    if (signupLength.getValue() == null
+            || signupLength.getValue() <= 0)
     {
       // Must be valid
       return false;
