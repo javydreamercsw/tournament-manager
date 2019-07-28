@@ -1,4 +1,4 @@
-package com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist;
+package com.github.javydreamercsw.tournament.manager.ui.common;
 
 import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
@@ -8,7 +8,7 @@ import com.vaadin.flow.data.converter.Converter;
  *
  * @author Javier Ortiz Bultron <javierortiz@pingidentity.com>
  */
-class DoubletoIntegerConverter implements Converter<Double, Integer>
+public class DoubletoIntegerConverter implements Converter<Double, Integer>
 {
   public DoubletoIntegerConverter()
   {
