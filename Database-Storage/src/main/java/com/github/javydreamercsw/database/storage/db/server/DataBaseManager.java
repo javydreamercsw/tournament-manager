@@ -539,10 +539,13 @@ public class DataBaseManager
     // Add matches
     for (int i = 0; i < 10; i++)
     {
+      Tournament t = TournamentService.getInstance().getAll().get(i);
+      TournamentService.getInstance().addRound(t);
       MatchEntry match = new MatchEntry();
       match.setMatchDate(LocalDate.now());
       match.setFormat(FormatService.getInstance().findFormatById(formatList
               .get(r.nextInt(formatList.size())).getFormatPK()).get());
+      match.setRound(t.getRoundList().get(0));
       MatchService.getInstance().saveMatch(match);
       for (int j = 0; j < 2; j++)
       {

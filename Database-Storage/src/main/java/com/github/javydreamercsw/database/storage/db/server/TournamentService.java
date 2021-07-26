@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -163,18 +164,58 @@ public class TournamentService extends Service<Tournament>
    *
    * @param t Tournament
    * @param team Team to add
+   * @return Team in Tournament record.
    * @throws IllegalOrphanException if an orphan is left
    * @throws Exception if there's an error adding team.
    */
-  public void addTeam(Tournament t, Team team) throws IllegalOrphanException,
-          Exception
+  public TournamentHasTeam addTeam(Tournament t, Team team)
+          throws IllegalOrphanException, Exception
   {
-    TournamentHasTeam tht = new TournamentHasTeam();
-    tht.setTeam(team);
-    tht.setTournament(t);
-    thtc.create(tht);
-    t.getTournamentHasTeamList().add(tht);
-    saveTournament(t);
+    if (!hasTeam(t, team))
+    {
+      TournamentHasTeam tht = new TournamentHasTeam();
+      tht.setTeam(team);
+      tht.setTournament(t);
+      thtc.create(tht);
+      t.getTournamentHasTeamList().add(tht);
+      saveTournament(t);
+
+      return tht;
+    }
+    return null;
+  }
+
+  /**
+   * Check if tournament already has team.
+   *
+   * @param tournament Tournament to check.
+   * @param team Team to check.
+   * @return true if found, false otherwise.
+   */
+  public boolean hasTeam(Tournament tournament, Team team)
+  {
+    return findTournament(tournament.getTournamentPK())
+            .getTournamentHasTeamList().stream()
+            .anyMatch((tht) -> (Objects.equals(tht.getTeam().getId(),
+            team.getId())));
+  }
+
+  /**
+   * Get TournamentHasTeam in tournament.
+   * @param t Tournament to search.
+   * @param team Team to search.
+   * @return TournamentHasTeam or null if not found.
+   */
+  public TournamentHasTeam getTeam(Tournament t, Team team)
+  {
+    for (TournamentHasTeam tht
+            : findTournament(t.getTournamentPK()).getTournamentHasTeamList())
+    {
+      if(Objects.equals(tht.getTeam().getId(), team.getId())){
+        return tht;
+      }
+    }
+    return null;
   }
 
   /**

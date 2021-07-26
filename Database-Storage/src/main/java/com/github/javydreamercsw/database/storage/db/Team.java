@@ -37,6 +37,8 @@ public class Team implements Serializable
   @Size(max = 245)
   @Column(name = "name")
   private String name;
+  @ManyToMany(mappedBy = "teamList")
+  private List<Record> recordList;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "team")
   private List<TeamHasFormatRecord> teamHasFormatRecordList;
   private static final long serialVersionUID = 1L;
@@ -153,6 +155,18 @@ public class Team implements Serializable
     this.teamHasFormatRecordList = teamHasFormatRecordList;
   }
   
+
+  @XmlTransient
+  public List<Record> getRecordList()
+  {
+    return recordList;
+  }
+
+  public void setRecordList(List<Record> recordList)
+  {
+    this.recordList = recordList;
+  }
+
   public String getName()
   {
     return name;

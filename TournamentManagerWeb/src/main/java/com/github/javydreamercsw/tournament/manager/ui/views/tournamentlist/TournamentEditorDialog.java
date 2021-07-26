@@ -15,9 +15,9 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist;
 
-import java.time.LocalDate;
+import com.github.javydreamercsw.tournament.manager.ui.common.DoubletoIntegerConverter;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -27,15 +27,12 @@ import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.Tournament;
 import com.github.javydreamercsw.database.storage.db.TournamentFormat;
 import com.github.javydreamercsw.database.storage.db.server.TournamentService;
+import com.github.javydreamercsw.tournament.manager.ui.CustomDateTimePicker;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.github.javydreamercsw.tournament.manager.ui.common.TournamentFormatLabelGenerator;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Result;
-import com.vaadin.flow.data.binder.ValueContext;
-import com.vaadin.flow.data.converter.Converter;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
@@ -46,13 +43,15 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
 {
   private static final long serialVersionUID = 1075907611022458493L;
   private final TextField tournamentNameField = new TextField("Name");
-  private final TextField winPoints = new TextField("Points per win");
-  private final TextField lossPoints = new TextField("Points per loss");
-  private final TextField drawPoints = new TextField("Points per draw");
+  private final NumberField winPoints = new NumberField("Points per win");
+  private final NumberField lossPoints = new NumberField("Points per loss");
+  private final NumberField drawPoints = new NumberField("Points per draw");
+  private final NumberField signupLength
+          = new NumberField("Signup time limit (Minutes)");
+  private final NumberField roundLength
+          = new NumberField("Round time limit (Minutes)");
   private final ComboBox<TournamentFormat> format = new ComboBox<>("Format");
-  private final DatePicker signups = new DatePicker();
-  private final ComboBox<Integer> dateHour = new ComboBox<>();
-  private final ComboBox<Integer> dateMin = new ComboBox<>();
+  private final CustomDateTimePicker signupDate = new CustomDateTimePicker();
 
   public TournamentEditorDialog(BiConsumer<Tournament, Operation> itemSaver,
           Consumer<Tournament> itemDeleter)
@@ -75,95 +74,38 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
 
   private void addSettings()
   {
-    List<Integer> minutes = new ArrayList<>();
-    for (int i = 1; i <= 60; i++)
-    {
-      minutes.add(i);
-    }
-
     LocalDateTime now = LocalDateTime.now();
 
-    dateHour.setPlaceholder("Hour");
-    dateHour.setDataProvider(new ListDataProvider<>(minutes.subList(0, 24)));
+    signupDate.setMinDate(now.toLocalDate());
+    signupDate.setLabel("Signups Start Date");
     if (getCurrentItem() != null)
     {
-      dateHour.setValue(getCurrentItem().getSignupDate() == null ? null
-              : getCurrentItem().getSignupDate().getHour());
+      signupDate.setValue(getCurrentItem().getSignupDate() == null ? null
+              : getCurrentItem().getSignupDate());
     }
-    dateHour.addValueChangeListener(event ->
-    {
-      updateSignupDate();
-    });
-
-    dateMin.setPlaceholder("Minutes");
-    dateMin.setDataProvider(new ListDataProvider<>(minutes));
-    if (getCurrentItem() != null)
-    {
-      dateMin.setValue(getCurrentItem().getSignupDate() == null ? null
-              : getCurrentItem().getSignupDate().getMinute());
-    }
-    dateMin.addValueChangeListener(event ->
-    {
-      updateSignupDate();
-    });
-
-    signups.setMin(now.toLocalDate());
-    signups.setPlaceholder("Date signups open.");
-    if (getCurrentItem() != null)
-    {
-      signups.setValue(getCurrentItem().getSignupDate() == null ? null
-              : getCurrentItem().getSignupDate().toLocalDate());
-    }
-    getFormLayout().add(signups);
-    getFormLayout().add(dateHour);
-    getFormLayout().add(dateMin);
-    signups.addValueChangeListener(event ->
-    {
-      updateSignupDate();
-    });
-    getBinder().forField(signups)
-            .withConverter(new Converter<LocalDate, LocalDateTime>()
-            {
-              private static final long serialVersionUID = -4231752474899375998L;
-
-              @Override
-              public Result<LocalDateTime> convertToModel(LocalDate value, ValueContext context)
-              {
-                LocalTime lt
-                        = LocalTime.of(dateHour.getValue() == null ? 0
-                                : dateHour.getValue(),
-                                dateMin.getValue() == null ? 0
-                                : dateMin.getValue());
-                return Result.ok(LocalDateTime.of(value, lt));
-              }
-
-              @Override
-              public LocalDate convertToPresentation(LocalDateTime value, ValueContext context)
-              {
-                if (value != null)
-                {
-                  dateHour.setValue(value.getHour());
-                  dateMin.setValue(value.getMinute());
-                }
-                return value == null ? null : value.toLocalDate();
-              }
-            })
+    getFormLayout().add(signupDate);
+    signupDate.addValueChangeListener(event -> validate());
+    getBinder().forField(signupDate)
             .bind(Tournament::getSignupDate, Tournament::setSignupDate);
 
-    ComboBox<Integer> signupLength = new ComboBox<>();
-    signupLength.setPlaceholder("Signup time limit.");
-    signupLength.setDataProvider(new ListDataProvider<>(minutes));
+    signupLength.setMin(0);
+    signupLength.setStep(1);
+    signupLength.setHasControls(true);
+    signupLength.addValueChangeListener(event -> validate());
 
     getFormLayout().add(signupLength);
     getBinder().forField(signupLength)
+            .withConverter(new DoubletoIntegerConverter())
             .bind(Tournament::getSignupTimeLimit, Tournament::setSignupTimeLimit);
 
-    ComboBox<Integer> roundLength = new ComboBox<>();
-    roundLength.setPlaceholder("Round time limit.");
-    roundLength.setDataProvider(new ListDataProvider<>(minutes));
+    roundLength.setMin(0);
+    roundLength.setStep(1);
+    roundLength.setHasControls(true);
+    roundLength.addValueChangeListener(event -> validate());
 
     getFormLayout().add(roundLength);
     getBinder().forField(roundLength)
+            .withConverter(new DoubletoIntegerConverter())
             .bind(Tournament::getRoundTimeLimit, Tournament::setRoundTimeLimit);
   }
 
@@ -192,44 +134,46 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
                 }
               }
               return valid;
-            },
-                    "Tournament name must be unique")
+            }, "Tournament name must be unique")
             .bind(Tournament::getName, Tournament::setName);
   }
 
   private void addNameWinPoints()
   {
+    winPoints.setMin(0);
+    winPoints.setStep(0.5);
+    winPoints.setHasControls(true);
     getFormLayout().add(winPoints);
 
     winPoints.addValueChangeListener(listener -> validate());
 
     getBinder().forField(winPoints)
-            .withConverter(
-                    new StringToIntegerConverter("Must enter a number"))
             .bind(Tournament::getWinPoints, Tournament::setWinPoints);
   }
 
   private void addNameLossPoints()
   {
+    lossPoints.setMin(0);
+    lossPoints.setStep(0.5);
+    lossPoints.setHasControls(true);
     getFormLayout().add(lossPoints);
 
     lossPoints.addValueChangeListener(listener -> validate());
 
     getBinder().forField(lossPoints)
-            .withConverter(
-                    new StringToIntegerConverter("Must enter a number"))
             .bind(Tournament::getLossPoints, Tournament::setLossPoints);
   }
 
   private void addNameDrawPoints()
   {
+    drawPoints.setMin(0);
+    drawPoints.setStep(0.5);
+    drawPoints.setHasControls(true);
     getFormLayout().add(drawPoints);
 
     drawPoints.addValueChangeListener(listener -> validate());
 
     getBinder().forField(drawPoints)
-            .withConverter(
-                    new StringToIntegerConverter("Must enter a number"))
             .bind(Tournament::getDrawPoints, Tournament::setDrawPoints);
   }
 
@@ -262,42 +206,44 @@ public class TournamentEditorDialog extends AbstractEditorDialog<Tournament>
   @Override
   protected boolean isValid()
   {
-    if (getCurrentItem().getTournamentFormat() == null)
+    if (tournamentNameField.getValue() == null
+            || tournamentNameField.getValue().isBlank())
+    {
+      // Invalid name
+      return false;
+    }
+    if (format.getValue() == null)
     {
       // No format
       return false;
     }
-    if (getCurrentItem().getWinPoints() <= getCurrentItem().getLossPoints()
-            || getCurrentItem().getWinPoints() <= getCurrentItem().getDrawPoints())
+    if (winPoints.getValue() <= lossPoints.getValue()
+            || winPoints.getValue() <= drawPoints.getValue())
     {
       // Win points are less than loss and/or draw.
       return false;
     }
 
-//    if (getCurrentItem().getNoShowTimeLimit() == null
-//            || (getCurrentItem().getNoShowTimeLimit().getHour()
-//            + getCurrentItem().getNoShowTimeLimit().getMinute() == 0))
-//    {
-//      // Must be valid
-//      return false;
-//    }
-    // All are zero
-    return getCurrentItem().getDrawPoints() + getCurrentItem().getLossPoints()
-            + getCurrentItem().getWinPoints() > 0;
-  }
+    if (signupDate.getValue() == null)
+    {
+      return false;
+    }
 
-  private void updateSignupDate()
-  {
-//    if (signups.getValue() != null
-//            && dateHour.getValue() != null
-//            && dateMin.getValue() != null)
-//    {
-//      LocalDateTime ldt = LocalDateTime.of(signups.getValue().getYear(),
-//              signups.getValue().getMonthValue(),
-//              signups.getValue().getDayOfMonth(),
-//              dateHour.getValue(), dateMin.getValue());
-//      System.out.println("New Date: " + ldt);
-//      getCurrentItem().setSignupDate(ldt);
-//    }
+    if (roundLength.getValue() == null
+            || roundLength.getValue() <= 0)
+    {
+      // Must be valid
+      return false;
+    }
+    
+    if (signupLength.getValue() == null
+            || signupLength.getValue() <= 0)
+    {
+      // Must be valid
+      return false;
+    }
+    // All are zero
+    return drawPoints.getValue() + lossPoints.getValue()
+            + winPoints.getValue() > 0;
   }
 }

@@ -61,20 +61,9 @@ public class Player implements Serializable
   })
   @ManyToMany
   private List<Team> teamList;
-  @JoinTable(name = "player_has_record", joinColumns =
-  {
-    @JoinColumn(name = "player_id", referencedColumnName = "id")
-  }, inverseJoinColumns =
-  {
-    @JoinColumn(name = "record_id", referencedColumnName = "id"),
-    @JoinColumn(name = "record_game_id", referencedColumnName = "game_id")
-  })
-  @ManyToMany
-  private List<Record> recordList;
 
   public Player()
   {
-    recordList = new ArrayList<>();
     teamList = new ArrayList<>();
   }
 
@@ -113,17 +102,6 @@ public class Player implements Serializable
   public void setTeamList(List<Team> teamList)
   {
     this.teamList = teamList;
-  }
-
-  @XmlTransient
-  public List<Record> getRecordList()
-  {
-    return recordList;
-  }
-
-  public void setRecordList(List<Record> recordList)
-  {
-    this.recordList = recordList;
   }
 
   @Override

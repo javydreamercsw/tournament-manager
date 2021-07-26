@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-Update Versions</actionName>
+            <displayName>Update Versions</displayName>
+            <goals>
+                <goal>versions:use-latest-versions</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-Commit Updated Versions</actionName>
+            <displayName>Commit Updated Versions</displayName>
+            <goals>
+                <goal>versions:update-child-modules</goal>
+                <goal>versions:commit</goal>
+            </goals>
+        </action>
+</actions>

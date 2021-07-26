@@ -16,7 +16,7 @@ public class DoubleElimination extends Elimination
     super(2, false);
   }
 
-  public DoubleElimination(int winPoints, int lossPoints, int drawPoints,
+  public DoubleElimination(double winPoints, double lossPoints, double drawPoints,
           boolean pairAlikeRecords)
   {
     super(2, winPoints, lossPoints, drawPoints, pairAlikeRecords);
@@ -30,7 +30,7 @@ public class DoubleElimination extends Elimination
 
   @Override
   public TournamentInterface createTournament(List<TeamInterface> teams,
-          int winPoints, int lossPoints, int drawPoints)
+          double winPoints, double lossPoints, double drawPoints)
           throws TournamentSignupException
   {
     DoubleElimination de = new DoubleElimination(winPoints, lossPoints,

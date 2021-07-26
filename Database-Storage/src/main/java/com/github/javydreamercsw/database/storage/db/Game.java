@@ -58,8 +58,6 @@ public class Game implements Serializable
   private Integer id;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
   private List<Format> formatList;
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
-  private List<Record> recordList;
 
   public Game()
   {
@@ -117,17 +115,6 @@ public class Game implements Serializable
   public String toString()
   {
     return "com.github.javydreamercsw.database.storage.db.Game[ id=" + id + " ]";
-  }
-
-  @XmlTransient
-  public List<Record> getRecordList()
-  {
-    return recordList;
-  }
-
-  public void setRecordList(List<Record> recordList)
-  {
-    this.recordList = recordList;
   }
 
   public String getName()

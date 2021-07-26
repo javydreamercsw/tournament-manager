@@ -19,9 +19,11 @@ import com.github.javydreamercsw.database.storage.db.MatchResult;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Record;
+import com.github.javydreamercsw.database.storage.db.Round;
 import com.github.javydreamercsw.database.storage.db.Team;
 import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecord;
 import com.github.javydreamercsw.database.storage.db.TeamHasFormatRecordPK;
+import com.github.javydreamercsw.database.storage.db.TournamentHasTeam;
 import com.github.javydreamercsw.database.storage.db.controller.MatchEntryJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.MatchHasTeamJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.MatchResultJpaController;
@@ -168,12 +170,13 @@ public class MatchService extends Service<MatchEntry>
    * @return true if added. False if team already in the match or was unable to
    * be added.
    * @throws Exception persisting to data base.
+   * @throws TournamentException if this match is part of a tournament.
    */
-  public boolean addTeam(MatchEntry match, Team team) throws Exception
+  public boolean addTeam(MatchEntry match, Team team)
+          throws TournamentException, Exception
   {
     // Check the team is not in this match already
-    if (!match.getMatchHasTeamList().stream().noneMatch((mht)
-            -> (Objects.equals(mht.getTeam().getId(), team.getId()))))
+    if (hasTeam(match, team))
     {
       return false;
     }
@@ -195,35 +198,27 @@ public class MatchService extends Service<MatchEntry>
 
     match.getMatchHasTeamList().add(mht);
 
-    // Make sure each team member has a record for this game. Add one otherwise.
-    team.getPlayerList().forEach(player ->
+    if (match.getRound() != null)
     {
-      boolean found = false;
-      for (Record r : player.getRecordList())
+      // Add record for this match.
+      Record record = new Record();
+      record.getTeamList().add(team);
+      TournamentHasTeam tht;
+      if (TournamentService.getInstance()
+              .hasTeam(match.getRound().getTournament(), team))
       {
-        if (Objects.equals(r.getGame().getId(),
-                match.getFormat().getGame().getId()))
-        {
-          found = true;
-          break;
-        }
+        tht = TournamentService.getInstance()
+                .getTeam(match.getRound().getTournament(), team);
       }
-      if (!found)
+      else
       {
-        try
-        {
-          Record record = new Record();
-          record.getPlayerList().add(player);
-          record.setGame(match.getFormat().getGame());
-          RecordService.getInstance().saveRecord(record);
-          player.getRecordList().add(record);
-        }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
+        tht = TournamentService.getInstance()
+                .addTeam(match.getRound().getTournament(), team);
       }
-    });
+      record.getTournamentHasTeamList().add(tht);
+      RecordService.getInstance().saveRecord(record);
+      team.getRecordList().add(record);
+    }
     return true;
   }
 
@@ -328,7 +323,7 @@ public class MatchService extends Service<MatchEntry>
       {
         try
         {
-          lockMatchResult(mht.getMatchResult());
+          lockMatchResult(me, mht.getMatchResult());
         }
         catch (Exception ex)
         {
@@ -346,47 +341,116 @@ public class MatchService extends Service<MatchEntry>
    * Lock the match result.This is meant not to be undone as it calculates
    * experience and update records which is dependent on when it happens.
    *
+   * @param me Match Entry to lock results for.
    * @param mr Match Result to lock.
    * @throws java.lang.Exception
    */
-  public void lockMatchResult(MatchResult mr) throws Exception
+  public synchronized void lockMatchResult(MatchEntry me, MatchResult mr)
+          throws Exception
   {
-    mr.setLocked(true);
-
-    // Update the record
+    // Update the tournament record
     mr.getMatchHasTeamList().forEach(mht ->
     {
-      mht.getTeam().getPlayerList().forEach(player ->
+      // Update tournament record if applicable.
+      Record record = getRecordForTournament(me.getRound(), mht.getTeam());
+      TeamHasFormatRecord teamRecord = getTeamRecord(me, mht.getTeam());
+      switch (mr.getMatchResultType().getType())
       {
-        Record record = player.getRecordList().get(0);
-        switch (mr.getMatchResultType().getType())
-        {
-          case "result.loss":
-          //Fall thru
-          case "result.forfeit":
-          //Fall thru
-          case "result.no_show":
-            record.setLoses(record.getLoses() + 1);
-            break;
-          case "result.draw":
+        case "result.loss":
+        //Fall thru
+        case "result.forfeit":
+        //Fall thru
+        case "result.no_show":
+          if (record != null)
+          {
+            record.setLosses(record.getLosses() + 1);
+          }
+          teamRecord.setLosses(teamRecord.getLosses() + 1);
+          break;
+        case "result.draw":
+          if (record != null)
+          {
             record.setDraws(record.getDraws() + 1);
-            break;
-          //Various reasons leading to a win.
-          case "result.win":
+          }
+          teamRecord.setDraws(teamRecord.getDraws() + 1);
+          break;
+        //Various reasons leading to a win.
+        case "result.win":
+          if (record != null)
+          {
             record.setWins(record.getWins() + 1);
-            break;
-        }
-        try
+          }
+          teamRecord.setWins(teamRecord.getWins() + 1);
+          break;
+      }
+      try
+      {
+        if (record != null)
         {
           RecordService.getInstance().saveRecord(record);
         }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
-      });
+        RecordService.getInstance().saveRecord(teamRecord);
+      }
+      catch (Exception ex)
+      {
+        Exceptions.printStackTrace(ex);
+      }
     });
+    mr.setLocked(true);
     mrc.edit(mr);
+  }
+
+  /**
+   * Get the teams overall record.
+   *
+   * @param me Match entry to use.
+   * @param team Team to get record for.
+   * @return The found record or null if not found.
+   */
+  private TeamHasFormatRecord getTeamRecord(MatchEntry me, Team team)
+  {
+    for (TeamHasFormatRecord thfr : team.getTeamHasFormatRecordList())
+    {
+      if (thfr.getFormat().getFormatPK().equals(me.getFormat().getFormatPK()))
+      {
+        return thfr;
+      }
+    }
+
+    // If we got here there's none for this format. Create one.
+    TeamHasFormatRecord thfr = new TeamHasFormatRecord();
+    thfr.setTeam(team);
+    thfr.setFormat(me.getFormat());
+
+    team.getTeamHasFormatRecordList().add(thfr);
+    return thfr;
+  }
+
+  /**
+   * Get the record for the matching tournament
+   *
+   * @param round Round to use.
+   * @param team Team to get record for.
+   * @return The found record or null if not found.
+   */
+  private Record getRecordForTournament(Round round, Team team)
+  {
+    if (round != null)
+    {
+      // Part of a tournament, go ahead.
+      for (Record r : team.getRecordList())
+      {
+        for (TournamentHasTeam tht : r.getTournamentHasTeamList())
+        {
+          if (tht.getTournament().getTournamentPK()
+                  .equals(round.getTournament().getTournamentPK()))
+          {
+            return r;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -725,5 +789,18 @@ public class MatchService extends Service<MatchEntry>
     return ((TrueSkillRankingProvider) rp).getCalculator().calculateMatchQuality(
             ((TrueSkillRankingProvider) rp).getGameInfo(),
             de.gesundkrank.jskills.Team.concat(teams)) * 100;
+  }
+
+  /**
+   * Check if match already has the team;
+   *
+   * @param match Match to check
+   * @param team Team to check.
+   * @return True if found, false otherwise.
+   */
+  public boolean hasTeam(MatchEntry match, Team team)
+  {
+    return match.getMatchHasTeamList().stream().anyMatch((mht)
+            -> (Objects.equals(mht.getTeam().getId(), team.getId())));
   }
 }
