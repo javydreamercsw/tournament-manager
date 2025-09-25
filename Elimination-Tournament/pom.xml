@@ -5,11 +5,10 @@
     <parent>
         <groupId>com.github.javydreamercsw</groupId>
         <artifactId>Tournament-Manager</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <groupId>com.github.javydreamercsw</groupId>
     <artifactId>Elimination-Tournament</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${parent.version}</version>
     <name>Elimination Tournament</name>
     <url>http://maven.apache.org</url>
     <build>
