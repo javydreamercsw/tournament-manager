@@ -93,7 +93,7 @@
           <toolchains>
             <jdk>
               <version>17</version>
-              <vendor>Oracle Corporation</vendor>
+
             </jdk>
           </toolchains>
         </configuration>
