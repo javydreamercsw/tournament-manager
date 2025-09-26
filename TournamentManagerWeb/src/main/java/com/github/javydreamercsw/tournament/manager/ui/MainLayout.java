@@ -15,15 +15,6 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.openide.util.Exceptions;
-
 import com.github.javydreamercsw.tournament.manager.ui.views.formatlist.FormatList;
 import com.github.javydreamercsw.tournament.manager.ui.views.matchlist.MatchList;
 import com.github.javydreamercsw.tournament.manager.ui.views.playerlist.PlayerList;
@@ -32,7 +23,7 @@ import com.github.javydreamercsw.tournament.manager.ui.views.tournamentlist.Tour
 import com.github.javydreamercsw.tournament.manager.ui.views.welcome.Welcome;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
@@ -40,51 +31,46 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.server.InitialPageSettings;
-import com.vaadin.flow.server.PageConfigurator;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import org.openide.util.Exceptions;
 
 /**
- * The main layout contains the header with the navigation buttons, and the
- * child views below that.
+ * The main layout contains the header with the navigation buttons, and the child views below that.
  */
-@HtmlImport("frontend://styles/shared-styles.html")
+@CssImport("./styles/shared-styles.css") // Corrected annotation
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
-public class MainLayout extends Div
-        implements RouterLayout, PageConfigurator
-{
-  private static final long serialVersionUID = 1412472530637429687L;
+public class MainLayout extends Div implements RouterLayout {
+  @Serial private static final long serialVersionUID = 1412472530637429687L;
   private static boolean demo = false;
-  private static final Logger LOG
-          = Logger.getLogger(MainLayout.class.getSimpleName());
+  private static final Logger LOG = Logger.getLogger(MainLayout.class.getSimpleName());
 
-  static
-  {
-    try
-    {
+  static {
+    try {
       InitialContext context = new InitialContext();
-      demo = (Boolean) context
-              .lookup("java:comp/env/tm/demo");
-    }
-    catch (NamingException ex)
-    {
+      demo = (Boolean) context.lookup("java:comp/env/tm/demo");
+    } catch (NamingException ex) {
       Exceptions.printStackTrace(ex);
     }
   }
 
-  public MainLayout() throws NamingException
-  {
+  public MainLayout() throws NamingException {
     H2 title = new H2("Tournament Buddy");
     title.addClassName("main-layout__title");
 
-    RouterLink welcome = new RouterLink(null, Welcome.class);
+    RouterLink welcome = new RouterLink("", Welcome.class);
     welcome.add(new Icon(VaadinIcon.HOME), new Text("Welcome"));
     welcome.addClassName("main-layout__nav-item");
 
-    RouterLink players = new RouterLink(null, PlayerList.class);
+    RouterLink players = new RouterLink("", PlayerList.class);
     players.add(new Icon(VaadinIcon.USERS), new Text("Players"));
     players.addClassName("main-layout__nav-item");
-    
-    RouterLink rankings = new RouterLink(null, RankingList.class);
+
+    RouterLink rankings = new RouterLink("", RankingList.class);
     rankings.add(new Icon(VaadinIcon.TABLE), new Text("Rankings"));
     rankings.addClassName("main-layout__nav-item");
 
@@ -93,20 +79,19 @@ public class MainLayout extends Div
     components.add(players);
     components.add(rankings);
 
-    if (demo)
-    {
-      RouterLink tournaments = new RouterLink(null, TournamentList.class);
+    if (demo) {
+      RouterLink tournaments = new RouterLink("", TournamentList.class);
       tournaments.add(new Icon(VaadinIcon.TROPHY), new Text("Tournaments"));
       tournaments.addClassName("main-layout__nav-item");
       components.add(tournaments);
     }
 
-    RouterLink matches = new RouterLink(null, MatchList.class);
+    RouterLink matches = new RouterLink("", MatchList.class);
     matches.add(new Icon(VaadinIcon.LIST), new Text("Matches"));
     matches.addClassName("main-layout__nav-item");
     components.add(matches);
 
-    RouterLink formats = new RouterLink(null, FormatList.class);
+    RouterLink formats = new RouterLink("", FormatList.class);
     formats.add(new Icon(VaadinIcon.ARCHIVES), new Text("Formats"));
     formats.addClassName("main-layout__nav-item");
 
@@ -120,12 +105,5 @@ public class MainLayout extends Div
     add(header);
 
     addClassName("main-layout");
-  }
-
-  @Override
-  public void configurePage(InitialPageSettings settings)
-  {
-    settings.addMetaTag("apple-mobile-web-app-capable", "yes");
-    settings.addMetaTag("apple-mobile-web-app-status-bar-style", "black");
   }
 }

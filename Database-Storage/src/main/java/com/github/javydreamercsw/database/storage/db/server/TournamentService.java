@@ -1,14 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
-
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
 import com.github.javydreamercsw.database.storage.db.MatchResultType;
@@ -34,41 +25,38 @@ import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.api.TournamentInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentListener;
 import com.github.javydreamercsw.tournament.manager.api.TournamentPlayerInterface;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
-public class TournamentService extends Service<Tournament>
-{
-  private TournamentJpaController tc
-          = new TournamentJpaController(DataBaseManager.getEntityManagerFactory());
-  private TournamentHasTeamJpaController thtc
-          = new TournamentHasTeamJpaController(DataBaseManager.getEntityManagerFactory());
-  private RoundJpaController rc
-          = new RoundJpaController(DataBaseManager.getEntityManagerFactory());
-  private TournamentFormatJpaController tfc
-          = new TournamentFormatJpaController(DataBaseManager.getEntityManagerFactory());
+public class TournamentService extends Service<Tournament> {
+  private TournamentJpaController tc =
+      new TournamentJpaController(DataBaseManager.getEntityManagerFactory());
+  private TournamentHasTeamJpaController thtc =
+      new TournamentHasTeamJpaController(DataBaseManager.getEntityManagerFactory());
+  private RoundJpaController rc = new RoundJpaController(DataBaseManager.getEntityManagerFactory());
+  private TournamentFormatJpaController tfc =
+      new TournamentFormatJpaController(DataBaseManager.getEntityManagerFactory());
   private Map<TournamentPK, TournamentInterface> tournamentMap = new HashMap<>();
 
-  private TournamentService()
-  {
-  }
+  private TournamentService() {}
 
   /**
-   * Helper class to initialize the singleton Service in a thread-safe way and
-   * to keep the initialization ordering clear between the two services. See
-   * also: https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
+   * Helper class to initialize the singleton Service in a thread-safe way and to keep the
+   * initialization ordering clear between the two services. See also:
+   * https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
    */
-  private static class SingletonHolder
-  {
+  private static class SingletonHolder {
     static final TournamentService INSTANCE = createTournamentService();
 
-    /**
-     * This class is not meant to be instantiated.
-     */
-    private SingletonHolder()
-    {
-    }
+    /** This class is not meant to be instantiated. */
+    private SingletonHolder() {}
 
-    private static TournamentService createTournamentService()
-    {
+    private static TournamentService createTournamentService() {
       TournamentService service = new TournamentService();
 
       return service;
@@ -80,54 +68,44 @@ public class TournamentService extends Service<Tournament>
    *
    * @return the unique instance of this Singleton
    */
-  public static TournamentService getInstance()
-  {
+  public static TournamentService getInstance() {
     return SingletonHolder.INSTANCE;
   }
 
-  public List<Tournament> findTournaments(String value)
-  {
+  public List<Tournament> findTournaments(String value) {
     List<Tournament> result = new ArrayList<>();
-    tc.findTournamentEntities().forEach(tournament ->
-    {
-      if (tournament.getName().toLowerCase().contains(value.toLowerCase()))
-      {
-        result.add(tournament);
-      }
-    });
+    tc.findTournamentEntities()
+        .forEach(
+            tournament -> {
+              if (tournament.getName().toLowerCase().contains(value.toLowerCase())) {
+                result.add(tournament);
+              }
+            });
     return result;
   }
 
-  public void saveTournament(Tournament t) throws NonexistentEntityException,
-          IllegalOrphanException, Exception
-  {
-    if (t.getTournamentPK() != null && tc.findTournament(t.getTournamentPK()) != null)
-    {
+  public void saveTournament(Tournament t)
+      throws NonexistentEntityException, IllegalOrphanException, Exception {
+    if (t.getTournamentPK() != null && tc.findTournament(t.getTournamentPK()) != null) {
       tc.edit(t);
-    }
-    else
-    {
+    } else {
       tc.create(t);
     }
   }
 
-  public void deleteTournament(Tournament t) throws IllegalOrphanException,
-          NonexistentEntityException
-  {
-    for (Round round : t.getRoundList())
-    {
+  public void deleteTournament(Tournament t)
+      throws IllegalOrphanException, NonexistentEntityException {
+    for (Round round : t.getRoundList()) {
       deleteRound(round);
     }
 
-    for (TournamentHasTeam tht : t.getTournamentHasTeamList())
-    {
+    for (TournamentHasTeam tht : t.getTournamentHasTeamList()) {
       deleteTeamFromTournament(tht);
     }
     tc.destroy(t.getTournamentPK());
   }
 
-  public Tournament findTournament(TournamentPK id)
-  {
+  public Tournament findTournament(TournamentPK id) {
     return tc.findTournament(id);
   }
 
@@ -138,8 +116,7 @@ public class TournamentService extends Service<Tournament>
    * @param teams Teams to add
    * @throws Exception if there's an error adding teams.
    */
-  public void addTeams(Tournament t, List<Team> teams) throws Exception
-  {
+  public void addTeams(Tournament t, List<Team> teams) throws Exception {
     addTeams(t, teams.toArray(new Team[0]));
   }
 
@@ -150,10 +127,8 @@ public class TournamentService extends Service<Tournament>
    * @param teams Teams to add
    * @throws Exception if there's an error adding teams.
    */
-  public void addTeams(Tournament t, Team... teams) throws Exception
-  {
-    for (Team team : teams)
-    {
+  public void addTeams(Tournament t, Team... teams) throws Exception {
+    for (Team team : teams) {
       addTeam(t, team);
     }
   }
@@ -166,9 +141,7 @@ public class TournamentService extends Service<Tournament>
    * @throws IllegalOrphanException if an orphan is left
    * @throws Exception if there's an error adding team.
    */
-  public void addTeam(Tournament t, Team team) throws IllegalOrphanException,
-          Exception
-  {
+  public void addTeam(Tournament t, Team team) throws IllegalOrphanException, Exception {
     TournamentHasTeam tht = new TournamentHasTeam();
     tht.setTeam(team);
     tht.setTournament(t);
@@ -183,8 +156,7 @@ public class TournamentService extends Service<Tournament>
    * @param t Tournament to add round to.
    * @throws Exception If something goes wrong adding it.
    */
-  public void addRound(Tournament t) throws Exception
-  {
+  public void addRound(Tournament t) throws Exception {
     addRound(t, true);
   }
 
@@ -195,15 +167,13 @@ public class TournamentService extends Service<Tournament>
    * @param save Save the tournament as part of this transaction.
    * @throws Exception If something goes wrong adding it.
    */
-  public void addRound(Tournament t, boolean save) throws Exception
-  {
+  public void addRound(Tournament t, boolean save) throws Exception {
     Round round = new Round();
     round.setTournament(t);
     round.setRoundNumber(t.getRoundList().size() + 1);
     rc.create(round);
     t.getRoundList().add(round);
-    if (save)
-    {
+    if (save) {
       saveTournament(t);
     }
   }
@@ -214,15 +184,12 @@ public class TournamentService extends Service<Tournament>
    * @param tht Team to remove.
    * @throws NonexistentEntityException if it doesn't exist.
    */
-  public void deleteTeamFromTournament(TournamentHasTeam tht)
-          throws NonexistentEntityException
-  {
+  public void deleteTeamFromTournament(TournamentHasTeam tht) throws NonexistentEntityException {
     thtc.destroy(tht.getTournamentHasTeamPK());
   }
 
   @Override
-  public List<Tournament> getAll()
-  {
+  public List<Tournament> getAll() {
     return tc.findTournamentEntities();
   }
 
@@ -233,11 +200,8 @@ public class TournamentService extends Service<Tournament>
    * @throws IllegalOrphanException
    * @throws NonexistentEntityException
    */
-  public void deleteRound(Round round) throws IllegalOrphanException,
-          NonexistentEntityException
-  {
-    for (MatchEntry me : round.getMatchEntryList())
-    {
+  public void deleteRound(Round round) throws IllegalOrphanException, NonexistentEntityException {
+    for (MatchEntry me : round.getMatchEntryList()) {
       MatchService.getInstance().deleteMatch(me);
     }
     rc.destroy(round.getRoundPK());
@@ -249,12 +213,9 @@ public class TournamentService extends Service<Tournament>
    * @param name format name
    * @return Format or null if not found.
    */
-  public TournamentFormat findFormat(String name)
-  {
-    for (TournamentFormat tf : tfc.findTournamentFormatEntities())
-    {
-      if (tf.getFormatName().equals(name))
-      {
+  public TournamentFormat findFormat(String name) {
+    for (TournamentFormat tf : tfc.findTournamentFormatEntities()) {
+      if (tf.getFormatName().equals(name)) {
         return tf;
       }
     }
@@ -267,13 +228,11 @@ public class TournamentService extends Service<Tournament>
    * @param tf Format to add
    * @throws Exception if something goes wrong creating it.
    */
-  public void addFormat(TournamentFormat tf) throws Exception
-  {
+  public void addFormat(TournamentFormat tf) throws Exception {
     tfc.create(tf);
   }
 
-  public List<TournamentFormat> getFormats()
-  {
+  public List<TournamentFormat> getFormats() {
     return tfc.findTournamentFormatEntities();
   }
 
@@ -284,59 +243,58 @@ public class TournamentService extends Service<Tournament>
    * @param listeners Tournament listeners
    * @throws TournamentException If something goes wrong.
    */
-  public void startTournament(Tournament tournament,
-          TournamentListener... listeners) throws TournamentException
-  {
-    try
-    {
+  public void startTournament(Tournament tournament, TournamentListener... listeners)
+      throws TournamentException {
+    try {
       // Check it has not been started already.
-      if (hasStarted(tournament))
-      {
+      if (hasStarted(tournament)) {
         throw new TournamentException("Tournament has already been started!");
       }
       // Check it's not over already.
-      if (isOver(tournament))
-      {
+      if (isOver(tournament)) {
         throw new TournamentException("Tournament is already over!");
       }
 
       // First get the Tournament Format
-      Class<? extends TournamentInterface> format
-              = (Class<? extends TournamentInterface>) Class.forName(tournament
-                      .getTournamentFormat().getImplementationClass());
+      Class<? extends TournamentInterface> format =
+          (Class<? extends TournamentInterface>)
+              Class.forName(tournament.getTournamentFormat().getImplementationClass());
 
-      //Convert the DB teams to the JSkill implementation
+      // Convert the DB teams to the JSkill implementation
       List<TeamInterface> teams = new ArrayList<>();
-      tournament.getTournamentHasTeamList().forEach(tht ->
-      {
-        List<TournamentPlayerInterface> players = new ArrayList<>();
-        tht.getTeam().getPlayerList().forEach(player ->
-        {
-          players.add(new UIPlayer(player.getName(), player.getId()));
-        });
-        teams.add(new com.github.javydreamercsw.tournament.manager.Team(
-                tht.getTeam().getId(),
-                tht.getTeam().getName(), players));
-      });
-      TournamentInterface tf
-              = Lookup.getDefault().lookup(format)
-                      .createTournament(teams,
-                              tournament.getWinPoints(),
-                              tournament.getLossPoints(),
-                              tournament.getDrawPoints());
+      tournament
+          .getTournamentHasTeamList()
+          .forEach(
+              tht -> {
+                List<TournamentPlayerInterface> players = new ArrayList<>();
+                tht.getTeam()
+                    .getPlayerList()
+                    .forEach(
+                        player -> {
+                          players.add(new UIPlayer(player.getName(), player.getId()));
+                        });
+                teams.add(
+                    new com.github.javydreamercsw.tournament.manager.Team(
+                        tht.getTeam().getId(), tht.getTeam().getName(), players));
+              });
+      TournamentInterface tf =
+          Lookup.getDefault()
+              .lookup(format)
+              .createTournament(
+                  teams,
+                  tournament.getWinPoints(),
+                  tournament.getLossPoints(),
+                  tournament.getDrawPoints());
       tournamentMap.put(tournament.getTournamentPK(), tf);
 
       // Add listeners
-      for (TournamentListener listner : listeners)
-      {
+      for (TournamentListener listner : listeners) {
         addTournamentListener(tournament, listner);
       }
 
       // Create first round.
       startNextRound(tournament);
-    }
-    catch (ClassNotFoundException | TournamentException ex)
-    {
+    } catch (ClassNotFoundException | TournamentException ex) {
       Exceptions.printStackTrace(ex);
       throw new TournamentException("Unable to create tournament!", ex);
     }
@@ -346,20 +304,15 @@ public class TournamentService extends Service<Tournament>
    * Start next round.
    *
    * @param tournament tournament to start the next round of.
-   * @throws TournamentException if tournament has not been started or is
-   * already over.
+   * @throws TournamentException if tournament has not been started or is already over.
    */
-  public void startNextRound(Tournament tournament) throws TournamentException
-  {
-    if (isOver(tournament))
-    {
+  public void startNextRound(Tournament tournament) throws TournamentException {
+    if (isOver(tournament)) {
       throw new TournamentException("Tournament is already over!");
     }
 
-    try
-    {
-      if (tournament.getRoundList().isEmpty())
-      {
+    try {
+      if (tournament.getRoundList().isEmpty()) {
         // Mark as started.
         tournament.setStartDate(LocalDateTime.now());
         saveTournament(tournament);
@@ -370,52 +323,39 @@ public class TournamentService extends Service<Tournament>
 
       ti.nextRound();
       Map<Integer, Encounter> pairings = ti.getPairings();
-      if (pairings != null && !pairings.isEmpty())
-      {
-        try
-        {
+      if (pairings != null && !pairings.isEmpty()) {
+        try {
           // Create a round
           TournamentService.getInstance().addRound(tournament);
 
-          Round currentRound
-                  = tournament.getRoundList().get(tournament.getRoundList().size() - 1);
+          Round currentRound = tournament.getRoundList().get(tournament.getRoundList().size() - 1);
           // Persist the round in the database.
-          for (Encounter encounter : pairings.values())
-          {
+          for (Encounter encounter : pairings.values()) {
             MatchEntry me = new MatchEntry();
             me.setRound(currentRound);
             me.setFormat(tournament.getFormat());
             MatchService.getInstance().saveMatch(me);
-            for (TeamInterface team : encounter.getEncounterSummary().keySet())
-            {
-              MatchService.getInstance().addTeam(me,
-                      TeamService.getInstance().findTeam(team.getTeamId()));
+            for (TeamInterface team : encounter.getEncounterSummary().keySet()) {
+              MatchService.getInstance()
+                  .addTeam(me, TeamService.getInstance().findTeam(team.getTeamId()));
             }
             currentRound.getMatchEntryList().add(me);
           }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
           Exceptions.printStackTrace(ex);
           throw new TournamentException("Error creating round!", ex);
         }
-        ti.getListeners().forEach(listener -> listener
-                .roundStart(tournament.getRoundList().size()));
-      }
-      else
-      {
+        ti.getListeners()
+            .forEach(listener -> listener.roundStart(tournament.getRoundList().size()));
+      } else {
         // Tournament is over!
         // Mark as ended.
         tournament.setEndDate(LocalDateTime.now());
         saveTournament(tournament);
       }
-    }
-    catch (IllegalOrphanException ex)
-    {
+    } catch (IllegalOrphanException ex) {
       Exceptions.printStackTrace(ex);
-    }
-    catch (Exception ex)
-    {
+    } catch (Exception ex) {
       Exceptions.printStackTrace(ex);
     }
   }
@@ -426,8 +366,7 @@ public class TournamentService extends Service<Tournament>
    * @param tournament Tournament to check
    * @return true if started, false otherwise.
    */
-  public boolean hasStarted(Tournament tournament)
-  {
+  public boolean hasStarted(Tournament tournament) {
     return findTournament(tournament.getTournamentPK()).getStartDate() != null;
   }
 
@@ -437,8 +376,7 @@ public class TournamentService extends Service<Tournament>
    * @param tournament Tournament to check
    * @return true if is over, false otherwise.
    */
-  public boolean isOver(Tournament tournament)
-  {
+  public boolean isOver(Tournament tournament) {
     return findTournament(tournament.getTournamentPK()).getEndDate() != null;
   }
 
@@ -448,8 +386,7 @@ public class TournamentService extends Service<Tournament>
    * @param roundPK ID.
    * @return Round with the given ID or null if not found.
    */
-  public Round getRound(RoundPK roundPK)
-  {
+  public Round getRound(RoundPK roundPK) {
     return rc.findRound(roundPK);
   }
 
@@ -460,16 +397,11 @@ public class TournamentService extends Service<Tournament>
    * @param listener Listener to add.
    * @throws TournamentException if tournament is not found.
    */
-  public void addTournamentListener(Tournament tournament,
-          TournamentListener listener) throws TournamentException
-  {
-    if (tournamentMap.containsKey(tournament.getTournamentPK()))
-    {
-      tournamentMap.get(tournament.getTournamentPK())
-              .addTournamentListener(listener);
-    }
-    else
-    {
+  public void addTournamentListener(Tournament tournament, TournamentListener listener)
+      throws TournamentException {
+    if (tournamentMap.containsKey(tournament.getTournamentPK())) {
+      tournamentMap.get(tournament.getTournamentPK()).addTournamentListener(listener);
+    } else {
       throw new TournamentException("Tournament not found!");
     }
   }
@@ -481,43 +413,30 @@ public class TournamentService extends Service<Tournament>
    * @param listener Listener to remove.
    * @throws TournamentException if tournament is not found.
    */
-  public void removeRoundListener(Tournament tournament,
-          TournamentListener listener) throws TournamentException
-  {
-    if (tournamentMap.containsKey(tournament.getTournamentPK()))
-    {
-      tournamentMap.get(tournament.getTournamentPK())
-              .removeTournamentListener(listener);
-    }
-    else
-    {
+  public void removeRoundListener(Tournament tournament, TournamentListener listener)
+      throws TournamentException {
+    if (tournamentMap.containsKey(tournament.getTournamentPK())) {
+      tournamentMap.get(tournament.getTournamentPK()).removeTournamentListener(listener);
+    } else {
       throw new TournamentException("Tournament not found!");
     }
   }
 
-  public void setResult(Tournament tournament, MatchHasTeam mht,
-          MatchResultType rt) throws Exception
-  {
+  public void setResult(Tournament tournament, MatchHasTeam mht, MatchResultType rt)
+      throws Exception {
     // Update the running tournament results.
-    final TournamentInterface ti
-            = tournamentMap.get(tournament.getTournamentPK());
+    final TournamentInterface ti = tournamentMap.get(tournament.getTournamentPK());
 
-    synchronized (ti)
-    {
+    synchronized (ti) {
       // Update database
       MatchService.getInstance().setResult(mht, rt);
-      for (Player player : mht.getTeam().getPlayerList())
-      {
+      for (Player player : mht.getTeam().getPlayerList()) {
         // Update runtime
-        for (Encounter e : ti.getRound(tournament.getRoundList().size()).values())
-        {
-          for (TeamInterface team : e.getEncounterSummary().keySet())
-          {
-            if (team.hasMember(player.getId()))
-            {
+        for (Encounter e : ti.getRound(tournament.getRoundList().size()).values()) {
+          for (TeamInterface team : e.getEncounterSummary().keySet()) {
+            if (team.hasMember(player.getId())) {
               EncounterResult result;
-              switch (rt.getType())
-              {
+              switch (rt.getType()) {
                 case "result.noshow":
                   result = EncounterResult.NO_SHOW;
                   break;
@@ -539,8 +458,7 @@ public class TournamentService extends Service<Tournament>
         }
       }
       int roundNumber = mht.getMatchEntry().getRound().getRoundNumber();
-      if (isRoundOver(tournament, roundNumber))
-      {
+      if (isRoundOver(tournament, roundNumber)) {
         ti.processRound(roundNumber);
         ti.getListeners().forEach(listener -> listener.roundOver(roundNumber));
       }
@@ -554,11 +472,12 @@ public class TournamentService extends Service<Tournament>
    * @param round Round to check
    * @return true if over, false otherwise.
    */
-  public boolean isRoundOver(Tournament t, int round)
-  {
-    return getRound(t, round).getMatchEntryList().stream().noneMatch((me)
-            -> (!me.getMatchHasTeamList().stream().noneMatch((mht)
-                    -> (mht.getMatchResult() == null))));
+  public boolean isRoundOver(Tournament t, int round) {
+    return getRound(t, round).getMatchEntryList().stream()
+        .noneMatch(
+            (me) ->
+                (!me.getMatchHasTeamList().stream()
+                    .noneMatch((mht) -> (mht.getMatchResult() == null))));
   }
 
   /**
@@ -568,20 +487,15 @@ public class TournamentService extends Service<Tournament>
    * @param round Round number to get.
    * @return The round or null if not found.
    */
-  public Round getRound(Tournament t, int round)
-  {
+  public Round getRound(Tournament t, int round) {
     List<Round> rounds = findTournament(t.getTournamentPK()).getRoundList();
-    if (rounds.size() >= round)
-    {
+    if (rounds.size() >= round) {
       return rounds.get(round - 1);
     }
     return null;
   }
 
-  public void checkStatus(Tournament t)
-  {
-
-  }
+  public void checkStatus(Tournament t) {}
 
   /**
    * Save a tournament Format.
@@ -591,14 +505,10 @@ public class TournamentService extends Service<Tournament>
    * @throws Exception If something goes wrong persisting to database.
    */
   public void saveTournamentFormat(TournamentFormat tf)
-          throws NonexistentEntityException, Exception
-  {
-    if (tf.getId() == null)
-    {
+      throws NonexistentEntityException, Exception {
+    if (tf.getId() == null) {
       tfc.create(tf);
-    }
-    else
-    {
+    } else {
       tfc.edit(tf);
     }
   }
@@ -608,8 +518,7 @@ public class TournamentService extends Service<Tournament>
    *
    * @return All formats in the database.
    */
-  public List<TournamentFormat> getAllFormats()
-  {
+  public List<TournamentFormat> getAllFormats() {
     return tfc.findTournamentFormatEntities();
   }
 }

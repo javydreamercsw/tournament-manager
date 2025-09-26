@@ -3,31 +3,23 @@ package com.github.javydreamercsw.tournament.manager;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.testng.annotations.Test;
-
 import com.github.javydreamercsw.tournament.manager.api.Encounter;
 import com.github.javydreamercsw.tournament.manager.api.EncounterResult;
 import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.testng.annotations.Test;
 
 /**
- *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class EncounterTest
-{
+public class EncounterTest {
 
-  /**
-   * Test of updateResult method, of class Encounter.
-   */
+  /** Test of updateResult method, of class Encounter. */
   @Test
-  public void testUpdateResult()
-  {
-    try
-    {
+  public void testUpdateResult() {
+    try {
       System.out.println("updateResult");
       TeamInterface team1 = new Team(1, new UIPlayer("Player 1", 1));
       TeamInterface team2 = new Team(2, new UIPlayer("Player 2", 2));
@@ -44,9 +36,7 @@ public class EncounterTest
       instance.updateResult(team2, EncounterResult.DRAW);
       assertEquals(1, team1.getTeamMembers().get(0).getRecord().getDraws());
       assertEquals(1, team2.getTeamMembers().get(0).getRecord().getDraws());
-    }
-    catch (TournamentException ex)
-    {
+    } catch (TournamentException ex) {
       Logger.getLogger(EncounterTest.class.getName()).log(Level.SEVERE, null, ex);
       fail();
     }

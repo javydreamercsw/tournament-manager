@@ -15,9 +15,6 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.formatlist;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import com.github.javydreamercsw.database.storage.db.Format;
 import com.github.javydreamercsw.database.storage.db.server.FormatService;
 import com.github.javydreamercsw.database.storage.db.server.MatchService;
@@ -25,59 +22,59 @@ import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDial
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.validator.StringLengthValidator;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-/**
- * A dialog for editing {@link Format} objects.
- */
+/** A dialog for editing {@link Format} objects. */
 public class FormatEditorDialog extends AbstractEditorDialog<Format> {
   private static final long serialVersionUID = 2349638969280300323L;
 
-    private final TextField formatNameField = new TextField("Name");
-    private final TextArea formatDescField = new TextArea("Description");
+  private final TextField formatNameField = new TextField("Name");
+  private final TextArea formatDescField = new TextArea("Description");
 
-    public FormatEditorDialog(BiConsumer<Format, Operation> itemSaver,
-            Consumer<Format> itemDeleter) {
-        super("format", itemSaver, itemDeleter);
+  public FormatEditorDialog(BiConsumer<Format, Operation> itemSaver, Consumer<Format> itemDeleter) {
+    super("format", itemSaver, itemDeleter);
 
-        addNameField();
-        addDescriptionField();
+    addNameField();
+    addDescriptionField();
+  }
+
+  private void addNameField() {
+    getFormLayout().add(formatNameField);
+
+    getBinder()
+        .forField(formatNameField)
+        .withConverter(String::trim, String::trim)
+        .withValidator(
+            new StringLengthValidator(
+                "Format name must contain at least 3 printable characters", 3, null))
+        .withValidator(
+            name -> FormatService.getInstance().findFormats(name).isEmpty(),
+            "Format name must be unique")
+        .bind(Format::getName, Format::setName);
+  }
+
+  private void addDescriptionField() {
+    getFormLayout().add(formatDescField);
+
+    getBinder()
+        .forField(formatDescField)
+        .withConverter(String::trim, String::trim)
+        .bind(Format::getDescription, Format::setDescription);
+  }
+
+  @Override
+  protected void confirmDelete() {
+    int reviewCount =
+        MatchService.getInstance().findMatchesWithFormat(getCurrentItem().getName()).size();
+    if (reviewCount > 0) {
+      openConfirmationDialog(
+          "Delete format",
+          "Are you sure you want to delete the “" + getCurrentItem().getName() + "” format?",
+          "Deleting the format will mark the associated matches as “undefined”. "
+              + "You can edit individual matches to select another format.");
+    } else {
+      doDelete(getCurrentItem());
     }
-
-    private void addNameField() {
-        getFormLayout().add(formatNameField);
-
-        getBinder().forField(formatNameField)
-                .withConverter(String::trim, String::trim)
-                .withValidator(new StringLengthValidator(
-                        "Format name must contain at least 3 printable characters",
-                        3, null))
-                .withValidator(name -> FormatService.getInstance()
-                        .findFormats(name).isEmpty(),
-                        "Format name must be unique")
-                .bind(Format::getName, Format::setName);
-    }
-    
-    private void addDescriptionField() {
-        getFormLayout().add(formatDescField);
-
-        getBinder().forField(formatDescField)
-                .withConverter(String::trim, String::trim)
-                .bind(Format::getDescription, Format::setDescription);
-    }
-
-    @Override
-    protected void confirmDelete() {
-        int reviewCount = MatchService.getInstance()
-                .findMatchesWithFormat(getCurrentItem().getName()).size();
-        if (reviewCount > 0) {
-            openConfirmationDialog("Delete format",
-                    "Are you sure you want to delete the “"
-                            + getCurrentItem().getName()
-                            + "” format?",
-                    "Deleting the format will mark the associated matches as “undefined”. "
-                            + "You can edit individual matches to select another format.");
-        } else {
-            doDelete(getCurrentItem());
-        }
-    }
+  }
 }

@@ -1,27 +1,23 @@
 package com.github.javydreamercsw.tournament.manager.api;
 
+import com.github.javydreamercsw.tournament.manager.api.standing.RecordInterface;
+import de.gesundkrank.jskills.ITeam;
 import java.util.List;
 
-import com.github.javydreamercsw.tournament.manager.api.standing.RecordInterface;
-
-import de.gesundkrank.jskills.ITeam;
-
 /**
- *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public interface TeamInterface extends ITeam
-{
+public interface TeamInterface extends ITeam {
 
   /**
    * @return the team's name
    */
-  public String getName();
+  String getName();
 
   /**
    * @return the team members
    */
-  public List<TournamentPlayerInterface> getTeamMembers();
+  List<TournamentPlayerInterface> getTeamMembers();
 
   /**
    * Checks if a player is part of this team.
@@ -30,7 +26,7 @@ public interface TeamInterface extends ITeam
    * @return true if found
    */
   boolean hasMember(TournamentPlayerInterface member);
-  
+
   /**
    * Checks if a player is part of this team.
    *
@@ -54,13 +50,12 @@ public interface TeamInterface extends ITeam
    * @param players Team members.
    * @return
    */
-  TeamInterface createTeam(int id, String name,
-          List<TournamentPlayerInterface> players);
+  TeamInterface createTeam(int id, String name, List<TournamentPlayerInterface> players);
 
   /**
    * Get the team's id.
    *
    * @return ID for this team.
    */
-  public int getTeamId();
+  int getTeamId();
 }

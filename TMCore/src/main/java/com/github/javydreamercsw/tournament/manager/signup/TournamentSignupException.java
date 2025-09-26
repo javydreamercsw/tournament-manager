@@ -7,22 +7,18 @@ import com.github.javydreamercsw.tournament.manager.api.TournamentException;
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class TournamentSignupException extends TournamentException
-{
+public class TournamentSignupException extends TournamentException {
   private static final long serialVersionUID = 2801512266224709855L;
 
-  public TournamentSignupException(String message)
-  {
+  public TournamentSignupException(String message) {
     super(message);
   }
 
-  public TournamentSignupException(String message, Throwable cause)
-  {
+  public TournamentSignupException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public TournamentSignupException(Throwable cause)
-  {
+  public TournamentSignupException(Throwable cause) {
     super(cause);
   }
 }

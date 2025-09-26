@@ -1,16 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
-
 import com.github.javydreamercsw.database.storage.db.MatchEntry;
 import com.github.javydreamercsw.database.storage.db.MatchEntryPK;
 import com.github.javydreamercsw.database.storage.db.MatchHasTeam;
@@ -34,62 +23,57 @@ import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
 import com.github.javydreamercsw.tournament.manager.api.TournamentException;
 import com.github.javydreamercsw.tournament.manager.api.standing.RankingProvider;
 import com.github.javydreamercsw.trueskill.TrueSkillRankingProvider;
-
 import de.gesundkrank.jskills.IPlayer;
 import de.gesundkrank.jskills.Rating;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
-public class MatchService extends Service<MatchEntry>
-{
-  private MatchEntryJpaController mc
-          = new MatchEntryJpaController(DataBaseManager.getEntityManagerFactory());
-  private MatchHasTeamJpaController mhtc
-          = new MatchHasTeamJpaController(DataBaseManager.getEntityManagerFactory());
-  private MatchResultJpaController mrc
-          = new MatchResultJpaController(DataBaseManager.getEntityManagerFactory());
-  private MatchResultTypeJpaController mrtc
-          = new MatchResultTypeJpaController(DataBaseManager.getEntityManagerFactory());
-  private final RankingProvider rp
-          = Lookup.getDefault().lookup(RankingProvider.class);
-  private final TeamHasFormatRecordJpaController thfrc
-          = new TeamHasFormatRecordJpaController(DataBaseManager.getEntityManagerFactory());
+public class MatchService extends Service<MatchEntry> {
+  private MatchEntryJpaController mc =
+      new MatchEntryJpaController(DataBaseManager.getEntityManagerFactory());
+  private MatchHasTeamJpaController mhtc =
+      new MatchHasTeamJpaController(DataBaseManager.getEntityManagerFactory());
+  private MatchResultJpaController mrc =
+      new MatchResultJpaController(DataBaseManager.getEntityManagerFactory());
+  private MatchResultTypeJpaController mrtc =
+      new MatchResultTypeJpaController(DataBaseManager.getEntityManagerFactory());
+  private final RankingProvider rp = Lookup.getDefault().lookup(RankingProvider.class);
+  private final TeamHasFormatRecordJpaController thfrc =
+      new TeamHasFormatRecordJpaController(DataBaseManager.getEntityManagerFactory());
 
   /**
-   * Helper class to initialize the singleton Service in a thread-safe way and
-   * to keep the initialization ordering clear between the two services. See
-   * also: https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
+   * Helper class to initialize the singleton Service in a thread-safe way and to keep the
+   * initialization ordering clear between the two services. See also:
+   * https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
    */
-  private static class SingletonHolder
-  {
+  private static class SingletonHolder {
     static final MatchService INSTANCE = createMatchService();
 
-    /**
-     * This class is not meant to be instantiated.
-     */
-    private SingletonHolder()
-    {
-    }
+    /** This class is not meant to be instantiated. */
+    private SingletonHolder() {}
 
-    private static MatchService createMatchService()
-    {
+    private static MatchService createMatchService() {
       final MatchService reviewService = new MatchService();
       return reviewService;
     }
   }
 
-  /**
-   * Declared private to ensure uniqueness of this Singleton.
-   */
-  private MatchService()
-  {
-  }
+  /** Declared private to ensure uniqueness of this Singleton. */
+  private MatchService() {}
 
   /**
    * Gets the unique instance of this Singleton.
    *
    * @return the unique instance of this Singleton
    */
-  public static MatchService getInstance()
-  {
+  public static MatchService getInstance() {
     return SingletonHolder.INSTANCE;
   }
 
@@ -99,15 +83,10 @@ public class MatchService extends Service<MatchEntry>
    * @param match Match to save.
    * @throws Exception if something goes wrong with the database.
    */
-  public void saveMatch(MatchEntry match) throws Exception
-  {
-    if (match.getMatchEntryPK() != null
-            && mc.findMatchEntry(match.getMatchEntryPK()) != null)
-    {
+  public void saveMatch(MatchEntry match) throws Exception {
+    if (match.getMatchEntryPK() != null && mc.findMatchEntry(match.getMatchEntryPK()) != null) {
       mc.edit(match);
-    }
-    else
-    {
+    } else {
       mc.create(match);
     }
   }
@@ -119,11 +98,9 @@ public class MatchService extends Service<MatchEntry>
    * @throws NonexistentEntityException if match doesn't exist
    * @throws IllegalOrphanException if an entity was left orphan.
    */
-  public void deleteMatch(MatchEntry match) throws NonexistentEntityException,
-          IllegalOrphanException
-  {
-    for (MatchHasTeam mht : match.getMatchHasTeamList())
-    {
+  public void deleteMatch(MatchEntry match)
+      throws NonexistentEntityException, IllegalOrphanException {
+    for (MatchHasTeam mht : match.getMatchHasTeamList()) {
       mhtc.destroy(mht.getMatchHasTeamPK());
     }
     mc.destroy(match.getMatchEntryPK());
@@ -135,17 +112,15 @@ public class MatchService extends Service<MatchEntry>
    * @param format Format name to look for.
    * @return List of matches with the specified format.
    */
-  public List<MatchEntry> findMatchesWithFormat(String format)
-  {
+  public List<MatchEntry> findMatchesWithFormat(String format) {
     List<MatchEntry> results = new ArrayList<>();
-    mc.findMatchEntryEntities().forEach(match ->
-    {
-      if (format.trim().isEmpty()
-              || match.getFormat().getName().equals(format))
-      {
-        results.add(match);
-      }
-    });
+    mc.findMatchEntryEntities()
+        .forEach(
+            match -> {
+              if (format.trim().isEmpty() || match.getFormat().getName().equals(format)) {
+                results.add(match);
+              }
+            });
     return results;
   }
 
@@ -155,8 +130,7 @@ public class MatchService extends Service<MatchEntry>
    * @param key Key for the match.
    * @return Match or null if not found.
    */
-  public MatchEntry findMatch(MatchEntryPK key)
-  {
+  public MatchEntry findMatch(MatchEntryPK key) {
     return mc.findMatchEntry(key);
   }
 
@@ -165,65 +139,56 @@ public class MatchService extends Service<MatchEntry>
    *
    * @param match Match to be added to.
    * @param team Team to add
-   * @return true if added. False if team already in the match or was unable to
-   * be added.
+   * @return true if added. False if team already in the match or was unable to be added.
    * @throws Exception persisting to data base.
    */
-  public boolean addTeam(MatchEntry match, Team team) throws Exception
-  {
+  public boolean addTeam(MatchEntry match, Team team) throws Exception {
     // Check the team is not in this match already
-    if (!match.getMatchHasTeamList().stream().noneMatch((mht)
-            -> (Objects.equals(mht.getTeam().getId(), team.getId()))))
-    {
+    if (match.getMatchHasTeamList().stream()
+        .anyMatch((mht) -> (Objects.equals(mht.getTeam().getId(), team.getId())))) {
       return false;
     }
     MatchHasTeam mht = new MatchHasTeam();
     mht.setTeam(team);
     mht.setMatchEntry(match);
-    if (match.getMatchEntryPK() != null)
-    {
-      mht.setMatchHasTeamPK(new MatchHasTeamPK(team.getId(),
+    if (match.getMatchEntryPK() != null) {
+      mht.setMatchHasTeamPK(
+          new MatchHasTeamPK(
+              team.getId(),
               match.getMatchEntryPK().getId(),
               match.getMatchEntryPK().getFormatId(),
               match.getFormat().getGame().getId()));
     }
 
-    if (match.getMatchEntryPK() != null)
-    {
+    if (match.getMatchEntryPK() != null) {
       mhtc.create(mht);
     }
 
     match.getMatchHasTeamList().add(mht);
 
     // Make sure each team member has a record for this game. Add one otherwise.
-    team.getPlayerList().forEach(player ->
-    {
-      boolean found = false;
-      for (Record r : player.getRecordList())
-      {
-        if (Objects.equals(r.getGame().getId(),
-                match.getFormat().getGame().getId()))
-        {
-          found = true;
-          break;
-        }
-      }
-      if (!found)
-      {
-        try
-        {
-          Record record = new Record();
-          record.getPlayerList().add(player);
-          record.setGame(match.getFormat().getGame());
-          RecordService.getInstance().saveRecord(record);
-          player.getRecordList().add(record);
-        }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
-      }
-    });
+    team.getPlayerList()
+        .forEach(
+            player -> {
+              boolean found = false;
+              for (Record r : player.getRecordList()) {
+                if (Objects.equals(r.getGame().getId(), match.getFormat().getGame().getId())) {
+                  found = true;
+                  break;
+                }
+              }
+              if (!found) {
+                try {
+                  Record record = new Record();
+                  record.getPlayerList().add(player);
+                  record.setGame(match.getFormat().getGame());
+                  RecordService.getInstance().saveRecord(record);
+                  player.getRecordList().add(record);
+                } catch (Exception ex) {
+                  Exceptions.printStackTrace(ex);
+                }
+              }
+            });
     return true;
   }
 
@@ -234,31 +199,24 @@ public class MatchService extends Service<MatchEntry>
    * @param team Team to remove.
    * @throws NonexistentEntityException if team doesn't exist in match.
    */
-  public void removeTeam(MatchEntry match, Team team)
-          throws NonexistentEntityException
-  {
+  public void removeTeam(MatchEntry match, Team team) throws NonexistentEntityException {
     MatchHasTeam mht = null;
-    for (MatchHasTeam temp : match.getMatchHasTeamList())
-    {
-      if (temp.getTeam().getId().equals(team.getId()))
-      {
+    for (MatchHasTeam temp : match.getMatchHasTeamList()) {
+      if (temp.getTeam().getId().equals(team.getId())) {
         mht = temp;
         break;
       }
     }
-    if (mht != null)
-    {
+    if (mht != null) {
       match.getMatchHasTeamList().remove(mht);
-      if (match.getMatchEntryPK() != null)
-      {
+      if (match.getMatchEntryPK() != null) {
         mhtc.destroy(mht.getMatchHasTeamPK());
       }
     }
   }
 
   @Override
-  public List<MatchEntry> getAll()
-  {
+  public List<MatchEntry> getAll() {
     return mc.findMatchEntryEntities();
   }
 
@@ -268,12 +226,9 @@ public class MatchService extends Service<MatchEntry>
    * @param type type to search for (as found in the data base).
    * @return Optional type.
    */
-  public Optional<MatchResultType> getResultType(String type)
-  {
-    for (MatchResultType mrt : getResultTypes())
-    {
-      if (mrt.getType().equals(type))
-      {
+  public Optional<MatchResultType> getResultType(String type) {
+    for (MatchResultType mrt : getResultTypes()) {
+      if (mrt.getType().equals(type)) {
         return Optional.of(mrt);
       }
     }
@@ -285,8 +240,7 @@ public class MatchService extends Service<MatchEntry>
    *
    * @return list of result types.
    */
-  public List<MatchResultType> getResultTypes()
-  {
+  public List<MatchResultType> getResultTypes() {
     return mrtc.findMatchResultTypeEntities();
   }
 
@@ -299,11 +253,9 @@ public class MatchService extends Service<MatchEntry>
    * @throws Exception persisting to data base
    */
   public void setResult(MatchHasTeam mht, MatchResultType mrt)
-          throws NonexistentEntityException, Exception
-  {
-    if (mht.getMatchResult() != null)
-    {
-      //Delete the old one.
+      throws NonexistentEntityException, Exception {
+    if (mht.getMatchResult() != null) {
+      // Delete the old one.
       mrc.destroy(mht.getMatchResult().getMatchResultPK());
     }
     MatchResult mr = new MatchResult();
@@ -314,78 +266,68 @@ public class MatchService extends Service<MatchEntry>
   }
 
   /**
-   * Lock the match result.This is meant not to be undone as it calculates
-   * experience and update records which is dependent on when it happens.
+   * Lock the match result.This is meant not to be undone as it calculates experience and update
+   * records which is dependent on when it happens.
    *
    * @param me Match Result to lock.
    * @throws TournamentException
    */
-  public void lockMatchResult(MatchEntry me) throws TournamentException
-  {
-    for (MatchHasTeam mht : findMatch(me.getMatchEntryPK()).getMatchHasTeamList())
-    {
-      if (mht != null)
-      {
-        try
-        {
+  public void lockMatchResult(MatchEntry me) throws TournamentException {
+    for (MatchHasTeam mht : findMatch(me.getMatchEntryPK()).getMatchHasTeamList()) {
+      if (mht != null) {
+        try {
           lockMatchResult(mht.getMatchResult());
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
           throw new TournamentException(ex);
         }
-      }
-      else
-      {
+      } else {
         throw new TournamentException("Missing result!");
       }
     }
   }
 
   /**
-   * Lock the match result.This is meant not to be undone as it calculates
-   * experience and update records which is dependent on when it happens.
+   * Lock the match result.This is meant not to be undone as it calculates experience and update
+   * records which is dependent on when it happens.
    *
    * @param mr Match Result to lock.
    * @throws java.lang.Exception
    */
-  public void lockMatchResult(MatchResult mr) throws Exception
-  {
+  public void lockMatchResult(MatchResult mr) throws Exception {
     mr.setLocked(true);
 
     // Update the record
-    mr.getMatchHasTeamList().forEach(mht ->
-    {
-      mht.getTeam().getPlayerList().forEach(player ->
-      {
-        Record record = player.getRecordList().get(0);
-        switch (mr.getMatchResultType().getType())
-        {
-          case "result.loss":
-          //Fall thru
-          case "result.forfeit":
-          //Fall thru
-          case "result.no_show":
-            record.setLoses(record.getLoses() + 1);
-            break;
-          case "result.draw":
-            record.setDraws(record.getDraws() + 1);
-            break;
-          //Various reasons leading to a win.
-          case "result.win":
-            record.setWins(record.getWins() + 1);
-            break;
-        }
-        try
-        {
-          RecordService.getInstance().saveRecord(record);
-        }
-        catch (Exception ex)
-        {
-          Exceptions.printStackTrace(ex);
-        }
-      });
-    });
+    mr.getMatchHasTeamList()
+        .forEach(
+            mht -> {
+              mht.getTeam()
+                  .getPlayerList()
+                  .forEach(
+                      player -> {
+                        Record record = player.getRecordList().get(0);
+                        switch (mr.getMatchResultType().getType()) {
+                          case "result.loss":
+                          // Fall thru
+                          case "result.forfeit":
+                          // Fall thru
+                          case "result.no_show":
+                            record.setLoses(record.getLoses() + 1);
+                            break;
+                          case "result.draw":
+                            record.setDraws(record.getDraws() + 1);
+                            break;
+                          // Various reasons leading to a win.
+                          case "result.win":
+                            record.setWins(record.getWins() + 1);
+                            break;
+                        }
+                        try {
+                          RecordService.getInstance().saveRecord(record);
+                        } catch (Exception ex) {
+                          Exceptions.printStackTrace(ex);
+                        }
+                      });
+            });
     mrc.edit(mr);
   }
 
@@ -395,14 +337,10 @@ public class MatchService extends Service<MatchEntry>
    * @param mr Match result to update.
    * @throws Exception If result doesn't exist.
    */
-  public void updateResult(MatchResult mr) throws Exception
-  {
-    if (mr.getMatchResultPK() != null)
-    {
+  public void updateResult(MatchResult mr) throws Exception {
+    if (mr.getMatchResultPK() != null) {
       mrc.edit(mr);
-    }
-    else
-    {
+    } else {
       throw new Exception("Trying to update non existing result!");
     }
   }
@@ -415,72 +353,56 @@ public class MatchService extends Service<MatchEntry>
    * @throws TournamentException if results are already locked.
    * @throws Exception If there's an error updating the result.
    */
-  public void setRanked(MatchEntry match, boolean ranked)
-          throws TournamentException, Exception
-  {
-    for (MatchHasTeam mht : match.getMatchHasTeamList())
-    {
-      if (!mht.getMatchResult().getLocked())
-      {
+  public void setRanked(MatchEntry match, boolean ranked) throws TournamentException, Exception {
+    for (MatchHasTeam mht : match.getMatchHasTeamList()) {
+      if (!mht.getMatchResult().getLocked()) {
         mht.getMatchResult().setRanked(ranked);
         MatchService.getInstance().updateResult(mht.getMatchResult());
-      }
-      else
-      {
+      } else {
         throw new TournamentException("Rsults already locked!");
       }
     }
   }
 
   /**
-   * Update rankings for the match. This assumes that all losers were eliminated
-   * at the same time.
+   * Update rankings for the match. This assumes that all losers were eliminated at the same time.
    *
    * @param me Match entry to check.
    * @throws TournamentException
    */
-  public void updateRankings(final MatchEntry me) throws TournamentException
-  {
+  public void updateRankings(final MatchEntry me) throws TournamentException {
     updateRankings(me, new HashMap<>());
   }
 
   /**
-   * Update rankings for the match. This allows to give extra credits for losing
-   * teams that lasted longer in the match. Use 1 for the key of the winner, 2
-   * for the runner up and so on. Value implemented as a list to handle ties on
-   * each place.
+   * Update rankings for the match. This allows to give extra credits for losing teams that lasted
+   * longer in the match. Use 1 for the key of the winner, 2 for the runner up and so on. Value
+   * implemented as a list to handle ties on each place.
    *
    * @param me Match entry to check.
-   * @param order Map indicating the place as key and a list of team id's as
-   * value.
+   * @param order Map indicating the place as key and a list of team id's as value.
    * @throws TournamentException
    */
-  public void updateRankings(final MatchEntry me,
-          Map<Integer, List<Integer>> order) throws TournamentException
-  {
+  public void updateRankings(final MatchEntry me, Map<Integer, List<Integer>> order)
+      throws TournamentException {
     TrueSkillRankingProvider p = (TrueSkillRankingProvider) rp;
     // First make sure that everyone has a result
     MatchEntry match = findMatch(me.getMatchEntryPK());
-    for (MatchHasTeam mht : match.getMatchHasTeamList())
-    {
-      if (mht.getMatchResult() == null || !mht.getMatchResult().getLocked())
-      {
+    for (MatchHasTeam mht : match.getMatchHasTeamList()) {
+      if (mht.getMatchResult() == null || !mht.getMatchResult().getLocked()) {
         throw new TournamentException("Not all teams have a locked result!");
       }
     }
 
     TeamInterface[] teams = new TeamInterface[match.getMatchHasTeamList().size()];
     int[] resultOrder = new int[match.getMatchHasTeamList().size()];
-    //Ok, now check the order if any
-    if (order.isEmpty())
-    {
+    // Ok, now check the order if any
+    if (order.isEmpty()) {
       order.put(1, new ArrayList<>());
       order.put(2, new ArrayList<>());
       // Create an order with the winner as first place and everyone else tied for second.
-      for (MatchHasTeam mht : match.getMatchHasTeamList())
-      {
-        switch (mht.getMatchResult().getMatchResultType().getType())
-        {
+      for (MatchHasTeam mht : match.getMatchHasTeamList()) {
+        switch (mht.getMatchResult().getMatchResultType().getType()) {
           case "result.win":
             order.get(1).add(mht.getTeam().getId());
             break;
@@ -490,56 +412,46 @@ public class MatchService extends Service<MatchEntry>
       }
     }
 
-    //Convert into the JSkill interface for calculations
-    for (MatchHasTeam mht : match.getMatchHasTeamList())
-    {
-      try
-      {
-        p.addTeam(TeamService.getInstance().convertToTeam(mht.getTeam(),
-                me.getFormat()));
-      }
-      catch (Exception ex)
-      {
+    // Convert into the JSkill interface for calculations
+    for (MatchHasTeam mht : match.getMatchHasTeamList()) {
+      try {
+        p.addTeam(TeamService.getInstance().convertToTeam(mht.getTeam(), me.getFormat()));
+      } catch (Exception ex) {
         throw new TournamentException(ex);
       }
     }
 
     int count = 0;
-    for (Entry<Integer, List<Integer>> entry : order.entrySet())
-    {
-      for (Integer t : entry.getValue())
-      {
-        teams[count] = TeamService.getInstance()
-                .convertToTeam(TeamService.getInstance().findTeam(t),
-                        me.getFormat());
+    for (Entry<Integer, List<Integer>> entry : order.entrySet()) {
+      for (Integer t : entry.getValue()) {
+        teams[count] =
+            TeamService.getInstance()
+                .convertToTeam(TeamService.getInstance().findTeam(t), me.getFormat());
         resultOrder[count++] = entry.getKey();
       }
     }
 
     /**
-     * Quality of the match is used to determine how even the match up is. It'll
-     * be a number between 0% and 100%.
+     * Quality of the match is used to determine how even the match up is. It'll be a number between
+     * 0% and 100%.
      *
-     * The closest to zero the higher reward for the lower ranked for a win and
-     * the lower reward for the higher ranked for the win. This number takes
-     * into account all the skills from all the teams in the match.
+     * <p>The closest to zero the higher reward for the lower ranked for a win and the lower reward
+     * for the higher ranked for the win. This number takes into account all the skills from all the
+     * teams in the match.
      */
     double quality = getMatchQuality(teams);
 
     // Make the calculations
-    Map<IPlayer, Rating> ratings
-            = p.getCalculator().calculateNewRatings(p.getGameInfo(),
-                    de.gesundkrank.jskills.Team.concat(teams),
-                    resultOrder);
+    Map<IPlayer, Rating> ratings =
+        p.getCalculator()
+            .calculateNewRatings(
+                p.getGameInfo(), de.gesundkrank.jskills.Team.concat(teams), resultOrder);
 
     // Now persist to database
-    for (Entry<IPlayer, Rating> entry : ratings.entrySet())
-    {
-      Optional<Player> temp
-              = PlayerService.getInstance()
-                      .findPlayerById(((UIPlayer) entry.getKey()).getID());
-      if (temp.isPresent())
-      {
+    for (Entry<IPlayer, Rating> entry : ratings.entrySet()) {
+      Optional<Player> temp =
+          PlayerService.getInstance().findPlayerById(((UIPlayer) entry.getKey()).getID());
+      if (temp.isPresent()) {
         Player player = temp.get();
 
         // This assumes that the first tema is the team only contaiining the player.
@@ -548,42 +460,36 @@ public class MatchService extends Service<MatchEntry>
         int totalPoints = (int) getMatchPointsEarned(team, me, quality);
 
         // Change modifier based on who beated who
-        try
-        {
-          if (TeamService.getInstance().hasFormatRecord(team, me.getFormat()))
-          {
-            //Update it
-            TeamHasFormatRecord thfr
-                    = TeamService.getInstance().getFormatRecord(team, me.getFormat());
+        try {
+          if (TeamService.getInstance().hasFormatRecord(team, me.getFormat())) {
+            // Update it
+            TeamHasFormatRecord thfr =
+                TeamService.getInstance().getFormatRecord(team, me.getFormat());
             thfr.setMean(entry.getValue().getMean());
             thfr.setStandardDeviation(entry.getValue().getStandardDeviation());
             thfr.setPoints(thfr.getPoints() + totalPoints);
-            if (thfr.getPoints() < 0)
-            {
+            if (thfr.getPoints() < 0) {
               // Don't go below zero.
               thfr.setPoints(0);
             }
             thfrc.edit(thfr);
-          }
-          else
-          {
-            TeamHasFormatRecord thfr
-                    = new TeamHasFormatRecord(new TeamHasFormatRecordPK(
-                            team.getId(),
-                            me.getFormat().getFormatPK().getId(),
-                            me.getFormat().getFormatPK().getGameId()),
-                            entry.getValue().getMean(),
-                            entry.getValue().getStandardDeviation());
+          } else {
+            TeamHasFormatRecord thfr =
+                new TeamHasFormatRecord(
+                    new TeamHasFormatRecordPK(
+                        team.getId(),
+                        me.getFormat().getFormatPK().getId(),
+                        me.getFormat().getFormatPK().getGameId()),
+                    entry.getValue().getMean(),
+                    entry.getValue().getStandardDeviation());
             thfr.setFormat(me.getFormat());
             thfr.setTeam(team);
-            //If it'll go below zero ignore it.
+            // If it'll go below zero ignore it.
             thfr.setPoints(totalPoints > 0 ? totalPoints : 0);
             thfrc.create(thfr);
             team.getTeamHasFormatRecordList().add(thfr);
           }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
           throw new TournamentException(ex);
         }
         TeamService.getInstance().saveTeam(team);
@@ -597,47 +503,27 @@ public class MatchService extends Service<MatchEntry>
    * @param quality Match quality
    * @return modifier.
    */
-  protected double calculateModifier(double quality)
-  {
+  protected double calculateModifier(double quality) {
     double modifier;
-    if (quality >= 90)
-    {
+    if (quality >= 90) {
       modifier = 1.0;
-    }
-    else if (quality >= 80)
-    {
+    } else if (quality >= 80) {
       modifier = 1.1;
-    }
-    else if (quality >= 70)
-    {
+    } else if (quality >= 70) {
       modifier = 1.2;
-    }
-    else if (quality >= 60)
-    {
+    } else if (quality >= 60) {
       modifier = 1.3;
-    }
-    else if (quality >= 50)
-    {
+    } else if (quality >= 50) {
       modifier = 1.4;
-    }
-    else if (quality >= 40)
-    {
+    } else if (quality >= 40) {
       modifier = 1.5;
-    }
-    else if (quality >= 30)
-    {
+    } else if (quality >= 30) {
       modifier = 1.6;
-    }
-    else if (quality >= 20)
-    {
+    } else if (quality >= 20) {
       modifier = 1.7;
-    }
-    else if (quality >= 10)
-    {
+    } else if (quality >= 10) {
       modifier = 1.8;
-    }
-    else
-    {
+    } else {
       modifier = 2.0;
     }
     return modifier;
@@ -651,17 +537,13 @@ public class MatchService extends Service<MatchEntry>
    * @param quality Match quality
    * @return points earned/lost.
    */
-  protected double getMatchPointsEarned(Team team, MatchEntry me, double quality)
-  {
+  protected double getMatchPointsEarned(Team team, MatchEntry me, double quality) {
     double base = 10.0;
 
     // Find result to adjust base accordingly
-    for (MatchHasTeam mht : findMatch(me.getMatchEntryPK()).getMatchHasTeamList())
-    {
-      if (Objects.equals(mht.getTeam().getId(), team.getId()))
-      {
-        switch (mht.getMatchResult().getMatchResultType().getType())
-        {
+    for (MatchHasTeam mht : findMatch(me.getMatchEntryPK()).getMatchHasTeamList()) {
+      if (Objects.equals(mht.getTeam().getId(), team.getId())) {
+        switch (mht.getMatchResult().getMatchResultType().getType()) {
           case "result.loss":
           // Fall thru
           case "result.forfeit":
@@ -691,22 +573,16 @@ public class MatchService extends Service<MatchEntry>
    * @return Quality of the match, in percentage.
    * @throws TournamentException if there's an error converting teams.
    */
-  public double getMatchQuality(MatchEntry me) throws TournamentException
-  {
+  public double getMatchQuality(MatchEntry me) throws TournamentException {
     TeamInterface[] teams = new TeamInterface[me.getMatchHasTeamList().size()];
-    //Convert into the JSkill interface for calculations
+    // Convert into the JSkill interface for calculations
 
     int count = 0;
-    for (MatchHasTeam mht : me.getMatchHasTeamList())
-    {
-      try
-      {
-        teams[count] = TeamService.getInstance().convertToTeam(mht.getTeam(),
-                me.getFormat());
+    for (MatchHasTeam mht : me.getMatchHasTeamList()) {
+      try {
+        teams[count] = TeamService.getInstance().convertToTeam(mht.getTeam(), me.getFormat());
         count++;
-      }
-      catch (Exception ex)
-      {
+      } catch (Exception ex) {
         throw new TournamentException(ex);
       }
     }
@@ -720,10 +596,12 @@ public class MatchService extends Service<MatchEntry>
    * @param teams Teams to get quality from.
    * @return Quality of the match, in percentage.
    */
-  public double getMatchQuality(TeamInterface[] teams)
-  {
-    return ((TrueSkillRankingProvider) rp).getCalculator().calculateMatchQuality(
-            ((TrueSkillRankingProvider) rp).getGameInfo(),
-            de.gesundkrank.jskills.Team.concat(teams)) * 100;
+  public double getMatchQuality(TeamInterface[] teams) {
+    return ((TrueSkillRankingProvider) rp)
+            .getCalculator()
+            .calculateMatchQuality(
+                ((TrueSkillRankingProvider) rp).getGameInfo(),
+                de.gesundkrank.jskills.Team.concat(teams))
+        * 100;
   }
 }

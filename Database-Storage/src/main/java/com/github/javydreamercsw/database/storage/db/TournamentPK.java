@@ -1,67 +1,59 @@
 package com.github.javydreamercsw.database.storage.db;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.TableGenerator;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.TableGenerator;
-import javax.validation.constraints.NotNull;
-
 @Embeddable
-public class TournamentPK implements Serializable
-{
+public class TournamentPK implements Serializable {
   private static final long serialVersionUID = -5852922586504031795L;
+
   @Basic(optional = false)
   @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "TournamentGen")
-  @TableGenerator(name = "TournamentGen", table = "tm_id",
-          pkColumnName = "table_name",
-          valueColumnName = "last_id",
-          pkColumnValue = "tournament",
-          allocationSize = 1,
-          initialValue = 1)
+  @TableGenerator(
+      name = "TournamentGen",
+      table = "tm_id",
+      pkColumnName = "table_name",
+      valueColumnName = "last_id",
+      pkColumnValue = "tournament",
+      allocationSize = 1,
+      initialValue = 1)
   private int id;
+
   @Basic(optional = false)
-  @NotNull
-  @Column(name = "tournament_format_id")
+  @NotNull @Column(name = "tournament_format_id")
   private int tournamentFormatId;
 
-  public TournamentPK()
-  {
+  public TournamentPK() {}
 
-  }
-
-  public TournamentPK(int tournamentFormatId)
-  {
+  public TournamentPK(int tournamentFormatId) {
     this.tournamentFormatId = tournamentFormatId;
   }
 
-  public int getId()
-  {
+  public int getId() {
     return id;
   }
 
-  public void setId(int id)
-  {
+  public void setId(int id) {
     this.id = id;
   }
 
-  public int getTournamentFormatId()
-  {
+  public int getTournamentFormatId() {
     return tournamentFormatId;
   }
 
-  public void setTournamentFormatId(int tournamentFormatId)
-  {
+  public void setTournamentFormatId(int tournamentFormatId) {
     this.tournamentFormatId = tournamentFormatId;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     int hash = 0;
     hash += (int) id;
     hash += (int) tournamentFormatId;
@@ -69,25 +61,24 @@ public class TournamentPK implements Serializable
   }
 
   @Override
-  public boolean equals(Object object)
-  {
+  public boolean equals(Object object) {
     // TODO: Warning - this method won't work in the case the id fields are not set
-    if (!(object instanceof TournamentPK))
-    {
+    if (!(object instanceof TournamentPK)) {
       return false;
     }
     TournamentPK other = (TournamentPK) object;
-    if (this.id != other.id)
-    {
+    if (this.id != other.id) {
       return false;
     }
     return this.tournamentFormatId == other.tournamentFormatId;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return "com.github.javydreamercsw.database.storage.db.TournamentPK[ id="
-            + id + ", tournamentFormatId=" + tournamentFormatId + " ]";
+        + id
+        + ", tournamentFormatId="
+        + tournamentFormatId
+        + " ]";
   }
 }

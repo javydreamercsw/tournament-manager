@@ -7,15 +7,15 @@ package com.github.javydreamercsw.tournament.manager.api;
  */
 public class TournamentException extends Exception {
 
-    public TournamentException(String message) {
-        super(message);
-    }
+  public TournamentException(String message) {
+    super(message);
+  }
 
-    public TournamentException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public TournamentException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public TournamentException(Throwable cause) {
-        super(cause);
-    }
+  public TournamentException(Throwable cause) {
+    super(cause);
+  }
 }

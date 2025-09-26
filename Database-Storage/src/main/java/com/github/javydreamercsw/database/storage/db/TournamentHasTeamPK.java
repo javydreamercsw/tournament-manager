@@ -1,58 +1,48 @@
 package com.github.javydreamercsw.database.storage.db;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
-
 @Embeddable
-public class TournamentHasTeamPK implements Serializable
-{
+public class TournamentHasTeamPK implements Serializable {
   private static final long serialVersionUID = 2563324495027629204L;
+
   @Basic(optional = false)
-  @NotNull
-  @Column(name = "tournament_id")
+  @NotNull @Column(name = "tournament_id")
   private int tournamentId;
+
   @Basic(optional = false)
-  @NotNull
-  @Column(name = "team_id")
+  @NotNull @Column(name = "team_id")
   private int teamId;
 
-  public TournamentHasTeamPK()
-  {
-  }
+  public TournamentHasTeamPK() {}
 
-  public TournamentHasTeamPK(int tournamentId, int teamId)
-  {
+  public TournamentHasTeamPK(int tournamentId, int teamId) {
     this.tournamentId = tournamentId;
     this.teamId = teamId;
   }
 
-  public int getTournamentId()
-  {
+  public int getTournamentId() {
     return tournamentId;
   }
 
-  public void setTournamentId(int tournamentId)
-  {
+  public void setTournamentId(int tournamentId) {
     this.tournamentId = tournamentId;
   }
 
-  public int getTeamId()
-  {
+  public int getTeamId() {
     return teamId;
   }
 
-  public void setTeamId(int teamId)
-  {
+  public void setTeamId(int teamId) {
     this.teamId = teamId;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     int hash = 0;
     hash += (int) tournamentId;
     hash += (int) teamId;
@@ -60,25 +50,24 @@ public class TournamentHasTeamPK implements Serializable
   }
 
   @Override
-  public boolean equals(Object object)
-  {
+  public boolean equals(Object object) {
     // TODO: Warning - this method won't work in the case the id fields are not set
-    if (!(object instanceof TournamentHasTeamPK))
-    {
+    if (!(object instanceof TournamentHasTeamPK)) {
       return false;
     }
     TournamentHasTeamPK other = (TournamentHasTeamPK) object;
-    if (this.tournamentId != other.tournamentId)
-    {
+    if (this.tournamentId != other.tournamentId) {
       return false;
     }
     return this.teamId == other.teamId;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return "com.github.javydreamercsw.database.storage.db.TournamentHasTeamPK[ tournamentId="
-            + tournamentId + ", teamId=" + teamId + " ]";
+        + tournamentId
+        + ", teamId="
+        + teamId
+        + " ]";
   }
 }
