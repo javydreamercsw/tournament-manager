@@ -12,21 +12,21 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import java.io.Serial;
 import org.openide.util.Exceptions;
 
 public class ResultForm extends FormLayout {
-  private static final long serialVersionUID = -777301071814867123L;
-  private Grid<MatchHasTeam> resultGrid = new Grid<>();
-  private Button lock = new Button("Lock Results");
+  @Serial private static final long serialVersionUID = -777301071814867123L;
+  private final Button lock = new Button("Lock Results");
   private final MatchEntry entry;
 
   public ResultForm(MatchList ml, Dialog dialog, MatchEntry me) {
     this.entry = me;
+    Grid<MatchHasTeam> resultGrid = new Grid<>();
     resultGrid
-        .addColumn(new ComponentRenderer<>((mht) -> new Label(mht.getTeam().getName())))
+        .addColumn(new ComponentRenderer<>((mht) -> new Span(mht.getTeam().getName())))
         .setHeader("Team")
         .setWidth("8em")
         .setResizable(true);

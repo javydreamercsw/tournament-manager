@@ -11,10 +11,6 @@
   <packaging>war</packaging>
   <name>Tournament Manager Web</name>
 
-  <prerequisites>
-    <maven>3</maven>
-  </prerequisites>
-
   <properties>
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <jetty.version>11.0.26</jetty.version>

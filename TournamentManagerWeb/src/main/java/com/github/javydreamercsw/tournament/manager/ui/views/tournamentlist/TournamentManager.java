@@ -5,15 +5,15 @@ import com.github.javydreamercsw.database.storage.db.TournamentPK;
 import com.github.javydreamercsw.database.storage.db.server.TournamentService;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.NativeButton;
+import com.vaadin.flow.component.html.Span;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TournamentManager extends Dialog {
   private static final long serialVersionUID = -9151481749063166946L;
   private final TournamentPK id;
-  private final Label title;
+  private final Span title;
   private final ComboBox<Integer> cb = new ComboBox<>("Round");
 
   public TournamentManager(Tournament tournament) {
@@ -21,7 +21,7 @@ public class TournamentManager extends Dialog {
     setSizeFull();
     setCloseOnEsc(true);
     setCloseOnOutsideClick(false);
-    title = new Label("Tournament: " + tournament.getName());
+    title = new Span("Tournament: " + tournament.getName());
     add(title);
     cb.addValueChangeListener(listener -> update());
     add(cb);
