@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.netbeans.api.annotations.common.NonNull;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -24,7 +25,6 @@ import org.openide.util.lookup.ServiceProvider;
 public class TrueSkillRankingProvider implements RankingProvider {
   private GameInfo gameInfo;
   private final Map<List<Integer>, Team> teamList = new HashMap<>();
-  private SkillCalculator calculator;
 
   @Override
   public void addTeam(TeamInterface... teams) throws Exception {
@@ -41,11 +41,16 @@ public class TrueSkillRankingProvider implements RankingProvider {
         if (!ids.contains(tm.getID())) {
           ids.add(tm.getID());
         } else {
-          throw new Exception("Team with duplicated ids!\n" + team.toString());
+          throw new Exception("Team with duplicated ids!\n" + team);
         }
       }
       teamList.put(ids, t);
     }
+  }
+
+  @Override
+  public String getName() {
+    return "True Skill";
   }
 
   /**
@@ -61,7 +66,7 @@ public class TrueSkillRankingProvider implements RankingProvider {
   /**
    * @param gameInfo the gameInfo to set
    */
-  public void setGameInfo(GameInfo gameInfo) {
+  public void setGameInfo(@NonNull GameInfo gameInfo) {
     this.gameInfo = gameInfo;
   }
 
@@ -69,6 +74,7 @@ public class TrueSkillRankingProvider implements RankingProvider {
    * @return the calculator
    */
   public SkillCalculator getCalculator() {
+    SkillCalculator calculator;
     if (getTeamList().size() == 2) {
       // Two teams, check how many players in each to pick the right calculator.
       boolean multiplayerTeam = false;
@@ -93,8 +99,7 @@ public class TrueSkillRankingProvider implements RankingProvider {
    * @return the teamList
    */
   public List<Team> getTeamList() {
-    ArrayList<Team> teams = new ArrayList<>();
-    teams.addAll(teamList.values());
+    ArrayList<Team> teams = new ArrayList<>(teamList.values());
     return Collections.unmodifiableList(teams);
   }
 }

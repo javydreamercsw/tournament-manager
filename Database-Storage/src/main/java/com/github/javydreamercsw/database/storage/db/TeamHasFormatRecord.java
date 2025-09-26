@@ -12,6 +12,8 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlRootElement;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -39,6 +41,7 @@ import java.io.Serializable;
       query = "SELECT t FROM TeamHasFormatRecord t WHERE t.standardDeviation = :standardDeviation")
 })
 public class TeamHasFormatRecord implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1517758449111184848L;
 
   @Basic(optional = false)

@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.List;
   @NamedQuery(name = "Player.findByName", query = "SELECT p FROM Player p WHERE p.name = :name")
 })
 public class Player implements Serializable {
-  private static final long serialVersionUID = 3254339194105024707L;
+  @Serial private static final long serialVersionUID = 3254339194105024707L;
 
   @Id
   @Basic(optional = false)

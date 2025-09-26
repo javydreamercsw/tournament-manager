@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.List;
       query = "SELECT r FROM Record r WHERE r.recordPK.gameId = :gameId")
 })
 public class Record implements Serializable {
-  private static final long serialVersionUID = -893880954416960217L;
+  @Serial private static final long serialVersionUID = -893880954416960217L;
   @EmbeddedId protected RecordPK recordPK;
 
   @Basic(optional = false)

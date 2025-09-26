@@ -22,15 +22,19 @@
     <testng.version>7.11.0</testng.version>
   </properties>
   <repositories>
-    <!--
-        Repository hosting NetBeans modules, especially APIs.
-        Versions are based on IDE releases, e.g.: RELEASE691
-        To create your own repository, use: nbm:populate-repository
-        -->
+    <repository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <url>https://repo.maven.apache.org/maven2/</url>
+    </repository>
     <repository>
       <id>netbeans</id>
       <name>NetBeans</name>
       <url>http://bits.netbeans.org/nexus/content/groups/netbeans/</url>
+    </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
   </repositories>
   <build>

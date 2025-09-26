@@ -15,6 +15,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class Format implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "format")
   private List<TeamHasFormatRecord> teamHasFormatRecordList;
 
+  @Serial
   private static final long serialVersionUID = -6764484082819653225L;
   @EmbeddedId protected FormatPK formatPK;
 

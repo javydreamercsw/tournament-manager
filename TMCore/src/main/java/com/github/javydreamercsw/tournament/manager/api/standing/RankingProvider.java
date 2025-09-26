@@ -13,4 +13,11 @@ public interface RankingProvider {
    * @throws java.lang.Exception
    */
   void addTeam(TeamInterface... teams) throws Exception;
+
+  /**
+   * Return the ranking name.
+   *
+   * @return the name
+   */
+  String getName();
 }

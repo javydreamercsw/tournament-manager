@@ -12,6 +12,7 @@ import de.gesundkrank.jskills.IPlayer;
 import de.gesundkrank.jskills.ITeam;
 import de.gesundkrank.jskills.Rating;
 import de.gesundkrank.jskills.trueskill.TwoPlayerTrueSkillCalculator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,9 +23,20 @@ import org.testng.annotations.Test;
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
 public class TrueSkillRankingProviderNGTest {
-  private final RankingProvider instance = Lookup.getDefault().lookup(RankingProvider.class);
+  private RankingProvider instance; // Removed final
 
   public TrueSkillRankingProviderNGTest() {
+    // Find all RankingProviders and select the TrueSkill one
+    Collection<? extends RankingProvider> providers =
+        Lookup.getDefault().lookupAll(RankingProvider.class);
+    RankingProvider trueSkillProvider = null;
+    for (RankingProvider provider : providers) {
+      if (provider instanceof TrueSkillRankingProvider) {
+        trueSkillProvider = provider;
+        break;
+      }
+    }
+    instance = trueSkillProvider;
     assertNotNull(instance);
     assertTrue(instance instanceof TrueSkillRankingProvider);
   }

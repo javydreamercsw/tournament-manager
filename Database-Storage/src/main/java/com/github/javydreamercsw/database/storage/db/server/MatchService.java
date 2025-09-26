@@ -32,19 +32,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+
+import org.netbeans.api.annotations.common.NonNull;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 public class MatchService extends Service<MatchEntry> {
-  private MatchEntryJpaController mc =
+  private final MatchEntryJpaController mc =
       new MatchEntryJpaController(DataBaseManager.getEntityManagerFactory());
-  private MatchHasTeamJpaController mhtc =
+  private final MatchHasTeamJpaController mhtc =
       new MatchHasTeamJpaController(DataBaseManager.getEntityManagerFactory());
-  private MatchResultJpaController mrc =
+  private final MatchResultJpaController mrc =
       new MatchResultJpaController(DataBaseManager.getEntityManagerFactory());
-  private MatchResultTypeJpaController mrtc =
+  private final MatchResultTypeJpaController mrtc =
       new MatchResultTypeJpaController(DataBaseManager.getEntityManagerFactory());
-  private final RankingProvider rp = Lookup.getDefault().lookup(RankingProvider.class);
+  private final TrueSkillRankingProvider rp = Lookup.getDefault().lookup(TrueSkillRankingProvider.class);
   private final TeamHasFormatRecordJpaController thfrc =
       new TeamHasFormatRecordJpaController(DataBaseManager.getEntityManagerFactory());
 
@@ -60,8 +62,7 @@ public class MatchService extends Service<MatchEntry> {
     private SingletonHolder() {}
 
     private static MatchService createMatchService() {
-      final MatchService reviewService = new MatchService();
-      return reviewService;
+        return new MatchService();
     }
   }
 
@@ -83,7 +84,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param match Match to save.
    * @throws Exception if something goes wrong with the database.
    */
-  public void saveMatch(MatchEntry match) throws Exception {
+  public void saveMatch(@NonNull MatchEntry match) throws Exception {
     if (match.getMatchEntryPK() != null && mc.findMatchEntry(match.getMatchEntryPK()) != null) {
       mc.edit(match);
     } else {
@@ -98,7 +99,7 @@ public class MatchService extends Service<MatchEntry> {
    * @throws NonexistentEntityException if match doesn't exist
    * @throws IllegalOrphanException if an entity was left orphan.
    */
-  public void deleteMatch(MatchEntry match)
+  public void deleteMatch(@NonNull MatchEntry match)
       throws NonexistentEntityException, IllegalOrphanException {
     for (MatchHasTeam mht : match.getMatchHasTeamList()) {
       mhtc.destroy(mht.getMatchHasTeamPK());
@@ -112,7 +113,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param format Format name to look for.
    * @return List of matches with the specified format.
    */
-  public List<MatchEntry> findMatchesWithFormat(String format) {
+  public List<MatchEntry> findMatchesWithFormat(@NonNull String format) {
     List<MatchEntry> results = new ArrayList<>();
     mc.findMatchEntryEntities()
         .forEach(
@@ -130,7 +131,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param key Key for the match.
    * @return Match or null if not found.
    */
-  public MatchEntry findMatch(MatchEntryPK key) {
+  public MatchEntry findMatch(@NonNull MatchEntryPK key) {
     return mc.findMatchEntry(key);
   }
 
@@ -140,9 +141,9 @@ public class MatchService extends Service<MatchEntry> {
    * @param match Match to be added to.
    * @param team Team to add
    * @return true if added. False if team already in the match or was unable to be added.
-   * @throws Exception persisting to data base.
+   * @throws Exception persisting to database.
    */
-  public boolean addTeam(MatchEntry match, Team team) throws Exception {
+  public boolean addTeam(@NonNull MatchEntry match, @NonNull Team team) throws Exception {
     // Check the team is not in this match already
     if (match.getMatchHasTeamList().stream()
         .anyMatch((mht) -> (Objects.equals(mht.getTeam().getId(), team.getId())))) {
@@ -199,7 +200,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param team Team to remove.
    * @throws NonexistentEntityException if team doesn't exist in match.
    */
-  public void removeTeam(MatchEntry match, Team team) throws NonexistentEntityException {
+  public void removeTeam(@NonNull MatchEntry match, @NonNull Team team) throws NonexistentEntityException {
     MatchHasTeam mht = null;
     for (MatchHasTeam temp : match.getMatchHasTeamList()) {
       if (temp.getTeam().getId().equals(team.getId())) {
@@ -226,7 +227,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param type type to search for (as found in the data base).
    * @return Optional type.
    */
-  public Optional<MatchResultType> getResultType(String type) {
+  public Optional<MatchResultType> getResultType(@NonNull String type) {
     for (MatchResultType mrt : getResultTypes()) {
       if (mrt.getType().equals(type)) {
         return Optional.of(mrt);
@@ -250,9 +251,9 @@ public class MatchService extends Service<MatchEntry> {
    * @param mht Team to assign result to.
    * @param mrt Result type.
    * @throws NonexistentEntityException If something doesn't exist.
-   * @throws Exception persisting to data base
+   * @throws Exception persisting to database
    */
-  public void setResult(MatchHasTeam mht, MatchResultType mrt)
+  public void setResult(@NonNull MatchHasTeam mht, @NonNull MatchResultType mrt)
       throws NonexistentEntityException, Exception {
     if (mht.getMatchResult() != null) {
       // Delete the old one.
@@ -272,7 +273,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param me Match Result to lock.
    * @throws TournamentException
    */
-  public void lockMatchResult(MatchEntry me) throws TournamentException {
+  public void lockMatchResult(@NonNull MatchEntry me) throws TournamentException {
     for (MatchHasTeam mht : findMatch(me.getMatchEntryPK()).getMatchHasTeamList()) {
       if (mht != null) {
         try {
@@ -293,7 +294,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param mr Match Result to lock.
    * @throws java.lang.Exception
    */
-  public void lockMatchResult(MatchResult mr) throws Exception {
+  public void lockMatchResult(@NonNull MatchResult mr) throws Exception {
     mr.setLocked(true);
 
     // Update the record
@@ -337,7 +338,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param mr Match result to update.
    * @throws Exception If result doesn't exist.
    */
-  public void updateResult(MatchResult mr) throws Exception {
+  public void updateResult(@NonNull MatchResult mr) throws Exception {
     if (mr.getMatchResultPK() != null) {
       mrc.edit(mr);
     } else {
@@ -353,7 +354,7 @@ public class MatchService extends Service<MatchEntry> {
    * @throws TournamentException if results are already locked.
    * @throws Exception If there's an error updating the result.
    */
-  public void setRanked(MatchEntry match, boolean ranked) throws TournamentException, Exception {
+  public void setRanked(@NonNull MatchEntry match, boolean ranked) throws TournamentException, Exception {
     for (MatchHasTeam mht : match.getMatchHasTeamList()) {
       if (!mht.getMatchResult().getLocked()) {
         mht.getMatchResult().setRanked(ranked);
@@ -370,7 +371,7 @@ public class MatchService extends Service<MatchEntry> {
    * @param me Match entry to check.
    * @throws TournamentException
    */
-  public void updateRankings(final MatchEntry me) throws TournamentException {
+  public void updateRankings(@NonNull final MatchEntry me) throws TournamentException {
     updateRankings(me, new HashMap<>());
   }
 
@@ -383,9 +384,8 @@ public class MatchService extends Service<MatchEntry> {
    * @param order Map indicating the place as key and a list of team id's as value.
    * @throws TournamentException
    */
-  public void updateRankings(final MatchEntry me, Map<Integer, List<Integer>> order)
+  public void updateRankings(@NonNull final MatchEntry me, @NonNull Map<Integer, List<Integer>> order)
       throws TournamentException {
-    TrueSkillRankingProvider p = (TrueSkillRankingProvider) rp;
     // First make sure that everyone has a result
     MatchEntry match = findMatch(me.getMatchEntryPK());
     for (MatchHasTeam mht : match.getMatchHasTeamList()) {
@@ -415,7 +415,7 @@ public class MatchService extends Service<MatchEntry> {
     // Convert into the JSkill interface for calculations
     for (MatchHasTeam mht : match.getMatchHasTeamList()) {
       try {
-        p.addTeam(TeamService.getInstance().convertToTeam(mht.getTeam(), me.getFormat()));
+        rp.addTeam(TeamService.getInstance().convertToTeam(mht.getTeam(), me.getFormat()));
       } catch (Exception ex) {
         throw new TournamentException(ex);
       }
@@ -443,9 +443,9 @@ public class MatchService extends Service<MatchEntry> {
 
     // Make the calculations
     Map<IPlayer, Rating> ratings =
-        p.getCalculator()
+        rp.getCalculator()
             .calculateNewRatings(
-                p.getGameInfo(), de.gesundkrank.jskills.Team.concat(teams), resultOrder);
+                rp.getGameInfo(), de.gesundkrank.jskills.Team.concat(teams), resultOrder);
 
     // Now persist to database
     for (Entry<IPlayer, Rating> entry : ratings.entrySet()) {
@@ -485,7 +485,7 @@ public class MatchService extends Service<MatchEntry> {
             thfr.setFormat(me.getFormat());
             thfr.setTeam(team);
             // If it'll go below zero ignore it.
-            thfr.setPoints(totalPoints > 0 ? totalPoints : 0);
+            thfr.setPoints(Math.max(totalPoints, 0));
             thfrc.create(thfr);
             team.getTeamHasFormatRecordList().add(thfr);
           }
