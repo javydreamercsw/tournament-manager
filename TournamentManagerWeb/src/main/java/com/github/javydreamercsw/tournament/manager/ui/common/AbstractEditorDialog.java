@@ -15,10 +15,6 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.common;
 
-import java.io.Serializable;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -27,60 +23,55 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
+import java.io.Serializable;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Abstract base class for dialogs adding, editing or deleting items.
  *
- * Subclasses are expected to
+ * <p>Subclasses are expected to
+ *
  * <ul>
- * <li>add, during construction, the needed UI components to
- * {@link #getFormLayout()} and bind them using {@link #getBinder()}, as well
- * as</li>
- * <li>override {@link #confirmDelete()} to open the confirmation dialog with
- * the desired message (by calling
- * {@link #openConfirmationDialog(String, String, String)}.</li>
+ *   <li>add, during construction, the needed UI components to {@link #getFormLayout()} and bind
+ *       them using {@link #getBinder()}, as well as
+ *   <li>override {@link #confirmDelete()} to open the confirmation dialog with the desired message
+ *       (by calling {@link #openConfirmationDialog(String, String, String)}.
  * </ul>
  *
  * @param <T> the type of the item to be added, edited or deleted
  */
-public abstract class AbstractEditorDialog<T extends Serializable>
-        extends Dialog
-{
+public abstract class AbstractEditorDialog<T extends Serializable> extends Dialog {
   private static final long serialVersionUID = -6916639397630884016L;
   private Operation currentOperation;
 
   /**
-   * The operations supported by this dialog. Delete is enabled when editing an
-   * already existing item.
+   * The operations supported by this dialog. Delete is enabled when editing an already existing
+   * item.
    */
-  public enum Operation
-  {
-    ADD("New", "add", false), EDIT("Edit", "edit", true);
+  public enum Operation {
+    ADD("New", "add", false),
+    EDIT("Edit", "edit", true);
 
     private final String nameInTitle;
     private final String nameInText;
     private final boolean deleteEnabled;
 
-    Operation(String nameInTitle, String nameInText,
-            boolean deleteEnabled)
-    {
+    Operation(String nameInTitle, String nameInText, boolean deleteEnabled) {
       this.nameInTitle = nameInTitle;
       this.nameInText = nameInText;
       this.deleteEnabled = deleteEnabled;
     }
 
-    public String getNameInTitle()
-    {
+    public String getNameInTitle() {
       return nameInTitle;
     }
 
-    public String getNameInText()
-    {
+    public String getNameInText() {
       return nameInText;
     }
 
-    public boolean isDeleteEnabled()
-    {
+    public boolean isDeleteEnabled() {
       return deleteEnabled;
     }
   }
@@ -92,8 +83,8 @@ public abstract class AbstractEditorDialog<T extends Serializable>
   private Registration registrationForSave;
 
   private final FormLayout formLayout = new FormLayout();
-  private final HorizontalLayout buttonBar = new HorizontalLayout(saveButton,
-          cancelButton, deleteButton);
+  private final HorizontalLayout buttonBar =
+      new HorizontalLayout(saveButton, cancelButton, deleteButton);
 
   private Binder<T> binder = new Binder<>();
   private T currentItem;
@@ -111,9 +102,8 @@ public abstract class AbstractEditorDialog<T extends Serializable>
    * @param itemSaver Callback to save the edited item
    * @param itemDeleter Callback to delete the edited item
    */
-  protected AbstractEditorDialog(String itemType,
-          BiConsumer<T, Operation> itemSaver, Consumer<T> itemDeleter)
-  {
+  protected AbstractEditorDialog(
+      String itemType, BiConsumer<T, Operation> itemSaver, Consumer<T> itemDeleter) {
     this.itemType = itemType;
     this.itemSaver = itemSaver;
     this.itemDeleter = itemDeleter;
@@ -125,27 +115,23 @@ public abstract class AbstractEditorDialog<T extends Serializable>
     setCloseOnOutsideClick(false);
   }
 
-  private void initTitle()
-  {
+  private void initTitle() {
     add(titleField);
   }
 
-  private void initFormLayout()
-  {
-    formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1),
-            new FormLayout.ResponsiveStep("25em", 2));
+  private void initFormLayout() {
+    formLayout.setResponsiveSteps(
+        new FormLayout.ResponsiveStep("0", 1), new FormLayout.ResponsiveStep("25em", 2));
     Div div = new Div(formLayout);
     div.addClassName("has-padding");
     add(div);
   }
 
-  private void initButtonBar()
-  {
+  private void initButtonBar() {
     saveButton.setAutofocus(true);
     saveButton.getElement().setAttribute("theme", "primary");
     cancelButton.addClickListener(e -> close());
-    if (itemDeleter != null)
-    {
+    if (itemDeleter != null) {
       deleteButton.addClickListener(e -> deleteClicked());
       deleteButton.getElement().setAttribute("theme", "error");
     }
@@ -155,13 +141,12 @@ public abstract class AbstractEditorDialog<T extends Serializable>
   }
 
   /**
-   * Gets the form layout, where additional components can be added for
-   * displaying or editing the item's properties.
+   * Gets the form layout, where additional components can be added for displaying or editing the
+   * item's properties.
    *
    * @return the form layout
    */
-  protected final FormLayout getFormLayout()
-  {
+  protected final FormLayout getFormLayout() {
     return formLayout;
   }
 
@@ -170,8 +155,7 @@ public abstract class AbstractEditorDialog<T extends Serializable>
    *
    * @return the binder
    */
-  protected final Binder<T> getBinder()
-  {
+  protected final Binder<T> getBinder() {
     return binder;
   }
 
@@ -180,54 +164,43 @@ public abstract class AbstractEditorDialog<T extends Serializable>
    *
    * @return the item currently being edited
    */
-  protected final T getCurrentItem()
-  {
+  protected final T getCurrentItem() {
     return currentItem;
   }
 
   /**
    * Opens the given item for editing in the dialog.
    *
-   * @param item The item to edit; it may be an existing or a newly created
-   * instance
+   * @param item The item to edit; it may be an existing or a newly created instance
    * @param operation The operation being performed on the item
    */
-  public final void open(T item, Operation operation)
-  {
+  public final void open(T item, Operation operation) {
     currentOperation = operation;
     currentItem = item;
     titleField.setText(operation.getNameInTitle() + " " + itemType);
-    if (registrationForSave != null)
-    {
+    if (registrationForSave != null) {
       registrationForSave.remove();
     }
-    registrationForSave = saveButton
-            .addClickListener(e -> saveClicked(operation));
+    registrationForSave = saveButton.addClickListener(e -> saveClicked(operation));
     binder.readBean(currentItem);
 
     deleteButton.setEnabled(operation.isDeleteEnabled());
     open();
   }
 
-  private void saveClicked(Operation operation)
-  {
+  private void saveClicked(Operation operation) {
     boolean isValid = binder.writeBeanIfValid(currentItem);
 
-    if (isValid)
-    {
+    if (isValid) {
       itemSaver.accept(currentItem, operation);
       close();
-    }
-    else
-    {
+    } else {
       binder.validate();
     }
   }
 
-  private void deleteClicked()
-  {
-    if (confirmationDialog.getElement().getParent() == null)
-    {
+  private void deleteClicked() {
+    if (confirmationDialog.getElement().getParent() == null) {
       getUI().ifPresent(ui -> ui.add(confirmationDialog));
     }
     confirmDelete();
@@ -238,19 +211,25 @@ public abstract class AbstractEditorDialog<T extends Serializable>
   /**
    * Opens the confirmation dialog before deleting the current item.
    *
-   * The dialog will display the given title and message(s), then call
-   * {@link #deleteConfirmed(Serializable)} if the Delete button is clicked.
+   * <p>The dialog will display the given title and message(s), then call {@link
+   * #deleteConfirmed(Serializable)} if the Delete button is clicked.
    *
    * @param title The title text
    * @param message Detail message (optional, may be empty)
    * @param additionalMessage Additional message (optional, may be empty)
    */
-  protected final void openConfirmationDialog(String title, String message,
-          String additionalMessage)
-  {
+  protected final void openConfirmationDialog(
+      String title, String message, String additionalMessage) {
     close();
-    confirmationDialog.open(title, message, additionalMessage, "Delete",
-            true, getCurrentItem(), this::deleteConfirmed, this::open);
+    confirmationDialog.open(
+        title,
+        message,
+        additionalMessage,
+        "Delete",
+        true,
+        getCurrentItem(),
+        this::deleteConfirmed,
+        this::open);
   }
 
   /**
@@ -258,60 +237,49 @@ public abstract class AbstractEditorDialog<T extends Serializable>
    *
    * @param item the item to delete
    */
-  protected void doDelete(T item)
-  {
-    if (itemDeleter != null)
-    {
+  protected void doDelete(T item) {
+    if (itemDeleter != null) {
       itemDeleter.accept(item);
       close();
     }
   }
 
-  private void deleteConfirmed(T item)
-  {
+  private void deleteConfirmed(T item) {
     doDelete(item);
   }
 
   /**
    * @return the saveButton
    */
-  protected Button getSaveButton()
-  {
+  protected Button getSaveButton() {
     return saveButton;
   }
 
   /**
    * @return the cancelButton
    */
-  protected Button getCancelButton()
-  {
+  protected Button getCancelButton() {
     return cancelButton;
   }
 
   /**
    * @return the deleteButton
    */
-  protected Button getDeleteButton()
-  {
+  protected Button getDeleteButton() {
     return deleteButton;
   }
 
   /**
    * Check that the form is valid to enable save/delete/
    *
-   * @return true if dialog is valid and save and/or delete buttons should be
-   * enabled.
+   * @return true if dialog is valid and save and/or delete buttons should be enabled.
    */
-  protected boolean isValid()
-  {
+  protected boolean isValid() {
     return true;
   }
 
-  /**
-   * Validate the form. Update buttons accordingly.
-   */
-  protected void validate()
-  {
+  /** Validate the form. Update buttons accordingly. */
+  protected void validate() {
     getSaveButton().setEnabled(isValid());
     getDeleteButton().setEnabled(isValid() && currentOperation.isDeleteEnabled());
   }
@@ -319,8 +287,7 @@ public abstract class AbstractEditorDialog<T extends Serializable>
   /**
    * @return the currentOperation
    */
-  protected Operation getCurrentOperation()
-  {
+  protected Operation getCurrentOperation() {
     return currentOperation;
   }
 }

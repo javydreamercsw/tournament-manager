@@ -1,15 +1,12 @@
 package com.github.javydreamercsw.tournament.manager.api;
 
+import com.github.javydreamercsw.tournament.manager.api.standing.RecordInterface;
 import de.gesundkrank.jskills.IPlayer;
 
-import com.github.javydreamercsw.tournament.manager.api.standing.RecordInterface;
-
 /**
- *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public interface TournamentPlayerInterface extends IPlayer
-{
+public interface TournamentPlayerInterface extends IPlayer {
 
   /**
    * Get the value for the specified key.
@@ -56,8 +53,7 @@ public interface TournamentPlayerInterface extends IPlayer
    * @param draws amount of draws
    * @return instance
    */
-  TournamentPlayerInterface createInstance(String name, int wins,
-          int loses, int draws);
+  TournamentPlayerInterface createInstance(String name, int wins, int loses, int draws);
 
   /**
    * Create an instance of this player interface.
@@ -69,8 +65,7 @@ public interface TournamentPlayerInterface extends IPlayer
    * @param draws amount of draws
    * @return instance
    */
-  TournamentPlayerInterface createInstance(String name, int id, int wins,
-          int loses, int draws);
+  TournamentPlayerInterface createInstance(String name, int id, int wins, int loses, int draws);
 
   /**
    * Create an instance of this player interface with a clean record

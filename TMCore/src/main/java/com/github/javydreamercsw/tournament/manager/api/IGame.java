@@ -5,8 +5,7 @@ package com.github.javydreamercsw.tournament.manager.api;
 
 import java.util.List;
 
-public interface IGame
-{
+public interface IGame {
   /**
    * Get game's name.
    *

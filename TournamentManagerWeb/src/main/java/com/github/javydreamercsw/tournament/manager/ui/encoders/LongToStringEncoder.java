@@ -15,33 +15,28 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.encoders;
 
-import com.vaadin.flow.templatemodel.ModelEncoder;
+import com.vaadin.flow.data.binder.Result;
+import com.vaadin.flow.data.binder.ValueContext;
+import com.vaadin.flow.data.converter.Converter;
+import java.io.Serial;
 
 /**
  * @author Vaadin Ltd
- *
  */
-public class LongToStringEncoder implements ModelEncoder<Long, String>
-{
-  private static final long serialVersionUID = 3626734330492819271L;
+public class LongToStringEncoder implements Converter<String, Long> {
+  @Serial private static final long serialVersionUID = 3626734330492819271L;
 
-  @Override
-  public String encode(Long modelValue)
-  {
-    if (modelValue == null)
-    {
+  public String convertToPresentation(Long modelValue, ValueContext context) {
+    if (modelValue == null) {
       return null;
     }
     return modelValue.toString();
   }
 
-  @Override
-  public Long decode(String presentationValue)
-  {
-    if (presentationValue == null)
-    {
-      return null;
+  public Result<Long> convertToModel(String presentationValue, ValueContext context) {
+    if (presentationValue == null) {
+      return Result.ok(null);
     }
-    return Long.parseLong(presentationValue);
+    return Result.ok(Long.parseLong(presentationValue));
   }
 }

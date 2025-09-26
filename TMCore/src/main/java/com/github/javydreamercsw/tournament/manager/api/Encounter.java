@@ -12,13 +12,10 @@ import java.util.logging.Logger;
  *
  * @author Javier A. Ortiz Bultron <javier.ortiz.78@gmail.com>
  */
-public class Encounter
-{
-  private final Map<TeamInterface, EncounterResult> results
-          = new HashMap<>();
+public class Encounter {
+  private final Map<TeamInterface, EncounterResult> results = new HashMap<>();
   private final int id;
-  private static final Logger LOG
-          = Logger.getLogger(Encounter.class.getName());
+  private static final Logger LOG = Logger.getLogger(Encounter.class.getName());
   private int format;
 
   /**
@@ -30,41 +27,31 @@ public class Encounter
    * @param team2 team 2
    * @param t additional teams (optional)
    */
-  public Encounter(int id, int format, TeamInterface team1, TeamInterface team2,
-          TeamInterface... t)
-  {
+  public Encounter(
+      int id, int format, TeamInterface team1, TeamInterface team2, TeamInterface... t) {
     results.put(team1, EncounterResult.UNDECIDED);
     results.put(team2, EncounterResult.UNDECIDED);
-    for (TeamInterface team : t)
-    {
+    for (TeamInterface team : t) {
       results.put(team, EncounterResult.UNDECIDED);
     }
     this.id = id;
     this.format = format;
   }
 
-  public void updateResult(TeamInterface team,
-          EncounterResult result) throws TournamentException
-  {
+  public void updateResult(TeamInterface team, EncounterResult result) throws TournamentException {
     TeamInterface target = null;
-    for (Entry<TeamInterface, EncounterResult> entry : getEncounterSummary().entrySet())
-    {
-      if (entry.getKey().getTeamMembers().contains(team.getTeamMembers().get(0)))
-      {
+    for (Entry<TeamInterface, EncounterResult> entry : getEncounterSummary().entrySet()) {
+      if (entry.getKey().getTeamMembers().contains(team.getTeamMembers().get(0))) {
         target = entry.getKey();
       }
     }
-    if (target != null)
-    {
-      LOG.log(Level.FINE, "Updating result for player: {0} to: {1}",
-              new Object[]
-              {
-                team.getName(), result
-              });
-      for (TournamentPlayerInterface p : target.getTeamMembers())
-      {
-        switch (result)
-        {
+    if (target != null) {
+      LOG.log(
+          Level.FINE,
+          "Updating result for player: {0} to: {1}",
+          new Object[] {team.getName(), result});
+      for (TournamentPlayerInterface p : target.getTeamMembers()) {
+        switch (result) {
           case WIN:
             p.getRecord().win();
             break;
@@ -73,41 +60,34 @@ public class Encounter
             break;
           case NO_SHOW:
           case FORFEIT:
-          //Fall thru
+          // Fall thru
           case LOSS:
             p.getRecord().loss();
             break;
           case UNDECIDED:
-            throw new TournamentException(MessageFormat
-                    .format("Unexpected result: {0}", result));
+            throw new TournamentException(MessageFormat.format("Unexpected result: {0}", result));
           default:
-            throw new TournamentException(MessageFormat
-                    .format("Invalid result: {0}", result));
+            throw new TournamentException(MessageFormat.format("Invalid result: {0}", result));
         }
       }
-    }
-    else
-    {
-      throw new TournamentException(MessageFormat
-              .format("TournamentPlayerInterface not part of this encounter: {0}",
-                      team.getName()));
+    } else {
+      throw new TournamentException(
+          MessageFormat.format(
+              "TournamentPlayerInterface not part of this encounter: {0}", team.getName()));
     }
   }
 
   /**
    * @return the teams
    */
-  public Map<TeamInterface, EncounterResult> getEncounterSummary()
-  {
+  public Map<TeamInterface, EncounterResult> getEncounterSummary() {
     return results;
   }
 
   @Override
-  public boolean equals(Object obj)
-  {
+  public boolean equals(Object obj) {
     boolean result = false;
-    if (obj instanceof Encounter)
-    {
+    if (obj instanceof Encounter) {
       Encounter encounter = (Encounter) obj;
       result = encounter.getId() == getId();
     }
@@ -115,8 +95,7 @@ public class Encounter
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     int hash = 7;
     hash = 19 * hash + (this.results != null ? this.results.hashCode() : 0);
     hash = 19 * hash + this.id;
@@ -126,28 +105,26 @@ public class Encounter
   /**
    * @return the id
    */
-  public int getId()
-  {
+  public int getId() {
     return id;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
-    results.keySet().forEach((t) ->
-    {
-      if (!sb.toString().isEmpty())
-      {
-        sb.append(" vs. ");
-      }
-      sb.append(t.toString());
-    });
+    results
+        .keySet()
+        .forEach(
+            (t) -> {
+              if (!sb.toString().isEmpty()) {
+                sb.append(" vs. ");
+              }
+              sb.append(t.toString());
+            });
     return MessageFormat.format("Encounter {0} ({1})", id, sb.toString());
   }
 
-  public int getFormat()
-  {
+  public int getFormat() {
     return format;
   }
 }

@@ -17,15 +17,13 @@
     <class>com.github.javydreamercsw.database.storage.db.TournamentFormat</class>
     <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:~/TournamentManager/data/tournament-manager;AUTO_SERVER=TRUE"/>
-      <property name="javax.persistence.jdbc.password" value=""/>
-      <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-      <property name="javax.persistence.jdbc.user" value="tm_user"/>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.user" value="tm_user"/>
       <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
       <property name="eclipselink.logging.logger" value="org.eclipse.persistence.logging.DefaultSessionLog"/>
       <property name="eclipselink.logging.level" value="SEVERE"/>
       <property name="eclipselink.jdbc.sequence-connection-pool" value="true"/>
-      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+      <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="TestTMPU" transaction-type="RESOURCE_LOCAL">
@@ -45,15 +43,15 @@
     <class>com.github.javydreamercsw.database.storage.db.TournamentFormat</class>
     <class>com.github.javydreamercsw.database.storage.db.TournamentHasTeam</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:./target/data/test/tournament-manager;AUTO_SERVER=TRUE"/>
-      <property name="javax.persistence.jdbc.password" value=""/>
-      <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-      <property name="javax.persistence.jdbc.user" value="tm_user"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:file:./target/data/test/tournament-manager;AUTO_SERVER=TRUE"/>
+      <property name="jakarta.persistence.jdbc.password" value=""/>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.user" value="tm_user"/>
       <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
       <property name="eclipselink.logging.logger" value="org.eclipse.persistence.logging.DefaultSessionLog"/>
       <property name="eclipselink.logging.level" value="SEVERE"/>
       <property name="eclipselink.jdbc.sequence-connection-pool" value="true"/>
-      <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+      <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="TMPUJNDI" transaction-type="JTA">

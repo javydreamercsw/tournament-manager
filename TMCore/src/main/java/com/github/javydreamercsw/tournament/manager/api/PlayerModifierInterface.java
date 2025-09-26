@@ -7,5 +7,5 @@ package com.github.javydreamercsw.tournament.manager.api;
  */
 public interface PlayerModifierInterface {
 
-    public void modify();
+  void modify();
 }

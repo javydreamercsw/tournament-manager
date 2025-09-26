@@ -1,11 +1,5 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.openide.util.Exceptions;
-
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.Record;
 import com.github.javydreamercsw.database.storage.db.Team;
@@ -13,33 +7,28 @@ import com.github.javydreamercsw.database.storage.db.controller.PlayerJpaControl
 import com.github.javydreamercsw.database.storage.db.controller.RecordJpaController;
 import com.github.javydreamercsw.database.storage.db.controller.exceptions.NonexistentEntityException;
 import com.github.javydreamercsw.tournament.manager.UIPlayer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.openide.util.Exceptions;
 
-/**
- * Simple backend service to store and retrieve {@link UIPlayer} instances.
- */
-public class PlayerService extends Service<Player>
-{
-  private final PlayerJpaController pc
-          = new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
+/** Simple backend service to store and retrieve {@link UIPlayer} instances. */
+public class PlayerService extends Service<Player> {
+  private final PlayerJpaController pc =
+      new PlayerJpaController(DataBaseManager.getEntityManagerFactory());
 
   /**
-   * Helper class to initialize the singleton Service in a thread-safe way and
-   * to keep the initialization ordering clear between the two services. See
-   * also: https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
+   * Helper class to initialize the singleton Service in a thread-safe way and to keep the
+   * initialization ordering clear between the two services. See also:
+   * https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
    */
-  private static class SingletonHolder
-  {
+  private static class SingletonHolder {
     static final PlayerService INSTANCE = createPlayerService();
 
-    /**
-     * This class is not meant to be instantiated.
-     */
-    private SingletonHolder()
-    {
-    }
+    /** This class is not meant to be instantiated. */
+    private SingletonHolder() {}
 
-    private static PlayerService createPlayerService()
-    {
+    private static PlayerService createPlayerService() {
       PlayerService service = new PlayerService();
 
       return service;
@@ -51,37 +40,32 @@ public class PlayerService extends Service<Player>
    *
    * @return the unique instance of this Singleton
    */
-  public static PlayerService getInstance()
-  {
+  public static PlayerService getInstance() {
     return SingletonHolder.INSTANCE;
   }
 
   /**
    * Fetches the players whose name matches the given filter text.
    *
-   * The matching is case insensitive. When passed an empty filter text, the
-   * method returns all players. The returned list is ordered by name.
+   * <p>The matching is case insensitive. When passed an empty filter text, the method returns all
+   * players. The returned list is ordered by name.
    *
    * @param filter the filter text
    * @return the list of matching players
    */
-  public List<Player> findPlayers(String filter)
-  {
+  public List<Player> findPlayers(String filter) {
     List<Player> results = new ArrayList<>();
-    if (filter == null || filter.trim().isEmpty())
-    {
+    if (filter == null || filter.trim().isEmpty()) {
       results.addAll(pc.findPlayerEntities());
-    }
-    else
-    {
+    } else {
       String normalizedFilter = filter.toLowerCase();
-      pc.findPlayerEntities().forEach(player ->
-      {
-        if (player.getName().toLowerCase().contains(normalizedFilter))
-        {
-          results.add(player);
-        }
-      });
+      pc.findPlayerEntities()
+          .forEach(
+              player -> {
+                if (player.getName().toLowerCase().contains(normalizedFilter)) {
+                  results.add(player);
+                }
+              });
     }
     return results;
   }
@@ -89,23 +73,19 @@ public class PlayerService extends Service<Player>
   /**
    * Searches for the exact category whose name matches the given filter text.
    *
-   * The matching is case insensitive.
+   * <p>The matching is case insensitive.
    *
    * @param name the filter text
-   * @return an {@link Optional} containing the category if found, or
-   * {@link Optional#empty()}
+   * @return an {@link Optional} containing the category if found, or {@link Optional#empty()}
    * @throws IllegalStateException if the result is ambiguous
    */
-  public Optional<Player> findPlayerByName(String name)
-  {
+  public Optional<Player> findPlayerByName(String name) {
     List<Player> playersMatching = findPlayers(name);
 
-    if (playersMatching.isEmpty())
-    {
+    if (playersMatching.isEmpty()) {
       return Optional.empty();
     }
-    if (playersMatching.size() > 1)
-    {
+    if (playersMatching.size() > 1) {
       return Optional.empty();
     }
     return Optional.of(playersMatching.get(0));
@@ -114,31 +94,25 @@ public class PlayerService extends Service<Player>
   /**
    * Fetches the exact place whose name matches the given filter text.
    *
-   * Behaves like {@link #findPlayerByName(String)}, except that returns a
-   * {@link UIPlayer} instead of an {@link Optional}. If the category can't be
-   * identified, an exception is thrown.
+   * <p>Behaves like {@link #findPlayerByName(String)}, except that returns a {@link UIPlayer}
+   * instead of an {@link Optional}. If the category can't be identified, an exception is thrown.
    *
    * @param name the filter text
    * @return the category, if found
-   * @throws IllegalStateException if not exactly one category matches the given
-   * name
+   * @throws IllegalStateException if not exactly one category matches the given name
    */
-  public Player findNameOrThrow(String name) throws IllegalStateException
-  {
+  public Player findNameOrThrow(String name) throws IllegalStateException {
     return findPlayerByName(name)
-            .orElseThrow(() -> new IllegalStateException("Player " + name
-            + " does not exist"));
+        .orElseThrow(() -> new IllegalStateException("Player " + name + " does not exist"));
   }
 
   /**
    * Searches for the exact UIPlayer with the given id.
    *
    * @param id the category id
-   * @return an {@link Optional} containing the category if found, or
-   * {@link Optional#empty()}
+   * @return an {@link Optional} containing the category if found, or {@link Optional#empty()}
    */
-  public Optional<Player> findPlayerById(Integer id)
-  {
+  public Optional<Player> findPlayerById(Integer id) {
     return Optional.ofNullable(pc.findPlayer(id));
   }
 
@@ -147,57 +121,45 @@ public class PlayerService extends Service<Player>
    *
    * @param player the player to delete
    */
-  public void deletePlayer(Player player)
-  {
-    try
-    {
-      RecordJpaController rc
-              = new RecordJpaController(DataBaseManager.getEntityManagerFactory());
-      player.getTeamList().forEach((team) ->
-      {
-        TeamService.getInstance().deleteTeam(team);
-      });
-      for (Record r : player.getRecordList())
-      {
+  public void deletePlayer(Player player) {
+    try {
+      RecordJpaController rc = new RecordJpaController(DataBaseManager.getEntityManagerFactory());
+      player
+          .getTeamList()
+          .forEach(
+              (team) -> {
+                TeamService.getInstance().deleteTeam(team);
+              });
+      for (Record r : player.getRecordList()) {
         rc.destroy(r.getRecordPK());
       }
       pc.destroy(player.getId());
-    }
-    catch (NonexistentEntityException ex)
-    {
+    } catch (NonexistentEntityException ex) {
       Exceptions.printStackTrace(ex);
     }
   }
 
   /**
-   * Persists the given player into the player store.If the category is already
-   * persistent, the saved category will get updated with the name of the given
-   * category object.
+   * Persists the given player into the player store.If the category is already persistent, the
+   * saved category will get updated with the name of the given category object.
    *
-   * If the category is new (i.e. its id is null), it will get a new unique id
-   * before being saved.
+   * <p>If the category is new (i.e. its id is null), it will get a new unique id before being
+   * saved.
    *
    * @param player the category to save
    * @throws java.lang.Exception
    */
-  public void savePlayer(Player player) throws Exception
-  {
-    if (player.getId() != null && pc.findPlayer(player.getId()) != null)
-    {
-      try
-      {
+  public void savePlayer(Player player) throws Exception {
+    if (player.getId() != null && pc.findPlayer(player.getId()) != null) {
+      try {
         pc.edit(player);
-      }
-      catch (Exception ex)
-      {
+      } catch (Exception ex) {
         Exceptions.printStackTrace(ex);
       }
-    }
-    else
-    {
+    } else {
       pc.create(player);
 
-      //Create the single player's team
+      // Create the single player's team
       Team alone = new Team();
       alone.setName(player.getName());
       alone.getPlayerList().add(player);
@@ -206,18 +168,17 @@ public class PlayerService extends Service<Player>
   }
 
   @Override
-  public List<Player> getAll()
-  {
+  public List<Player> getAll() {
     return pc.findPlayerEntities();
   }
 
   /**
    * Convert a player to a UIPlayer.
+   *
    * @param p Player to transform
    * @return transformed player.
    */
-  public UIPlayer convertToUIPlayer(Player p)
-  {
+  public UIPlayer convertToUIPlayer(Player p) {
     return new UIPlayer(p.getName(), p.getId());
   }
 }

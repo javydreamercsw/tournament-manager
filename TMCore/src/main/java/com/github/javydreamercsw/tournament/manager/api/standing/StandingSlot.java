@@ -9,11 +9,11 @@ import com.github.javydreamercsw.tournament.manager.api.TeamInterface;
  */
 public class StandingSlot {
 
-    int points;
-    TeamInterface team;
+  int points;
+  TeamInterface team;
 
-    public StandingSlot(int points, TeamInterface team) {
-        this.points = points;
-        this.team = team;
-    }
+  public StandingSlot(int points, TeamInterface team) {
+    this.points = points;
+    this.team = team;
+  }
 }

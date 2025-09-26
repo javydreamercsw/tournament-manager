@@ -15,61 +15,49 @@
  */
 package com.github.javydreamercsw.tournament.manager.ui.views.playerlist;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import com.github.javydreamercsw.database.storage.db.Player;
 import com.github.javydreamercsw.database.storage.db.server.PlayerService;
 import com.github.javydreamercsw.tournament.manager.ui.common.AbstractEditorDialog;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.validator.StringLengthValidator;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-/**
- * A dialog for editing {@link Format} objects.
- */
-public class PlayerEditorDialog extends AbstractEditorDialog<Player>
-{
+/** A dialog for editing {@link Format} objects. */
+public class PlayerEditorDialog extends AbstractEditorDialog<Player> {
   private static final long serialVersionUID = 4724212789545035906L;
 
   private final TextField formatNameField = new TextField("Name");
 
-  public PlayerEditorDialog(BiConsumer<Player, Operation> itemSaver,
-          Consumer<Player> itemDeleter)
-  {
+  public PlayerEditorDialog(BiConsumer<Player, Operation> itemSaver, Consumer<Player> itemDeleter) {
     super("player", itemSaver, itemDeleter);
 
     addNameField();
   }
 
-  private void addNameField()
-  {
+  private void addNameField() {
     getFormLayout().add(formatNameField);
 
-    getBinder().forField(formatNameField)
-            .withConverter(String::trim, String::trim)
-            .withValidator(new StringLengthValidator(
-                    "Player name must contain at least 3 printable characters",
-                    3, null))
-            .withValidator(name -> PlayerService.getInstance()
-            .findPlayers(name).isEmpty(),
-                    "Player name must be unique")
-            .bind(Player::getName, Player::setName);
+    getBinder()
+        .forField(formatNameField)
+        .withConverter(String::trim, String::trim)
+        .withValidator(
+            new StringLengthValidator(
+                "Player name must contain at least 3 printable characters", 3, null))
+        .withValidator(
+            name -> PlayerService.getInstance().findPlayers(name).isEmpty(),
+            "Player name must be unique")
+        .bind(Player::getName, Player::setName);
   }
 
   @Override
-  protected void confirmDelete()
-  {
-    if (getCurrentItem().getRecordList().size() > 0
-            || getCurrentItem().getTeamList().size() > 0)
-    {
-      openConfirmationDialog("Delete player",
-              "Are you sure you want to delete the “"
-              + getCurrentItem().getName()
-              + "” player?",
-              "You will lose all it's data.");
-    }
-    else
-    {
+  protected void confirmDelete() {
+    if (getCurrentItem().getRecordList().size() > 0 || getCurrentItem().getTeamList().size() > 0) {
+      openConfirmationDialog(
+          "Delete player",
+          "Are you sure you want to delete the “" + getCurrentItem().getName() + "” player?",
+          "You will lose all it's data.");
+    } else {
       doDelete(getCurrentItem());
     }
   }

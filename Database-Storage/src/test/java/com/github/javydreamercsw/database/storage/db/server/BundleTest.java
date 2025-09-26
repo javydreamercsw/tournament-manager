@@ -4,24 +4,18 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
 import java.util.MissingResourceException;
-
 import org.openide.util.NbBundle;
 import org.testng.annotations.Test;
 
-public class BundleTest
-{
+public class BundleTest {
   @Test
-  public void testBundle()
-  {
+  public void testBundle() {
     assertNotNull(NbBundle.getMessage(DataBaseManager.class, "message.db.locked"));
 
-    try
-    {
+    try {
       NbBundle.getMessage(DataBaseManager.class, "dummy");
       fail("Expected MissingResourceException!");
-    }
-    catch (MissingResourceException ex)
-    {
+    } catch (MissingResourceException ex) {
       // Expected
     }
   }

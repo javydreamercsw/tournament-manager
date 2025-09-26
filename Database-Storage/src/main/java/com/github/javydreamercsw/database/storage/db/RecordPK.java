@@ -1,66 +1,59 @@
 package com.github.javydreamercsw.database.storage.db;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.TableGenerator;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.TableGenerator;
-import javax.validation.constraints.NotNull;
-
 @Embeddable
-public class RecordPK implements Serializable
-{
+public class RecordPK implements Serializable {
   private static final long serialVersionUID = 2778418123591111690L;
+
   @Basic(optional = false)
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "RecordGen")
-  @TableGenerator(name = "RecordGen", table = "tm_id",
-          pkColumnName = "table_name",
-          valueColumnName = "last_id",
-          pkColumnValue = "record",
-          allocationSize = 1,
-          initialValue = 1)
+  @TableGenerator(
+      name = "RecordGen",
+      table = "tm_id",
+      pkColumnName = "table_name",
+      valueColumnName = "last_id",
+      pkColumnValue = "record",
+      allocationSize = 1,
+      initialValue = 1)
   @Column(name = "id")
   private int id;
+
   @Basic(optional = false)
-  @NotNull
-  @Column(name = "game_id")
+  @NotNull @Column(name = "game_id")
   private int gameId;
 
-  public RecordPK()
-  {
-  }
+  public RecordPK() {}
 
-  public RecordPK(int gameId)
-  {
+  public RecordPK(int gameId) {
     this.gameId = gameId;
   }
 
-  public int getId()
-  {
+  public int getId() {
     return id;
   }
 
-  public void setId(int id)
-  {
+  public void setId(int id) {
     this.id = id;
   }
 
-  public int getGameId()
-  {
+  public int getGameId() {
     return gameId;
   }
 
-  public void setGameId(int gameId)
-  {
+  public void setGameId(int gameId) {
     this.gameId = gameId;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     int hash = 0;
     hash += (int) id;
     hash += (int) gameId;
@@ -68,25 +61,24 @@ public class RecordPK implements Serializable
   }
 
   @Override
-  public boolean equals(Object object)
-  {
+  public boolean equals(Object object) {
     // TODO: Warning - this method won't work in the case the id fields are not set
-    if (!(object instanceof RecordPK))
-    {
+    if (!(object instanceof RecordPK)) {
       return false;
     }
     RecordPK other = (RecordPK) object;
-    if (this.id != other.id)
-    {
+    if (this.id != other.id) {
       return false;
     }
     return this.gameId == other.gameId;
   }
 
   @Override
-  public String toString()
-  {
-    return "com.github.javydreamercsw.database.storage.db.RecordPK[ id=" + id 
-            + ", gameId=" + gameId + " ]";
+  public String toString() {
+    return "com.github.javydreamercsw.database.storage.db.RecordPK[ id="
+        + id
+        + ", gameId="
+        + gameId
+        + " ]";
   }
 }

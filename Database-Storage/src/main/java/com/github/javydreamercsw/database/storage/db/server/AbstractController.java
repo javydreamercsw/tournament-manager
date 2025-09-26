@@ -1,23 +1,17 @@
 package com.github.javydreamercsw.database.storage.db.server;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
-/**
- * This avoids synchronization issues where each service had their own
- * EntityManager.
- */
-public class AbstractController
-{
+/** This avoids synchronization issues where each service had their own EntityManager. */
+public class AbstractController {
   private EntityManagerFactory emf = null;
 
-  public AbstractController(EntityManagerFactory emf)
-  {
+  public AbstractController(EntityManagerFactory emf) {
     this.emf = emf;
   }
 
-  public final EntityManager getEntityManager()
-  {
+  public final EntityManager getEntityManager() {
     return emf.createEntityManager();
   }
 }
